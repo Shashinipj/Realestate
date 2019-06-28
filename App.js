@@ -6,28 +6,64 @@
  * @flow
  */
 
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import React, { Component } from 'react';
+import { Platform, StyleSheet, Text, View, Button } from 'react-native';
 // import AppNavigator from "./app/route/route"
 import AppContainer from './app/route/route'
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+import firebase from 'firebase'
 
-type Props = {};
-export default class App extends Component<Props> {
+
+
+export default class App extends Component {
+
+  state = { loggedIn: null };
+
+
+  componentDidMount() {
+    let config = {
+      apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
+      authDomain: "realestate-be70e.firebaseapp.com",
+      databaseURL: "https://realestate-be70e.firebaseio.com",
+      projectId: "realestate-be70e",
+      storageBucket: "",
+      messagingSenderId: "1093883421506",
+    };
+    firebase.initializeApp(config);
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ loggedIn: true })
+      } else {
+        this.setState({ loggedIn: false })
+      }
+    })
+  }
+
+
+  // renderComponent() {
+  //   if (this.state.loggedIn) {
+  //     return (
+  //       <Button
+  //         title="Sign out"
+  //         onPress={() => firebase.auth().signOut()}
+  //       />
+  //     );
+  //   } else {
+  //     return (
+  //       // <LoginForm />
+  //       <AppContainer />
+  //     );
+  //   }
+  // }
+
   render() {
     return (
-      // <View style={styles.container}>
-        
-      // </View>
 
-      // <AppNavigator/>
-      <AppContainer/>
+      <AppContainer />
+      // <View>
+      //   {/* <Header title='Authenticator' /> */}
+      //   {this.renderComponent()}
+      // </View>
     );
   }
 }

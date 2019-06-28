@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, TextInputProps, Image, Text, TouchableOpacity, Switch } from 'react-native';
+import { View, StyleSheet, TextInput, TextInputProps, Image, Text, TouchableOpacity, Switch, Modal, ActivityIndicator, Button } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 // import Switch from "react-switch";
+
+import firebase from 'firebase'
 
 export default class SearchScreen extends Component {
 
@@ -26,7 +28,34 @@ export default class SearchScreen extends Component {
             checked: true,
             dataSource: [],
             search: '',
+            modalVisible: false,
+
+            // loginButton: 'Sign in',
+            signUpVisible: false,
+
+            email: '',
+            password: '',
+            error: ''
         };
+
+        this.forgotPassword_Alert = this.forgotPassword_Alert.bind(this);
+    }
+
+    // componentDidMount() {
+    //     let firebaseConfig = {
+    //         apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
+    //         authDomain: "realestate-be70e.firebaseapp.com",
+    //         databaseURL: "https://realestate-be70e.firebaseio.com",
+    //         projectId: "realestate-be70e",
+    //         storageBucket: "",
+    //         messagingSenderId: "1093883421506",
+    //     }
+
+    //     firebase.initializeApp(firebaseConfig);
+    // }
+
+    setModalVisible(visible) {
+        this.setState({ modalVisible: visible });
     }
 
     updateSearch = search => {
@@ -35,6 +64,29 @@ export default class SearchScreen extends Component {
 
     handleChange(checked) {
         this.setState({ checked });
+    }
+
+    onPress_Register() {
+        this.setState({
+            signUpVisible: !this.state.signUpVisible
+        });
+    }
+
+    forgotPassword_Alert() {
+        Alert.alert(
+            'Forgot password',
+            'Open web browser to reset your password via our mobile website?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                { text: 'OK', onPress: () => console.log('OK Pressed') },
+            ],
+            { cancelable: false },
+        );
+
     }
 
 
@@ -55,11 +107,116 @@ export default class SearchScreen extends Component {
     // }
 
 
-    onPress_LoginButton() {
-        this.props.navigation.navigate('Login');
+    // onPress_JoinButton() {
+    //     this.props.navigation.navigate('Login');
+    // }
+
+    onButtonPress() {
+        this.setState({ error: '', loading: true })
+        const { email, password } = this.state;
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(this.onLoginSuccess.bind(this))
+            .catch(() => {
+                firebase.auth().createUserWithEmailAndPassword(email, password)
+                    .then(this.onLoginSuccess.bind(this))
+                    .catch((error) => {
+                        let errorCode = error.code
+                        let errorMessage = error.message;
+                        if (errorCode == 'auth/weak-password') {
+                            this.onLoginFailure.bind(this)('Weak password!')
+                        } else {
+                            this.onLoginFailure.bind(this)(errorMessage)
+                        }
+                    });
+            });
+    }
+
+    onLoginSuccess() {
+        this.setState({
+            email: '', password: '', error: '', loading: false
+        })
+    }
+
+    onLoginFailure(errorMessage) {
+        this.setState({ error: errorMessage, loading: false })
+    }
+
+    renderButton() {
+        if (this.state.loading) {
+            return (
+                <View style={styles.spinnerStyle}>
+                    <ActivityIndicator size={"small"} />
+                </View>
+            );
+        }
+        // return (
+        //     <Button
+        //         title="Sign in"
+        //         onPress={this.onButtonPress.bind(this)}
+        //     />
+        // );
+    }
+
+    renderView() {
+        if (!this.state.signUpVisible) {
+
+            return (
+                <View style={{ alignItems: "center" }} >
+                    <View style={{ width: '100%' }}>
+                        <TouchableOpacity style={styles.loginButton} 
+                        // onPress={this.onButtonPress.bind(this) || this.renderButton()}
+                        >
+                            <Text style={{ textAlign: 'center', color: '#ffffff' }}>Sign in</Text>
+
+                        </TouchableOpacity>
+                    </View>
+
+                    <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}>
+                        <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text>
+                    </TouchableOpacity>
+
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ color: '#616161', fontSize: 12 }}>Don't have an account? {' '}</Text>
+                        <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
+                            <Text style={{ color: '#49141E', fontSize: 12, fontWeight: 500 }}>Register</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            );
+        }
+        else {
+            return (
+                <View style={{ alignItems: "center" }} >
+                    <View style={{ alignSelf: 'center', width: '100%'}}>
+                        <TouchableOpacity style={styles.loginButton} onPress={this.onButtonPress.bind(this) || this.renderButton()}>
+                            <Text style={{ textAlign: 'center', color: '#ffffff' }}>Create account</Text>
+
+                        </TouchableOpacity>
+                    </View>
+
+                    <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}>
+                        {/* <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text> */}
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text>
+                            <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
+                                <Text style={{ color: '#49141E', fontSize: 12, fontWeight: 500 }}>Sign in</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+
+                    {/* <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ color: 'gray', fontSize: 12 }}>Don't have an account? {' '}</Text>
+                        <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
+                            <Text style={{ color: '#49141E', fontSize: 12, fontWeight: 500 }}>Register</Text>
+                        </TouchableOpacity>
+                    </View> */}
+                </View>
+            );
+        }
     }
 
     render() {
+
 
         const { search } = this.state;
 
@@ -95,10 +252,9 @@ export default class SearchScreen extends Component {
                             />
                         </View>
 
-                        <Image source={require('../../assets/images/search-home.jpg')} style={styles.image} />
+                        <Image source={require('../../assets/images/search-home.jpg')} style={styles.imageTop} />
 
                     </View>
-
 
                     <View style={styles.bottomContainer}>
                         <View style={{ flexDirection: 'row' }}>
@@ -125,8 +281,14 @@ export default class SearchScreen extends Component {
                                 </Text>
                             </View>
 
-                            <TouchableOpacity style={styles.joinButton} onPress={this.onPress_LoginButton.bind(this)}>
-                                <Text style={{ textAlign: 'center', color: '#ffffff' }}>Join</Text>
+                            <TouchableOpacity style={styles.joinButton}
+                                // onPress={this.onPress_LoginButton.bind(this)}
+                                onPress={() => {
+                                    // this.setModalVisible(true);
+                                    this.setModalVisible(!this.state.modalVisible);
+                                }}
+                            >
+                                <Text style={{ textAlign: 'center', color: '#49141E' }}>Join</Text>
 
                             </TouchableOpacity>
 
@@ -135,6 +297,134 @@ export default class SearchScreen extends Component {
                     </View>
 
                 </ScrollView>
+
+
+                {/* s;dlj;lasdasasdasdasdasdasdasdasdasdasd */}
+
+                <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={this.state.modalVisible}
+                    onRequestClose={() => {
+                        Alert.alert('Modal has been closed.');
+                    }}>
+                    <View style={{ marginTop: 22, backgroundColor: '#f3d500' }}>
+
+                        <TouchableOpacity
+                            style={{
+                                // backgroundColor: "red",
+                                alignSelf: "flex-start",
+                                padding: 10
+                            }}
+                            onPress={() => {
+                                this.setModalVisible(!this.state.modalVisible);
+                                this.onLoginSuccess.bind(this);
+                            }}>
+                            {/* <Text>Hide Modal</Text> */}
+
+                            <Icon
+                                name="close"
+                                type='MaterialIcons'
+                                size={20}
+                            // color='gray'
+                            />
+
+
+                        </TouchableOpacity>
+                    </View>
+
+
+                    {/* login modal view */}
+
+                    <View style={styles.modalContainer}>
+                        <Image source={require('../../assets/images/rtcl.png')} style={styles.image} />
+                        {/* <View style={{backgroundColor:'yellow', marginVertical: 5}}> */}
+                        <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
+                            <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                                <Icon
+                                    name="email"
+                                    type='MaterialIcons'
+                                    size={20}
+                                    color='gray'
+                                />
+                                <TextInput
+                                    label="Email"
+                                    value={this.state.email}
+                                    style={styles.textinput}
+                                    secureTextEntry={false}
+                                    onChangeText={email => this.setState({ email })}
+                                    editable={true}
+                                    maxLength={40}
+                                    placeholder='Email address' />
+                            </View>
+
+                            <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
+
+                            <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+
+                                <Icon
+                                    name="lock"
+                                    type='MaterialIcons'
+                                    size={20}
+                                    color='gray'
+                                />
+                                <TextInput
+                                    label="Password"
+                                    value={this.state.password}
+                                    style={styles.textinput}
+                                    onChangeText={password => this.setState({ password })}
+                                    editable={true}
+                                    maxLength={40}
+                                    placeholder='Password'
+                                    secureTextEntry={true} />
+
+                                {/* {this.renderButton()} */}
+
+                                {/* <Text style={styles.errorTextStyle}>
+                                    {this.state.error}
+                                </Text> */}
+                            </View>
+                        </View>
+
+                        {/* <TouchableOpacity style={styles.loginButton} onPress={this.onButtonPress.bind(this) || this.renderButton()}>
+                            <Text style={{ textAlign: 'center', color: '#ffffff' }}>Sign in</Text>
+
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}>
+                            <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text>
+                        </TouchableOpacity>
+
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ color: 'gray', fontSize: 12 }}>Don't have an account? {' '}</Text>
+                            <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
+                                <Text style={{ color: '#49141E', fontSize: 12, fontWeight: 500 }}>Register</Text>
+                            </TouchableOpacity>
+                        </View> */}
+
+                        <View style={{ width: "70%" }}>
+                            {this.renderView()}
+                        </View>
+
+                        <Text style={styles.errorTextStyle} >
+                            {this.state.error}
+                        </Text>
+
+                        <View style={styles.footerView}>
+                            <TouchableOpacity>
+                                <Text style={{ fontSize: 12, color: '#616161' }}> Personal information collection statement</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+
+                    {/* login modal view */}
+
+
+                </Modal>
+
+                {/* s;dlj;lasdasasdasdasdasdasdasdasdasdasd */}
+
 
 
                 <TouchableOpacity style={styles.footer}>
@@ -157,6 +447,8 @@ export default class SearchScreen extends Component {
 
                 </TouchableOpacity>
 
+
+
             </View>
         );
     }
@@ -169,7 +461,7 @@ const styles = StyleSheet.create({
         // backgroundColor: 'blue',
         // paddingTop: 10
     },
-    image: {
+    imageTop: {
         // flex: 1,
         width: '100%',
         height: 300,
@@ -192,7 +484,8 @@ const styles = StyleSheet.create({
         margin: 10
     },
     joinButton: {
-        backgroundColor: '#C62828',
+        // backgroundColor: '#C62828',
+        backgroundColor: '#f3d500',
         width: '40%',
         height: 30,
         borderRadius: 4,
@@ -211,6 +504,63 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         paddingHorizontal: 5,
         backgroundColor: '#ffffff'
+    },
+
+    //modal styles
+    modalContainer: {
+        backgroundColor: '#f3d500',
+        flex: 1,
+        alignItems: 'center',
+        paddingTop: 100
+        // justifyContent: 'center'
+    },
+    image: {
+        width: 200,
+        height: 100,
+        resizeMode: 'contain',
+        // marginBottom: -5,
+
+    },
+    textinput: {
+        height: 40,
+        // borderBottomColor: 'gray',
+        // borderWidth: 1,
+        // borderRadius: 4,
+        width: '90%',
+        // flex:1,
+        // marginVertical: 5,
+        paddingHorizontal: 5,
+        // color: 'white'
+        // backgroundColor: 'green'
+    },
+    loginButton: {
+        // backgroundColor: '#C62828',
+        backgroundColor: '#49141E',
+        width: '100%',
+        height: 30,
+        borderRadius: 4,
+        justifyContent: 'center',
+        marginTop: 15,
+        // flex: 1
+    },
+    footerView: {
+        position: 'absolute',
+        bottom: 0,
+        height: 30,
+        // backgroundColor:'green', 
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopWidth: 1,
+        borderColor: 'gray'
+    },
+
+    errorTextStyle: {
+        fontSize: 13,
+        alignSelf: 'center',
+        justifyContent: 'flex-end',
+        color: 'red',
+        // textAlign: 'bottom'
     }
 
 });
