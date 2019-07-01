@@ -11,7 +11,8 @@ import { Platform, StyleSheet, Text, View, Button } from 'react-native';
 // import AppNavigator from "./app/route/route"
 import AppContainer from './app/route/route'
 
-import firebase from 'firebase'
+// import firebase from 'firebase'
+import firebase from 'react-native-firebase';
 
 
 
@@ -20,24 +21,24 @@ export default class App extends Component {
   state = { loggedIn: null };
 
 
-  componentDidMount() {
-    let config = {
-      apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
-      authDomain: "realestate-be70e.firebaseapp.com",
-      databaseURL: "https://realestate-be70e.firebaseio.com",
-      projectId: "realestate-be70e",
-      storageBucket: "",
-      messagingSenderId: "1093883421506",
-    };
-    firebase.initializeApp(config);
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.setState({ loggedIn: true })
-      } else {
-        this.setState({ loggedIn: false })
-      }
-    })
-  }
+  // componentDidMount() {
+  //   let config = {
+  //     apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
+  //     authDomain: "realestate-be70e.firebaseapp.com",
+  //     databaseURL: "https://realestate-be70e.firebaseio.com",
+  //     projectId: "realestate-be70e",
+  //     storageBucket: "",
+  //     messagingSenderId: "1093883421506",
+  //   };
+  //   firebase.initializeApp(config);
+  //   firebase.auth().onAuthStateChanged((user) => {
+  //     if (user) {
+  //       this.setState({ loggedIn: true })
+  //     } else {
+  //       this.setState({ loggedIn: false })
+  //     }
+  //   })
+  // }
 
 
   // renderComponent() {

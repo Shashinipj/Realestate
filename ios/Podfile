@@ -1,0 +1,23 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'Realestate' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for Realestate
+#  pod 'Firebase/Analytics'
+  pod 'Firebase/Core'
+  pod 'Firebase/Auth'
+  
+  target 'Realestate-tvOSTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'RealestateTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end

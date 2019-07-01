@@ -1,20 +1,16 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, TextInputProps, Image, Text, TouchableOpacity, Switch, Modal, ActivityIndicator, Button } from 'react-native';
+import { View, StyleSheet, TextInput, TextInputProps, Image, Text, TouchableOpacity, Switch, Modal, ActivityIndicator, Button, Alert } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
-// import Switch from "react-switch";
 
-import firebase from 'firebase'
+import firebase from 'react-native-firebase';
 
 export default class SearchScreen extends Component {
 
     static navigationOptions = {
         header: null,
-        // headerTitleStyle: { textAlign: 'center', alignSelf: 'center' },
-        // headerStyle: {
-        //   backgroundColor: 'white',
-        // },
+
     };
 
     arrayholder = [];
@@ -35,24 +31,14 @@ export default class SearchScreen extends Component {
 
             email: '',
             password: '',
-            error: ''
+            error: '',
+            success: '',
+            loginState: false
         };
 
         this.forgotPassword_Alert = this.forgotPassword_Alert.bind(this);
     }
 
-    // componentDidMount() {
-    //     let firebaseConfig = {
-    //         apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
-    //         authDomain: "realestate-be70e.firebaseapp.com",
-    //         databaseURL: "https://realestate-be70e.firebaseio.com",
-    //         projectId: "realestate-be70e",
-    //         storageBucket: "",
-    //         messagingSenderId: "1093883421506",
-    //     }
-
-    //     firebase.initializeApp(firebaseConfig);
-    // }
 
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
@@ -68,7 +54,11 @@ export default class SearchScreen extends Component {
 
     onPress_Register() {
         this.setState({
-            signUpVisible: !this.state.signUpVisible
+            signUpVisible: !this.state.signUpVisible,
+            email: '',
+            password: '',
+            error: '',
+            success: ''
         });
     }
 
@@ -107,54 +97,117 @@ export default class SearchScreen extends Component {
     // }
 
 
-    // onPress_JoinButton() {
-    //     this.props.navigation.navigate('Login');
-    // }
+    onSignUPButtonPress = () => {
 
-    onButtonPress() {
-        this.setState({ error: '', loading: true })
-        const { email, password } = this.state;
-        firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(this.onLoginSuccess.bind(this))
-            .catch(() => {
-                firebase.auth().createUserWithEmailAndPassword(email, password)
-                    .then(this.onLoginSuccess.bind(this))
-                    .catch((error) => {
-                        let errorCode = error.code
-                        let errorMessage = error.message;
-                        if (errorCode == 'auth/weak-password') {
-                            this.onLoginFailure.bind(this)('Weak password!')
-                        } else {
-                            this.onLoginFailure.bind(this)(errorMessage)
-                        }
-                    });
+        firebase
+            .auth()
+            .createUserWithEmailAndPassword(this.state.email, this.state.password)
+            .then(() => {
+                this.onSignInButtonPress();
+            })
+            //   .catch(error => this.setState({ errorMessage: error.message }))
+            .catch((error) => {
+                let errorCode = error.code
+                let errorMessage = error.message;
+                if (errorCode == 'auth/weak-password') {
+                    this.onLoginFailure.bind(this)('Weak password!')
+                } else {
+                    this.onLoginFailure.bind(this)(errorMessage)
+                }
             });
     }
 
+    onSignInButtonPress() {
+        console.log('sign in button pressed');
+
+        const { email, password } = this.state
+        firebase
+            .auth()
+            .signInWithEmailAndPassword(email, password)
+            .then(() => {
+                this.onLoginSuccess();
+            })
+            .catch((error) => {
+                let errorCode = error.code
+                let errorMessage = error.message;
+                this.onLoginFailure(errorMessage)
+            });
+
+    }
+
     onLoginSuccess() {
+        console.log(this.state.email);
+
         this.setState({
-            email: '', password: '', error: '', loading: false
+            error: '',
+            success: 'Successfully login',
+            modalVisible: !this.state.modalVisible,
+            loginState: true
+        })
+    }
+
+    onPressSignOutButton() {
+    
+        Alert.alert(
+            'Sign Out',
+            'Are you sure to want sign out?',
+            [
+                {
+                    text: 'No',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes', onPress: () => {
+                        this.setState({ loginState: false });
+                        this.loginReset();
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
+    }
+
+    loginReset() {
+        this.setState({
+            email: '', password: '', error: '', success: '', loading: false
         })
     }
 
     onLoginFailure(errorMessage) {
-        this.setState({ error: errorMessage, loading: false })
+        this.setState({ error: errorMessage, loading: false, success: '' })
     }
 
-    renderButton() {
-        if (this.state.loading) {
+    renderJoinButton() {
+        if (!this.state.loginState) {
             return (
-                <View style={styles.spinnerStyle}>
-                    <ActivityIndicator size={"small"} />
-                </View>
+                <TouchableOpacity style={styles.joinButton}
+                    // onPress={this.onPress_LoginButton.bind(this)}
+                    onPress={() => {
+                        // this.setModalVisible(true);
+                        this.setModalVisible(!this.state.modalVisible);
+                        // this.loginReset();
+                    }}
+                >
+                    <Text style={{ textAlign: 'center', color: '#49141E' }}>Join</Text>
+
+                </TouchableOpacity>
             );
         }
-        // return (
-        //     <Button
-        //         title="Sign in"
-        //         onPress={this.onButtonPress.bind(this)}
-        //     />
-        // );
+
+        else {
+            return (
+                <TouchableOpacity style={styles.joinButton}
+                    onPress={() => {
+                        firebase.auth().signOut();
+                        this.onPressSignOutButton();
+                    }}
+                >
+                    <Text style={{ textAlign: 'center', color: '#49141E' }}>Sign Out</Text>
+
+                </TouchableOpacity>
+            );
+        }
     }
 
     renderView() {
@@ -163,8 +216,10 @@ export default class SearchScreen extends Component {
             return (
                 <View style={{ alignItems: "center" }} >
                     <View style={{ width: '100%' }}>
-                        <TouchableOpacity style={styles.loginButton} 
-                        // onPress={this.onButtonPress.bind(this) || this.renderButton()}
+                        <TouchableOpacity style={styles.loginButton}
+                            // onPress={this.onButtonPress.bind(this) || this.renderButton()}
+                            onPress={this.onSignInButtonPress.bind(this)}
+                        // onPress={this.onSignUPButtonPress.bind(this)}
                         >
                             <Text style={{ textAlign: 'center', color: '#ffffff' }}>Sign in</Text>
 
@@ -187,8 +242,8 @@ export default class SearchScreen extends Component {
         else {
             return (
                 <View style={{ alignItems: "center" }} >
-                    <View style={{ alignSelf: 'center', width: '100%'}}>
-                        <TouchableOpacity style={styles.loginButton} onPress={this.onButtonPress.bind(this) || this.renderButton()}>
+                    <View style={{ alignSelf: 'center', width: '100%' }}>
+                        <TouchableOpacity style={styles.loginButton} onPress={this.onSignUPButtonPress.bind(this)}>
                             <Text style={{ textAlign: 'center', color: '#ffffff' }}>Create account</Text>
 
                         </TouchableOpacity>
@@ -204,12 +259,6 @@ export default class SearchScreen extends Component {
                         </View>
                     </TouchableOpacity>
 
-                    {/* <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ color: 'gray', fontSize: 12 }}>Don't have an account? {' '}</Text>
-                        <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                            <Text style={{ color: '#49141E', fontSize: 12, fontWeight: 500 }}>Register</Text>
-                        </TouchableOpacity>
-                    </View> */}
                 </View>
             );
         }
@@ -281,16 +330,7 @@ export default class SearchScreen extends Component {
                                 </Text>
                             </View>
 
-                            <TouchableOpacity style={styles.joinButton}
-                                // onPress={this.onPress_LoginButton.bind(this)}
-                                onPress={() => {
-                                    // this.setModalVisible(true);
-                                    this.setModalVisible(!this.state.modalVisible);
-                                }}
-                            >
-                                <Text style={{ textAlign: 'center', color: '#49141E' }}>Join</Text>
-
-                            </TouchableOpacity>
+                            {this.renderJoinButton()}
 
                         </View>
 
@@ -318,9 +358,9 @@ export default class SearchScreen extends Component {
                             }}
                             onPress={() => {
                                 this.setModalVisible(!this.state.modalVisible);
-                                this.onLoginSuccess.bind(this);
+                                // this.onLoginSuccess.bind(this);
+                                this.loginReset.bind(this)();
                             }}>
-                            {/* <Text>Hide Modal</Text> */}
 
                             <Icon
                                 name="close"
@@ -386,28 +426,16 @@ export default class SearchScreen extends Component {
                             </View>
                         </View>
 
-                        {/* <TouchableOpacity style={styles.loginButton} onPress={this.onButtonPress.bind(this) || this.renderButton()}>
-                            <Text style={{ textAlign: 'center', color: '#ffffff' }}>Sign in</Text>
-
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}>
-                            <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text>
-                        </TouchableOpacity>
-
-                        <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ color: 'gray', fontSize: 12 }}>Don't have an account? {' '}</Text>
-                            <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                                <Text style={{ color: '#49141E', fontSize: 12, fontWeight: 500 }}>Register</Text>
-                            </TouchableOpacity>
-                        </View> */}
-
                         <View style={{ width: "70%" }}>
                             {this.renderView()}
                         </View>
 
                         <Text style={styles.errorTextStyle} >
                             {this.state.error}
+                        </Text>
+
+                        <Text style={styles.errorTextStyle} >
+                            {this.state.success}
                         </Text>
 
                         <View style={styles.footerView}>
@@ -523,9 +551,6 @@ const styles = StyleSheet.create({
     },
     textinput: {
         height: 40,
-        // borderBottomColor: 'gray',
-        // borderWidth: 1,
-        // borderRadius: 4,
         width: '90%',
         // flex:1,
         // marginVertical: 5,
