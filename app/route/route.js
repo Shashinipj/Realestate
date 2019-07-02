@@ -8,12 +8,16 @@ import TabNavigatorScreen from '../tabNavigator/tabNavigatorScreen';
 import { Icon } from 'react-native-elements';
 import Icon2 from 'react-native-vector-icons/FontAwesome';
 import Login from '../screens/login/loginScreen'
+import FilterSearchResults from '../screens/Search/filterSearchResult'
 
 
 
 const searchStack = createStackNavigator({
     Search: {
         screen: SearchScreen,
+    },
+    FilterSearchResults: {
+        screen: FilterSearchResults
     }
 
 });
@@ -121,6 +125,18 @@ const mainStack = createStackNavigator(
         }
     }
 );
+
+searchStack.navigationOptions = ({ navigation }) => {
+    let tabBarVisible = true;
+    if (navigation.state.index > 0) {
+      tabBarVisible = false;
+    }
+  
+    return {
+      tabBarVisible,
+    };
+  };
+  
 
 const AppContainer = createAppContainer(mainStack);
 

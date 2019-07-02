@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TextInput, TextInputProps, Image, Text, TouchableOpacity, Switch, Modal, ActivityIndicator, Button, Alert } from 'react-native';
 import { SearchBar } from 'react-native-elements';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
+
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import firebase from 'react-native-firebase';
 
@@ -25,6 +27,7 @@ export default class SearchScreen extends Component {
             dataSource: [],
             search: '',
             modalVisible: false,
+            searchModalVisible: false,
 
             // loginButton: 'Sign in',
             signUpVisible: false,
@@ -44,9 +47,16 @@ export default class SearchScreen extends Component {
         this.setState({ modalVisible: visible });
     }
 
-    updateSearch = search => {
-        this.setState({ search });
-    };
+    setSearchModalVisible(visible) {
+        this.setState({ searchModalVisible: visible },
+            () => {
+                console.log(this.state.searchModalVisible);
+            });
+    }
+
+    // updateSearch = search => {
+    //     this.setState({ search });
+    // };
 
     handleChange(checked) {
         this.setState({ checked });
@@ -146,8 +156,14 @@ export default class SearchScreen extends Component {
         })
     }
 
+    // onPressSearchBar() {
+    //     this.setState({
+    //         searchModalVisible: !this.state.searchModalVisible
+    //     })
+    // }
+
     onPressSignOutButton() {
-    
+
         Alert.alert(
             'Sign Out',
             'Are you sure to want sign out?',
@@ -182,11 +198,8 @@ export default class SearchScreen extends Component {
         if (!this.state.loginState) {
             return (
                 <TouchableOpacity style={styles.joinButton}
-                    // onPress={this.onPress_LoginButton.bind(this)}
                     onPress={() => {
-                        // this.setModalVisible(true);
                         this.setModalVisible(!this.state.modalVisible);
-                        // this.loginReset();
                     }}
                 >
                     <Text style={{ textAlign: 'center', color: '#49141E' }}>Join</Text>
@@ -210,7 +223,7 @@ export default class SearchScreen extends Component {
         }
     }
 
-    renderView() {
+    renderSignUpSignInView() {
         if (!this.state.signUpVisible) {
 
             return (
@@ -264,6 +277,208 @@ export default class SearchScreen extends Component {
         }
     }
 
+
+    GooglePlacesInput = () => {
+
+        const { search } = this.state;
+
+        return (
+            <GooglePlacesAutocomplete
+                placeholder='Search suburb, postcode, state'
+                minLength={2} // minimum length of text to search
+                autoFocus={false}
+                value={search}
+                returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
+                listViewDisplayed='auto'    // true/false/undefined
+                fetchDetails={true}
+                renderDescription={row => row.description} // custom description render
+                onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+                    console.log(data, details);
+                    // console.log(data.description);
+                    this.props.navigation.navigate('FilterSearchResults', { location: data });
+                }}
+
+                getDefaultValue={() => ''}
+
+                query={{
+                    // available options: https://developers.google.com/places/web-service/autocomplete
+                    key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
+                    language: 'en', // language of the results
+                    types: '(cities)', // default: 'geocode'
+                    region: "LK",
+                    components: 'country:lk'
+                }}
+
+                styles={{
+                    textInputContainer: {
+                        width: '100%',
+                        backgroundColor: '#ffffff'
+                    },
+                    description: {
+                        fontWeight: 'bold'
+                    },
+                    predefinedPlacesDescription: {
+                        color: '#1faadb'
+                    }
+                }}
+
+                currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
+                currentLocationLabel="Current location"
+                nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+                GoogleReverseGeocodingQuery={{
+                    // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+                }}
+                GooglePlacesSearchQuery={{
+                    // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
+                    rankby: 'distance',
+                    types: 'food'
+                }}
+
+                filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+                // predefinedPlaces={[homePlace, workPlace]}
+
+                debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
+                // renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
+                // renderRightButton={() => <View style={{ alignSelf: 'center' }}>
+                //     <TouchableOpacity onPress={() => {
+                //         this.setSearchModalVisible(!this.state.searchModalVisible);
+                //     }}>
+                //         <Text >cancel</Text>
+                //     </TouchableOpacity>
+                // </View>}
+            />
+        );
+    }
+
+    showJoinModal() {
+
+        return (
+
+            <Modal
+                animationType="slide"
+                transparent={false}
+                visible={this.state.modalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={{ marginTop: 22, backgroundColor: '#f3d500' }}>
+
+                    <TouchableOpacity
+                        style={{
+                            // backgroundColor: "red",
+                            alignSelf: "flex-start",
+                            padding: 10
+                        }}
+                        onPress={() => {
+                            this.setModalVisible(!this.state.modalVisible);
+                            // this.onLoginSuccess.bind(this);
+                            this.loginReset.bind(this)();
+                        }}>
+
+                        <Icon
+                            name="close"
+                            type='MaterialIcons'
+                            size={20}
+                        />
+
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.modalContainer}>
+                    <Image source={require('../../assets/images/rtcl.png')} style={styles.image} />
+                    {/* <View style={{backgroundColor:'yellow', marginVertical: 5}}> */}
+                    <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                            <Icon
+                                name="email"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="Email"
+                                value={this.state.email}
+                                style={styles.textinput}
+                                secureTextEntry={false}
+                                onChangeText={email => this.setState({ email })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Email address' />
+                        </View>
+
+                        <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
+
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+
+                            <Icon
+                                name="lock"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="Password"
+                                value={this.state.password}
+                                style={styles.textinput}
+                                onChangeText={password => this.setState({ password })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Password'
+                                secureTextEntry={true} />
+
+                        </View>
+                    </View>
+
+                    <View style={{ width: "70%" }}>
+                        {this.renderSignUpSignInView()}
+                    </View>
+
+                    <Text style={styles.errorTextStyle} >
+                        {this.state.error}
+                    </Text>
+
+                    <Text style={styles.errorTextStyle} >
+                        {this.state.success}
+                    </Text>
+
+                    <View style={styles.footerView}>
+                        <TouchableOpacity>
+                            <Text style={{ fontSize: 12, color: '#616161' }}> Personal information collection statement</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+
+            </Modal>
+
+        );
+
+    }
+
+    showSearchModal() {
+
+        // {this.showJoinModal()}
+
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={this.state.searchModalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={{ margin: 10 }}>
+                    {this.GooglePlacesInput()}
+                    <ScrollView></ScrollView>
+                </View>
+                
+
+            </Modal>
+        );
+    }
+
+
+
     render() {
 
 
@@ -276,29 +491,40 @@ export default class SearchScreen extends Component {
                     <View style={{ paddingTop: 20, padding: 5 }}>
                         <View style={styles.searchBarView}>
 
-                            <SearchBar
-                                // round
-                                // style={{borderRadius:4}}
-                                placeholder="Search suburb, postcode, state"
-                                onChangeText={this.updateSearch}
-                                value={search}
-                                lightTheme='true'
-                                containerStyle={{
-                                    height: 50,
-                                    backgroundColor: '#ffffff',
-                                    // borderRadius:4
-                                    // borderTopWidth: 0,
-                                }}
-                                inputContainerStyle={{
-                                    height: 30,
-                                    backgroundColor: '#ffffff'
-                                }}
-                                inputStyle={{
-                                    fontSize: 14,
-                                }}
-                            // onChangeText={text => this.SearchFilterFunction(text)}
-                            // onClear={text => this.SearchFilterFunction('')}
-                            />
+                            {/* <TouchableWithoutFeedback style={{ backgroundColor: 'green', padding: 5 }} onPress={() => {
+                                this.setSearchModalVisible(!this.state.searchModalVisible);
+                            }}> */}
+
+                                {/* <SearchBar
+                                    // round
+                                    // style={{borderRadius:4}}
+                                    placeholder="Search suburb, postcode, state"
+                                    // onChangeText={this.updateSearch}
+
+                                    value={search}
+                                    lightTheme='true'
+                                    containerStyle={{
+                                        height: 50,
+                                        // backgroundColor: '#ffffff',
+                                        backgroundColor: '#093fff',
+                                        // borderRadius:4
+                                        // borderTopWidth: 0,
+                                    }}
+                                    inputContainerStyle={{
+                                        height: 0,
+                                        backgroundColor: '#ffffff'
+                                    }}
+                                    inputStyle={{
+                                        fontSize: 14,
+                                    }}
+                                /> */}
+
+                                {/* <View style={{ height: 30 }}></View> */}
+
+                            {/* </TouchableWithoutFeedback> */}
+
+                            {this.GooglePlacesInput()}
+
                         </View>
 
                         <Image source={require('../../assets/images/search-home.jpg')} style={styles.imageTop} />
@@ -338,121 +564,10 @@ export default class SearchScreen extends Component {
 
                 </ScrollView>
 
+                {/* show Join modal */}
 
-                {/* s;dlj;lasdasasdasdasdasdasdasdasdasdasd */}
-
-                <Modal
-                    animationType="slide"
-                    transparent={false}
-                    visible={this.state.modalVisible}
-                    onRequestClose={() => {
-                        Alert.alert('Modal has been closed.');
-                    }}>
-                    <View style={{ marginTop: 22, backgroundColor: '#f3d500' }}>
-
-                        <TouchableOpacity
-                            style={{
-                                // backgroundColor: "red",
-                                alignSelf: "flex-start",
-                                padding: 10
-                            }}
-                            onPress={() => {
-                                this.setModalVisible(!this.state.modalVisible);
-                                // this.onLoginSuccess.bind(this);
-                                this.loginReset.bind(this)();
-                            }}>
-
-                            <Icon
-                                name="close"
-                                type='MaterialIcons'
-                                size={20}
-                            // color='gray'
-                            />
-
-
-                        </TouchableOpacity>
-                    </View>
-
-
-                    {/* login modal view */}
-
-                    <View style={styles.modalContainer}>
-                        <Image source={require('../../assets/images/rtcl.png')} style={styles.image} />
-                        {/* <View style={{backgroundColor:'yellow', marginVertical: 5}}> */}
-                        <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
-                            <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
-                                <Icon
-                                    name="email"
-                                    type='MaterialIcons'
-                                    size={20}
-                                    color='gray'
-                                />
-                                <TextInput
-                                    label="Email"
-                                    value={this.state.email}
-                                    style={styles.textinput}
-                                    secureTextEntry={false}
-                                    onChangeText={email => this.setState({ email })}
-                                    editable={true}
-                                    maxLength={40}
-                                    placeholder='Email address' />
-                            </View>
-
-                            <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
-
-                            <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
-
-                                <Icon
-                                    name="lock"
-                                    type='MaterialIcons'
-                                    size={20}
-                                    color='gray'
-                                />
-                                <TextInput
-                                    label="Password"
-                                    value={this.state.password}
-                                    style={styles.textinput}
-                                    onChangeText={password => this.setState({ password })}
-                                    editable={true}
-                                    maxLength={40}
-                                    placeholder='Password'
-                                    secureTextEntry={true} />
-
-                                {/* {this.renderButton()} */}
-
-                                {/* <Text style={styles.errorTextStyle}>
-                                    {this.state.error}
-                                </Text> */}
-                            </View>
-                        </View>
-
-                        <View style={{ width: "70%" }}>
-                            {this.renderView()}
-                        </View>
-
-                        <Text style={styles.errorTextStyle} >
-                            {this.state.error}
-                        </Text>
-
-                        <Text style={styles.errorTextStyle} >
-                            {this.state.success}
-                        </Text>
-
-                        <View style={styles.footerView}>
-                            <TouchableOpacity>
-                                <Text style={{ fontSize: 12, color: '#616161' }}> Personal information collection statement</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                    </View>
-
-                    {/* login modal view */}
-
-
-                </Modal>
-
-                {/* s;dlj;lasdasasdasdasdasdasdasdasdasdasd */}
-
+                {this.showJoinModal()}
+                {this.showSearchModal()}
 
 
                 <TouchableOpacity style={styles.footer}>
