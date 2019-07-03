@@ -21,50 +21,31 @@ export default class App extends Component {
   state = { loggedIn: null };
 
 
-  // componentDidMount() {
-  //   let config = {
-  //     apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
-  //     authDomain: "realestate-be70e.firebaseapp.com",
-  //     databaseURL: "https://realestate-be70e.firebaseio.com",
-  //     projectId: "realestate-be70e",
-  //     storageBucket: "",
-  //     messagingSenderId: "1093883421506",
-  //   };
-  //   firebase.initializeApp(config);
-  //   firebase.auth().onAuthStateChanged((user) => {
-  //     if (user) {
-  //       this.setState({ loggedIn: true })
-  //     } else {
-  //       this.setState({ loggedIn: false })
-  //     }
-  //   })
-  // }
+  componentDidMount() {
+    let config = {
+      apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
+      authDomain: "realestate-be70e.firebaseapp.com",
+      databaseURL: "https://realestate-be70e.firebaseio.com",
+      projectId: "realestate-be70e",
+      storageBucket: "",
+      messagingSenderId: "1093883421506",
+    };
+    firebase.initializeApp(config);
+    // firebase.auth().onAuthStateChanged((user) => {
+    //   if (user) {
+    //     this.setState({ loggedIn: true })
+    //   } else {
+    //     this.setState({ loggedIn: false })
+    //   }
+    // })
+  }
 
-
-  // renderComponent() {
-  //   if (this.state.loggedIn) {
-  //     return (
-  //       <Button
-  //         title="Sign out"
-  //         onPress={() => firebase.auth().signOut()}
-  //       />
-  //     );
-  //   } else {
-  //     return (
-  //       // <LoginForm />
-  //       <AppContainer />
-  //     );
-  //   }
-  // }
 
   render() {
     return (
 
       <AppContainer />
-      // <View>
-      //   {/* <Header title='Authenticator' /> */}
-      //   {this.renderComponent()}
-      // </View>
+  
     );
   }
 }

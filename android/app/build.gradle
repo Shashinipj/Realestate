@@ -138,6 +138,7 @@ android {
 }
 
 dependencies {
+    implementation project(':rn-range-slider')
     implementation project(':react-native-firebase')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-gesture-handler')

@@ -54,9 +54,6 @@ export default class SearchScreen extends Component {
             });
     }
 
-    // updateSearch = search => {
-    //     this.setState({ search });
-    // };
 
     handleChange(checked) {
         this.setState({ checked });
@@ -88,24 +85,6 @@ export default class SearchScreen extends Component {
         );
 
     }
-
-
-    // SearchFilterFunction(text) {
-    //     //passing the inserted text in textinput
-    //     const newData = this.arrayholder.filter(function (item) {
-    //         //applying filter for the inserted text in search bar
-    //         const itemData = item.trackName ? item.trackName.toUpperCase() : ''.toUpperCase();
-    //         const textData = text.toUpperCase();
-    //         return itemData.indexOf(textData) > -1;
-    //     });
-    //     this.setState({
-    //         //setting the filtered newData on datasource
-    //         //After setting the data it will automatically re-render the view
-    //         dataSource: newData,
-    //         search: text,
-    //     });
-    // }
-
 
     onSignUPButtonPress = () => {
 
@@ -277,79 +256,6 @@ export default class SearchScreen extends Component {
         }
     }
 
-
-    GooglePlacesInput = () => {
-
-        const { search } = this.state;
-
-        return (
-            <GooglePlacesAutocomplete
-                placeholder='Search suburb, postcode, state'
-                minLength={2} // minimum length of text to search
-                autoFocus={false}
-                value={search}
-                returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
-                listViewDisplayed='auto'    // true/false/undefined
-                fetchDetails={true}
-                renderDescription={row => row.description} // custom description render
-                onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                    console.log(data, details);
-                    // console.log(data.description);
-                    this.props.navigation.navigate('FilterSearchResults', { location: data });
-                }}
-
-                getDefaultValue={() => ''}
-
-                query={{
-                    // available options: https://developers.google.com/places/web-service/autocomplete
-                    key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
-                    language: 'en', // language of the results
-                    types: '(cities)', // default: 'geocode'
-                    region: "LK",
-                    components: 'country:lk'
-                }}
-
-                styles={{
-                    textInputContainer: {
-                        width: '100%',
-                        backgroundColor: '#ffffff'
-                    },
-                    description: {
-                        fontWeight: 'bold'
-                    },
-                    predefinedPlacesDescription: {
-                        color: '#1faadb'
-                    }
-                }}
-
-                currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
-                currentLocationLabel="Current location"
-                nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
-                GoogleReverseGeocodingQuery={{
-                    // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
-                }}
-                GooglePlacesSearchQuery={{
-                    // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
-                    rankby: 'distance',
-                    types: 'food'
-                }}
-
-                filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
-                // predefinedPlaces={[homePlace, workPlace]}
-
-                debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
-                // renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
-                // renderRightButton={() => <View style={{ alignSelf: 'center' }}>
-                //     <TouchableOpacity onPress={() => {
-                //         this.setSearchModalVisible(!this.state.searchModalVisible);
-                //     }}>
-                //         <Text >cancel</Text>
-                //     </TouchableOpacity>
-                // </View>}
-            />
-        );
-    }
-
     showJoinModal() {
 
         return (
@@ -457,8 +363,6 @@ export default class SearchScreen extends Component {
 
     showSearchModal() {
 
-        // {this.showJoinModal()}
-
         return (
             <Modal
                 animationType="slide"
@@ -468,19 +372,17 @@ export default class SearchScreen extends Component {
                     Alert.alert('Modal has been closed.');
                 }}>
                 <View style={{ margin: 10 }}>
-                    {this.GooglePlacesInput()}
+
                     <ScrollView></ScrollView>
                 </View>
-                
+
 
             </Modal>
         );
     }
 
 
-
     render() {
-
 
         const { search } = this.state;
 
@@ -491,9 +393,10 @@ export default class SearchScreen extends Component {
                     <View style={{ paddingTop: 20, padding: 5 }}>
                         <View style={styles.searchBarView}>
 
-                            {/* <TouchableWithoutFeedback style={{ backgroundColor: 'green', padding: 5 }} onPress={() => {
-                                this.setSearchModalVisible(!this.state.searchModalVisible);
-                            }}> */}
+                            <TouchableWithoutFeedback style={{ backgroundColor: 'green', padding: 5 }} onPress={() => {
+                                // this.setSearchModalVisible(!this.state.searchModalVisible);
+                                this.props.navigation.navigate('SearchBarScreen');
+                            }}>
 
                                 {/* <SearchBar
                                     // round
@@ -519,11 +422,10 @@ export default class SearchScreen extends Component {
                                     }}
                                 /> */}
 
-                                {/* <View style={{ height: 30 }}></View> */}
+                                <View style={{ height: 30 }}></View>
 
-                            {/* </TouchableWithoutFeedback> */}
+                            </TouchableWithoutFeedback>
 
-                            {this.GooglePlacesInput()}
 
                         </View>
 
@@ -589,8 +491,6 @@ export default class SearchScreen extends Component {
                     </View>
 
                 </TouchableOpacity>
-
-
 
             </View>
         );
