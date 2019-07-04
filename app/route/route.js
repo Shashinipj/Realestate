@@ -7,7 +7,7 @@ import ProfileScreen from '../screens/Profile/profileScreen';
 import TabNavigatorScreen from '../tabNavigator/tabNavigatorScreen';
 import { Icon } from 'react-native-elements';
 import Icon2 from 'react-native-vector-icons/FontAwesome';
-import Login from '../screens/login/loginScreen'
+// import Login from '../screens/login/loginScreen'
 import SearchBarScreen from '../screens/Search/searchBarScreen'
 import SearchResultView from '../screens/Search/searchResultView'
 
@@ -46,12 +46,6 @@ const profileStack = createStackNavigator({
 
 });
 
-const loginStack = createStackNavigator({
-    Login: {
-        screen: Login
-    },
-
-});
 
 
 const TabNavigator = createBottomTabNavigator({
@@ -59,7 +53,6 @@ const TabNavigator = createBottomTabNavigator({
     Search: {
         screen: searchStack,
         navigationOptions: {
-            // tabBarLabel:"Home Page",
             tabBarIcon: ({ tintColor }) => (
                 <Icon
                     name="search"
@@ -73,7 +66,6 @@ const TabNavigator = createBottomTabNavigator({
         screen: collectionStack,
 
         navigationOptions: {
-            // tabBarLabel:"Home Page",
             tabBarIcon: ({ tintColor }) => (
                 <Icon
                     name="collections"
@@ -87,7 +79,6 @@ const TabNavigator = createBottomTabNavigator({
         screen: notificationStack,
 
         navigationOptions: {
-            // tabBarLabel:"Home Page",
             tabBarIcon: ({ tintColor }) => (
                 <Icon
                     name="notifications"
@@ -102,7 +93,6 @@ const TabNavigator = createBottomTabNavigator({
         screen: profileStack,
 
         navigationOptions: {
-            // tabBarLabel:"Home Page",
             tabBarIcon: ({ tintColor }) => (
                 <Icon2
                     name="user-circle-o"
@@ -119,7 +109,7 @@ const TabNavigator = createBottomTabNavigator({
 const mainStack = createStackNavigator(
     {
         App: TabNavigator,
-        login: loginStack
+        // login: loginStack
     },
     {
         headerMode: 'none',

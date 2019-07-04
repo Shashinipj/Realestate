@@ -22,15 +22,15 @@ export default class App extends Component {
 
 
   componentDidMount() {
-    let config = {
-      apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
-      authDomain: "realestate-be70e.firebaseapp.com",
-      databaseURL: "https://realestate-be70e.firebaseio.com",
-      projectId: "realestate-be70e",
-      storageBucket: "",
-      messagingSenderId: "1093883421506",
-    };
-    firebase.initializeApp(config);
+    // let config = {
+    //   apiKey: "AIzaSyAZoqObbC8SQeJ1uPjxLPfgk_AvF-E_MFc",
+    //   authDomain: "realestate-be70e.firebaseapp.com",
+    //   databaseURL: "https://realestate-be70e.firebaseio.com",
+    //   projectId: "realestate-be70e",
+    //   storageBucket: "",
+    //   messagingSenderId: "1093883421506",
+    // };
+    // firebase.initializeApp(config);
     // firebase.auth().onAuthStateChanged((user) => {
     //   if (user) {
     //     this.setState({ loggedIn: true })

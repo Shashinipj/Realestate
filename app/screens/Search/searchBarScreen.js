@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import {
-    View, StyleSheet, Text, TextInputProps, TouchableOpacity, Modal, ScrollView,
-    Switch, TextInput, TouchableHighlight
-} from 'react-native';
-
+import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, Switch, TextInput } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { Icon } from 'react-native-elements';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import RangeSlider from 'rn-range-slider';
@@ -37,59 +35,141 @@ export default class SearchBarScreen extends Component {
             isSelectedApartment: false,
             isSelectedTownhouse: false,
             isSelectedVilla: false,
-            isSelectAll: false
+            isSelectAll: false,
+
+            propertyType: null,
+            location: '',
+
+            bedRooms: -1,
+            bathRooms: -1,
+            carSpace: -1,
         };
 
+    }
+
+    ResetFilters() {
+        this.setState({
+
+            agreementType: 1,
+
+            isSelectedHouse: false,
+            isSelectedApartment: false,
+            isSelectedTownhouse: false,
+            isSelectedVilla: false,
+            isSelectAll: false,
+
+            propertyType: null,
+            bedRooms: -1,
+            bathRooms: -1,
+            carSpace: -1,
+        });
     }
 
     Onpress_PropertyTypeFilter(type) {
         if (type == PropertyTypes.All) {
             this.setState({
+                propertyType: null,
+
                 isSelectedHouse: false,
                 isSelectedApartment: false,
                 isSelectedTownhouse: false,
                 isSelectedVilla: false,
                 isSelectAll: true
-
+            }, () => {
+                console.log("FILTER PROPTYPE: ", this.state.propertyType);
             });
         } else {
+            if (!this.state.propertyType) {
+                this.state.propertyType = {};
+                // this.state.propertyType = null;
+            }
 
             switch (type) {
                 case PropertyTypes.House:
-                    this.setState({
-                        isSelectedHouse: !this.state.isSelectedHouse,
-                        isSelectAll: false
-                    });
+                    if (!this.state.isSelectedHouse) {
+                        this.state.propertyType[type] = true;
+                    } else {
+                        delete this.state.propertyType[type];
+                    }
+
+                    this.state.isSelectedHouse = !this.state.isSelectedHouse;
                     break;
+
                 case PropertyTypes.Apartment:
-                    this.setState({
-                        isSelectedApartment: !this.state.isSelectedApartment,
-                        isSelectAll: false
-                    });
+                    if (!this.state.isSelectedApartment) {
+                        this.state.propertyType[type] = true;
+                    } else {
+                        delete this.state.propertyType[type];
+                    }
+
+                    this.state.isSelectedApartment = !this.state.isSelectedApartment;
+                    // propertyType: 2
                     break;
+
                 case PropertyTypes.Townhouse:
-                    this.setState({
-                        isSelectedTownhouse: !this.state.isSelectedTownhouse,
-                        isSelectAll: false
-                    });
+                    if (!this.state.isSelectedTownhouse) {
+                        this.state.propertyType[type] = true;
+                    } else {
+                        delete this.state.propertyType[type];
+                    }
+
+                    this.state.isSelectedTownhouse = !this.state.isSelectedTownhouse;
+                    // propertyType: 3
                     break;
+
                 case PropertyTypes.Villa:
-                    this.setState({
-                        isSelectedVilla: !this.state.isSelectedVilla,
-                        isSelectAll: false
-                    });
+                    if (!this.state.isSelectedVilla) {
+                        this.state.propertyType[type] = true;
+                    } else {
+                        delete this.state.propertyType[type];
+                    }
+
+                    this.state.isSelectedVilla = !this.state.isSelectedVilla;
+                    // propertyType: 4
                     break;
 
             }
 
-        }
+            let hasFilters = false;
+            for (const key in this.state.propertyType) {
+                hasFilters = true;
+                break;
+            }
 
+            if (!hasFilters) {
+                this.state.propertyType = null;
+            }
+
+            this.setState({
+                isSelectAll: hasFilters ? false : true
+            });
+
+            console.log("FILTER PROPTYPE: ", this.state.propertyType);
+        }
 
     }
 
     isAgreementTypeButtonPress(buttonNo) {
         this.setState({
             agreementType: buttonNo
+        });
+    }
+
+    bedRoomsButtonPress(buttonNo) {
+        this.setState({
+            bedRooms: buttonNo
+        });
+    }
+
+    bathRoomsButtonPress(buttonNo) {
+        this.setState({
+            bathRooms: buttonNo
+        });
+    }
+
+    carSpaceButtonPress(buttonNo) {
+        this.setState({
+            carSpace: buttonNo
         });
     }
 
@@ -214,19 +294,37 @@ export default class SearchBarScreen extends Component {
             <View style={{ flex: 1 }}>
                 <View style={styles.searchBarView}>
                     {/* {this.GooglePlacesInput()} */}
+                    <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
+                        // this.setSearchModalVisible(!this.state.searchModalVisible);
+                        this.props.navigation.navigate('SearchBarScreen');
+                        this.setFilterModalVisible();
+                    }}>
+
+                        <View style={{ height: 30, alignItems: 'center', flexDirection: 'row' }}>
+                            <Icon
+                                name="search"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <Text style={{ color: '#000000', marginLeft: 10 }}>{this.state.location}</Text>
+                        </View>
+
+                    </TouchableWithoutFeedback>
                 </View>
 
                 <View style={{
                     position: "absolute",
-                    top: 0,
+                    top: 10,
                     left: 0,
                     zIndex: 2,
                     width: "100%",
-                    marginTop: 40, backgroundColor: 'rgba(244, 244, 244, .97)'
+                    marginTop: 40,
+                    backgroundColor: 'rgba(244, 244, 244, .97)'
                 }}>
 
                     <View style={{ position: 'relative', alignSelf: 'flex-end' }}>
-                        <TouchableOpacity style={styles.resetFilterButton}>
+                        <TouchableOpacity style={styles.resetFilterButton} onPress={() => this.ResetFilters()}>
 
                             <Text style={{ fontSize: 10 }}>RESET FILTERS</Text>
 
@@ -286,8 +384,6 @@ export default class SearchBarScreen extends Component {
 
                     <View style={{
                         marginHorizontal: 5,
-                        // flexDirection: 'row',
-                        // justifyContent: 'space-between',
                         marginVertical: 15
                     }}>
                         <ScrollView horizontal={true} >
@@ -295,9 +391,11 @@ export default class SearchBarScreen extends Component {
                                 <TouchableOpacity onPress={this.Onpress_PropertyTypeFilter.bind(this, PropertyTypes.All)}>
                                     {/* <View style={styles.propertTypeButtons}> */}
                                     <View style={
-                                        this.state.isSelectAll ? [styles.propertTypeButtons, { backgroundColor: 'red' }]
+                                        this.state.isSelectAll ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
+                                        <Text style={
+                                    this.state.isSelectAll ? [{ color: 'white', fontSize: 16 }] : {fontSize: 16}}>ALL</Text>
 
                                     </View>
                                 </TouchableOpacity>
@@ -307,7 +405,7 @@ export default class SearchBarScreen extends Component {
                             <View style={styles.propertyTypeView}>
                                 <TouchableOpacity onPress={this.Onpress_PropertyTypeFilter.bind(this, PropertyTypes.House)}>
                                     <View style={
-                                        this.state.isSelectedHouse ? [styles.propertTypeButtons, { backgroundColor: 'red' }]
+                                        this.state.isSelectedHouse ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
 
@@ -319,7 +417,7 @@ export default class SearchBarScreen extends Component {
                             <View style={styles.propertyTypeView}>
                                 <TouchableOpacity onPress={this.Onpress_PropertyTypeFilter.bind(this, PropertyTypes.Apartment)}>
                                     <View style={
-                                        this.state.isSelectedApartment ? [styles.propertTypeButtons, { backgroundColor: 'red' }]
+                                        this.state.isSelectedApartment ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
 
@@ -331,7 +429,7 @@ export default class SearchBarScreen extends Component {
                             <View style={styles.propertyTypeView}>
                                 <TouchableOpacity onPress={this.Onpress_PropertyTypeFilter.bind(this, PropertyTypes.Townhouse)}>
                                     <View style={
-                                        this.state.isSelectedTownhouse ? [styles.propertTypeButtons, { backgroundColor: 'red' }]
+                                        this.state.isSelectedTownhouse ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
 
@@ -343,7 +441,7 @@ export default class SearchBarScreen extends Component {
                             <View style={styles.propertyTypeView}>
                                 <TouchableOpacity onPress={this.Onpress_PropertyTypeFilter.bind(this, PropertyTypes.Villa)}>
                                     <View style={
-                                        this.state.isSelectedVilla ? [styles.propertTypeButtons, { backgroundColor: 'red' }]
+                                        this.state.isSelectedVilla ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
 
@@ -366,46 +464,102 @@ export default class SearchBarScreen extends Component {
 
                     <View style={{ marginVertical: 10 }}>
                         <View style={styles.buttonSetView}>
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            <TouchableOpacity
+                                style={
+                                    this.state.bedRooms == -1 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                }
+                                onPress={() => this.bedRoomsButtonPress(-1)}
+                            >
+
                                 <View style={[styles.subButtonView, { borderRightWidth: 1, height: 30 }]}>
-                                    <Text style={styles.propertyTypeText}>All</Text>
+                                    <Text style={
+                                        this.state.bedRooms == -1 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>All</Text>
                                 </View>
+
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            <TouchableOpacity
+                                style={
+                                    this.state.bedRooms == 0 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                }
+                                onPress={() => this.bedRoomsButtonPress(0)}
+                            >
+
                                 <View style={styles.subButtonView}>
-                                    <Text style={{ fontSize: 10 }}>STUDIO+</Text>
+                                    <Text style={
+                                        this.state.bedRooms == 0 ? { color: 'white', fontSize: 9 } : { fontSize: 9 }}>STUDIO+</Text>
                                 </View>
+
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            <TouchableOpacity
+                                style={
+                                    this.state.bedRooms == 1 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                }
+                                onPress={() => this.bedRoomsButtonPress(1)}
+                            >
+
                                 <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                    <Text style={styles.propertyTypeText}>1+</Text>
+                                    <Text style={
+                                        this.state.bedRooms == 1 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>1+</Text>
                                 </View>
+
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            <TouchableOpacity
+                                style={
+                                    this.state.bedRooms == 2 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                }
+                                onPress={() => this.bedRoomsButtonPress(2)}
+                            >
+
                                 <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                    <Text style={styles.propertyTypeText}>2+</Text>
+                                    <Text style={
+                                        this.state.bedRooms == 2 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>2+</Text>
                                 </View>
+
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            <TouchableOpacity
+                                style={
+                                    this.state.bedRooms == 3 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                }
+                                onPress={() => this.bedRoomsButtonPress(3)}
+                            >
+
                                 <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                    <Text style={styles.propertyTypeText}>3+</Text>
+                                    <Text style={
+                                        this.state.bedRooms == 3 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>3+</Text>
                                 </View>
+
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            <TouchableOpacity
+                                style={
+                                    this.state.bedRooms == 4 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                }
+                                onPress={() => this.bedRoomsButtonPress(4)}
+                            >
+
                                 <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                    <Text style={styles.propertyTypeText}>4+</Text>
+                                    <Text style={
+                                        this.state.bedRooms == 4 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>4+</Text>
                                 </View>
+
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            <TouchableOpacity
+                                style={
+                                    this.state.bedRooms == 5 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                }
+                                onPress={() => this.bedRoomsButtonPress(5)}
+                            >
+
                                 <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                    <Text style={styles.propertyTypeText}>5+</Text>
+                                    <Text style={
+                                        this.state.bedRooms == 5 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>5+</Text>
                                 </View>
+
                             </TouchableOpacity>
 
                         </View>
@@ -418,7 +572,6 @@ export default class SearchBarScreen extends Component {
                                 checked={this.state.checked}
                                 height={5}
                                 width={20}
-
                             />
 
                         </View>
@@ -432,40 +585,87 @@ export default class SearchBarScreen extends Component {
 
 
                     <View style={styles.buttonSetView}>
-                        <TouchableOpacity style={{ flex: 1 }}>
+
+                        <TouchableOpacity
+                            style={
+                                this.state.bathRooms == -1 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.bathRoomsButtonPress(-1)}
+                        >
+
                             <View style={[styles.subButtonView, { borderRightWidth: 1, height: 30 }]}>
-                                <Text style={styles.propertyTypeText}>All</Text>
+                                <Text style={
+                                    this.state.bathRooms == -1 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>All</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.bathRooms == 1 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.bathRoomsButtonPress(1)}
+                        >
+
                             <View style={styles.subButtonView}>
-                                <Text style={styles.propertyTypeText}>1+</Text>
+                                <Text style={
+                                    this.state.bathRooms == 1 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>1+</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.bathRooms == 2 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.bathRoomsButtonPress(2)}
+                        >
+
                             <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>2+</Text>
+                                <Text style={
+                                    this.state.bathRooms == 2 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>2+</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.bathRooms == 3 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.bathRoomsButtonPress(3)}
+                        >
                             <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>3+</Text>
+                                <Text style={
+                                    this.state.bathRooms == 3 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>3+</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.bathRooms == 4 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.bathRoomsButtonPress(4)}
+                        >
+
                             <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>4+</Text>
+                                <Text style={
+                                    this.state.bathRooms == 4 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>4+</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.bathRooms == 5 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.bathRoomsButtonPress(5)}
+                        >
                             <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>5+</Text>
+                                <Text style={
+                                    this.state.bathRooms == 5 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>5+</Text>
                             </View>
+
                         </TouchableOpacity>
 
                     </View>
@@ -477,42 +677,88 @@ export default class SearchBarScreen extends Component {
                         <Text style={styles.mainCategoryText}>(icon) Car apaces</Text>
                     </View>
 
-
                     <View style={styles.buttonSetView}>
-                        <TouchableOpacity style={{ flex: 1 }}>
+
+                        <TouchableOpacity
+                            style={
+                                this.state.carSpace == -1 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.carSpaceButtonPress(-1)}
+                        >
+
                             <View style={[styles.subButtonView, { borderRightWidth: 1, height: 30 }]}>
-                                <Text style={styles.propertyTypeText}>All</Text>
+                                <Text style={
+                                    this.state.carSpace == -1 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>All</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.carSpace == 1 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.carSpaceButtonPress(1)}
+                        >
+
                             <View style={styles.subButtonView}>
-                                <Text style={styles.propertyTypeText}>1+</Text>
+                                <Text style={
+                                    this.state.carSpace == 1 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>1+</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.carSpace == 2 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.carSpaceButtonPress(2)}
+                        >
+
                             <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>2+</Text>
+                                <Text style={
+                                    this.state.carSpace == 2 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>2+</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.carSpace == 3 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.carSpaceButtonPress(3)}
+                        >
                             <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>3+</Text>
+                                <Text style={
+                                    this.state.carSpace == 3 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>3+</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.carSpace == 4 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.carSpaceButtonPress(4)}
+                        >
+
                             <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>4+</Text>
+                                <Text style={
+                                    this.state.carSpace == 4 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>4+</Text>
                             </View>
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ flex: 1 }}>
+                        <TouchableOpacity
+                            style={
+                                this.state.carSpace == 5 ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                            }
+                            onPress={() => this.carSpaceButtonPress(5)}
+                        >
                             <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>5+</Text>
+                                <Text style={
+                                    this.state.carSpace == 5 ? [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>5+</Text>
                             </View>
+
                         </TouchableOpacity>
 
                     </View>
@@ -530,13 +776,21 @@ export default class SearchBarScreen extends Component {
                         // onChangeText={(text) => this.setState({ text })}
                         // value={this.state.text}
                         />
-                        <Text style={{ fontSize: 15 }}>(m2)</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ fontSize: 15 }}>m</Text>
+                            <Text style={{ fontSize: 10, lineHeight: 12 }}>2</Text>
+                        </View>
+
                     </View>
 
                     <View style={[styles.buttonSetView, { marginHorizontal: 80 }]}>
                         <TouchableOpacity style={{ flex: 1 }}>
                             <View style={[styles.subButtonView, { borderRightWidth: 1, height: 20 }]}>
-                                <Text style={styles.propertyTypeText}>Metres(2)</Text>
+                                {/* <Text style={styles.propertyTypeText}>Metres(2)</Text> */}
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ fontSize: 12 }}>Metres</Text>
+                                    <Text style={{ fontSize: 9, lineHeight: 12 }}>2</Text>
+                                </View>
                             </View>
                         </TouchableOpacity>
 
@@ -580,17 +834,27 @@ export default class SearchBarScreen extends Component {
                     <View style={styles.separatorView}></View>
 
                 </ScrollView>
-                <View style={{ height: 50, backgroundColor: 'gray', alignItems: 'center' }}>
+                <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
                     <TouchableOpacity onPress={() => {
                         this.setFilterModalVisible();
-                        this.props.navigation.navigate('SearchResultView');
+                        this.props.navigation.navigate('SearchResultView', {
+                            data: {
+                                ...this.state
+                            }
+                        });
                         console.log('search button clicked');
                     }}>
                         <View style={{
-                            backgroundColor: 'red', marginVertical: 7, flex: 1, marginHorizontal: 10, width: 300,
+                            backgroundColor: '#49141E', marginVertical: 7, flex: 1, marginHorizontal: 10, width: 300,
                             borderRadius: 7, alignItems: 'center', justifyContent: 'center'
                         }}>
-                            <Text>Search</Text>
+                            {/* <Text style={{ color: 'white' }}>Search</Text> */}
+                            <Icon
+                                name="search"
+                                type='MaterialIcons'
+                                size={30}
+                                color='white'
+                            />
                         </View>
                     </TouchableOpacity>
 
@@ -618,9 +882,11 @@ export default class SearchBarScreen extends Component {
                 renderDescription={row => row.description} // custom description render
                 onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
                     console.log(data, details);
-                    // console.log(data.description);
-                    // this.props.navigation.navigate('FilterSearchResults', { location: data });
+                    console.log(data.description);
                     this.setFilterModalVisible();
+                    this.setState({
+                        location: data.description
+                    });
                 }}
 
                 getDefaultValue={() => ''}
@@ -694,10 +960,7 @@ const styles = StyleSheet.create({
 
     },
     searchBarView: {
-        // borderRadius: 4,
-        // paddingHorizontal: 5,
-        // backgroundColor: '#ffffff',
-        backgroundColor: 'yellow',
+        marginTop: 15,
         margin: 5,
         height: 40
     },
@@ -715,7 +978,9 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 30,
         borderWidth: 1,
-        marginBottom: 5
+        marginBottom: 5,
+        alignItems:'center',
+        justifyContent:'center'
     },
     propertyTypeMainView: {
         marginHorizontal: 5,

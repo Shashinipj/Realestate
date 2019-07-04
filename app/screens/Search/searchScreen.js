@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, TextInputProps, Image, Text, TouchableOpacity, Switch, Modal, ActivityIndicator, Button, Alert } from 'react-native';
+import { View, StyleSheet, TextInput, TextInputProps, Image, Text, TouchableOpacity, Switch, Modal, Button, Alert } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
-
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import firebase from 'react-native-firebase';
 
@@ -121,7 +119,6 @@ export default class SearchScreen extends Component {
                 let errorMessage = error.message;
                 this.onLoginFailure(errorMessage)
             });
-
     }
 
     onLoginSuccess() {
@@ -134,12 +131,6 @@ export default class SearchScreen extends Component {
             loginState: true
         })
     }
-
-    // onPressSearchBar() {
-    //     this.setState({
-    //         searchModalVisible: !this.state.searchModalVisible
-    //     })
-    // }
 
     onPressSignOutButton() {
 
@@ -165,7 +156,11 @@ export default class SearchScreen extends Component {
 
     loginReset() {
         this.setState({
-            email: '', password: '', error: '', success: '', loading: false
+            email: '',
+            password: '',
+            error: '',
+            success: '',
+            loading: false
         })
     }
 
@@ -209,9 +204,7 @@ export default class SearchScreen extends Component {
                 <View style={{ alignItems: "center" }} >
                     <View style={{ width: '100%' }}>
                         <TouchableOpacity style={styles.loginButton}
-                            // onPress={this.onButtonPress.bind(this) || this.renderButton()}
                             onPress={this.onSignInButtonPress.bind(this)}
-                        // onPress={this.onSignUPButtonPress.bind(this)}
                         >
                             <Text style={{ textAlign: 'center', color: '#ffffff' }}>Sign in</Text>
 
@@ -375,16 +368,12 @@ export default class SearchScreen extends Component {
 
                     <ScrollView></ScrollView>
                 </View>
-
-
             </Modal>
         );
     }
 
 
     render() {
-
-        const { search } = this.state;
 
         return (
             <View style={styles.container}>
@@ -393,39 +382,22 @@ export default class SearchScreen extends Component {
                     <View style={{ paddingTop: 20, padding: 5 }}>
                         <View style={styles.searchBarView}>
 
-                            <TouchableWithoutFeedback style={{ backgroundColor: 'green', padding: 5 }} onPress={() => {
+                            <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
                                 // this.setSearchModalVisible(!this.state.searchModalVisible);
                                 this.props.navigation.navigate('SearchBarScreen');
                             }}>
 
-                                {/* <SearchBar
-                                    // round
-                                    // style={{borderRadius:4}}
-                                    placeholder="Search suburb, postcode, state"
-                                    // onChangeText={this.updateSearch}
-
-                                    value={search}
-                                    lightTheme='true'
-                                    containerStyle={{
-                                        height: 50,
-                                        // backgroundColor: '#ffffff',
-                                        backgroundColor: '#093fff',
-                                        // borderRadius:4
-                                        // borderTopWidth: 0,
-                                    }}
-                                    inputContainerStyle={{
-                                        height: 0,
-                                        backgroundColor: '#ffffff'
-                                    }}
-                                    inputStyle={{
-                                        fontSize: 14,
-                                    }}
-                                /> */}
-
-                                <View style={{ height: 30 }}></View>
+                                <View style={{ height: 30, alignItems: 'center', flexDirection: 'row' }}>
+                                    <Icon
+                                        name="search"
+                                        type='MaterialIcons'
+                                        size={20}
+                                        color='gray'
+                                    />
+                                    <Text style={{ color: 'gray', marginLeft: 10 }}>Search suburb, postcode, state</Text>
+                                </View>
 
                             </TouchableWithoutFeedback>
-
 
                         </View>
 
@@ -436,16 +408,15 @@ export default class SearchScreen extends Component {
                     <View style={styles.bottomContainer}>
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={{ fontSize: 12, color: 'gray', marginVertical: 10 }}> Saved Searches</Text>
+
                             <Switch
                                 style={{ position: 'absolute', right: 5 }}
                                 onChange={this.handleChange}
                                 checked={this.state.checked}
                                 height={10}
                                 width={48}
-
                             />
-                            {/* <Switch style={{ position: 'absolute', right: 5 }}></Switch> */}
-                            {/* <Switch></Switch> */}
+
                         </View>
 
                         <View style={styles.textContainer}>
@@ -501,11 +472,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#E0E0E0',
-        // backgroundColor: 'blue',
-        // paddingTop: 10
     },
     imageTop: {
-        // flex: 1,
         width: '100%',
         height: 300,
         marginTop: 5,
@@ -516,7 +484,6 @@ const styles = StyleSheet.create({
         padding: 6
     },
     textContainer: {
-        // backgroundColor: 'gray',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 15
@@ -527,7 +494,6 @@ const styles = StyleSheet.create({
         margin: 10
     },
     joinButton: {
-        // backgroundColor: '#C62828',
         backgroundColor: '#f3d500',
         width: '40%',
         height: 30,
@@ -555,23 +521,17 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         paddingTop: 100
-        // justifyContent: 'center'
     },
     image: {
         width: 200,
         height: 100,
         resizeMode: 'contain',
-        // marginBottom: -5,
 
     },
     textinput: {
         height: 40,
         width: '90%',
-        // flex:1,
-        // marginVertical: 5,
         paddingHorizontal: 5,
-        // color: 'white'
-        // backgroundColor: 'green'
     },
     loginButton: {
         // backgroundColor: '#C62828',
@@ -581,7 +541,6 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         justifyContent: 'center',
         marginTop: 15,
-        // flex: 1
     },
     footerView: {
         position: 'absolute',
@@ -600,7 +559,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         justifyContent: 'flex-end',
         color: 'red',
-        // textAlign: 'bottom'
     }
 
 });
