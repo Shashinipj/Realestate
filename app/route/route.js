@@ -4,12 +4,12 @@ import CollectionScreen from '../screens/Collection/collectionScreen';
 import SearchScreen from '../screens/Search/searchScreen';
 import NotificationScreen from '../screens/Notifications/notificationScreen';
 import ProfileScreen from '../screens/Profile/profileScreen';
-import TabNavigatorScreen from '../tabNavigator/tabNavigatorScreen';
 import { Icon } from 'react-native-elements';
 import Icon2 from 'react-native-vector-icons/FontAwesome';
 // import Login from '../screens/login/loginScreen'
 import SearchBarScreen from '../screens/Search/searchBarScreen'
 import SearchResultView from '../screens/Search/searchResultView'
+import ExpandedView from '../screens/Search/expandedView'
 
 
 const searchStack = createStackNavigator({
@@ -21,6 +21,9 @@ const searchStack = createStackNavigator({
     },
     SearchResultView: {
         screen: SearchResultView
+    },
+    ExpandedView:{
+        screen: ExpandedView
     }
 
 });
@@ -45,8 +48,6 @@ const profileStack = createStackNavigator({
     },
 
 });
-
-
 
 const TabNavigator = createBottomTabNavigator({
 

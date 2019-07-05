@@ -52,7 +52,6 @@ export default class SearchScreen extends Component {
             });
     }
 
-
     handleChange(checked) {
         this.setState({ checked });
     }
@@ -84,7 +83,7 @@ export default class SearchScreen extends Component {
 
     }
 
-    onSignUPButtonPress = () => {
+    onSignUPButtonPress() {
 
         firebase
             .auth()
@@ -193,6 +192,20 @@ export default class SearchScreen extends Component {
                     <Text style={{ textAlign: 'center', color: '#49141E' }}>Sign Out</Text>
 
                 </TouchableOpacity>
+            );
+        }
+    }
+
+    loginScreenImage() {
+        if (!this.state.loginState) {
+            return (
+                <Image source={require('../../assets/images/search-home.jpg')} style={styles.imageTop} />
+            );
+        }
+
+        else {
+            return (
+                <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
             );
         }
     }
@@ -401,8 +414,8 @@ export default class SearchScreen extends Component {
 
                         </View>
 
-                        <Image source={require('../../assets/images/search-home.jpg')} style={styles.imageTop} />
-
+                        {/* <Image source={require('../../assets/images/search-home.jpg')} style={styles.imageTop} /> */}
+                            {this.loginScreenImage()}
                     </View>
 
                     <View style={styles.bottomContainer}>

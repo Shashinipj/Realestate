@@ -3,8 +3,9 @@ import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, Switch, Te
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-
 import RangeSlider from 'rn-range-slider';
+import Ionicon from 'react-native-vector-icons/Ionicons';
+import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const PropertyTypes = {
@@ -81,7 +82,6 @@ export default class SearchBarScreen extends Component {
         } else {
             if (!this.state.propertyType) {
                 this.state.propertyType = {};
-                // this.state.propertyType = null;
             }
 
             switch (type) {
@@ -292,25 +292,33 @@ export default class SearchBarScreen extends Component {
 
         return (
             <View style={{ flex: 1 }}>
-                <View style={styles.searchBarView}>
-                    {/* {this.GooglePlacesInput()} */}
-                    <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
-                        // this.setSearchModalVisible(!this.state.searchModalVisible);
+                <View style={[styles.searchBarView, { flexDirection: 'row', width: "100%" }]}>
+
+                    <TouchableWithoutFeedback style={{ padding: 5, flex: 1 }} onPress={() => {
                         this.props.navigation.navigate('SearchBarScreen');
                         this.setFilterModalVisible();
                     }}>
 
-                        <View style={{ height: 30, alignItems: 'center', flexDirection: 'row' }}>
+                        <View style={{ height: 30, alignItems: 'center', flexDirection: 'row', width: "100%" }}>
                             <Icon
                                 name="search"
                                 type='MaterialIcons'
                                 size={20}
                                 color='gray'
                             />
-                            <Text style={{ color: '#000000', marginLeft: 10 }}>{this.state.location}</Text>
+                            <Text style={{ color: '#000000', marginLeft: 10, width: '75%' }}>{this.state.location}</Text>
+
                         </View>
 
                     </TouchableWithoutFeedback>
+
+                    <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => {
+                        this.setFilterModalVisible();
+                        this.props.navigation.navigate('Search');
+                    }}>
+                        <Text style={{ textAlign: 'right', fontSize: 12 }}>Cancel</Text>
+                    </TouchableOpacity>
+
                 </View>
 
                 <View style={{
@@ -395,7 +403,7 @@ export default class SearchBarScreen extends Component {
                                             : styles.propertTypeButtons
                                     }>
                                         <Text style={
-                                    this.state.isSelectAll ? [{ color: 'white', fontSize: 16 }] : {fontSize: 16}}>ALL</Text>
+                                            this.state.isSelectAll ? [{ color: 'white', fontSize: 16 }] : { fontSize: 16 }}>ALL</Text>
 
                                     </View>
                                 </TouchableOpacity>
@@ -409,6 +417,8 @@ export default class SearchBarScreen extends Component {
                                             : styles.propertTypeButtons
                                     }>
 
+                                        <Meticon name='home-outline' size={30} color={this.state.isSelectedHouse ? 'white' : 'gray'} />
+
                                     </View>
                                 </TouchableOpacity>
                                 <Text>House</Text>
@@ -420,6 +430,7 @@ export default class SearchBarScreen extends Component {
                                         this.state.isSelectedApartment ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
+                                        <Meticon name='home-outline' size={30} color={this.state.isSelectedApartment ? 'white' : 'gray'} />
 
                                     </View>
                                 </TouchableOpacity>
@@ -433,6 +444,8 @@ export default class SearchBarScreen extends Component {
                                             : styles.propertTypeButtons
                                     }>
 
+                                        <Meticon name='home-outline' size={30} color={this.state.isSelectedTownhouse ? 'white' : 'gray'} />
+
                                     </View>
                                 </TouchableOpacity>
                                 <Text>Townhouse</Text>
@@ -444,6 +457,7 @@ export default class SearchBarScreen extends Component {
                                         this.state.isSelectedVilla ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
+                                        <Meticon name='home-outline' size={30} color={this.state.isSelectedVilla ? 'white' : 'gray'} />
 
                                     </View>
                                 </TouchableOpacity>
@@ -458,11 +472,12 @@ export default class SearchBarScreen extends Component {
 
                     <View style={styles.separatorView}></View>
 
-                    <View style={{ marginHorizontal: 5 }}>
-                        <Text style={styles.mainCategoryText}>(icon) Bedrooms</Text>
+                    <View style={[styles.mainCategoryView, { flexDirection: 'row' }]}>
+                        <Ionicon name="ios-bed" size={20} />
+                        <Text style={[styles.mainCategoryText, { marginLeft: 10 }]}>Bedrooms</Text>
                     </View>
 
-                    <View style={{ marginVertical: 10 }}>
+                    <View style={{ marginBottom: 10 }}>
                         <View style={styles.buttonSetView}>
                             <TouchableOpacity
                                 style={
@@ -579,8 +594,9 @@ export default class SearchBarScreen extends Component {
 
                     <View style={styles.separatorView}></View>
 
-                    <View style={styles.mainCategoryView}>
-                        <Text style={styles.mainCategoryText}>(icon) Bathrooms</Text>
+                    <View style={[styles.mainCategoryView, { flexDirection: 'row' }]}>
+                        <Meticon name="shower" size={20} />
+                        <Text style={[styles.mainCategoryText, { marginLeft: 10 }]}>Bathrooms</Text>
                     </View>
 
 
@@ -673,8 +689,9 @@ export default class SearchBarScreen extends Component {
 
                     <View style={styles.separatorView}></View>
 
-                    <View style={styles.mainCategoryView}>
-                        <Text style={styles.mainCategoryText}>(icon) Car apaces</Text>
+                    <View style={[styles.mainCategoryView, { flexDirection: 'row' }]}>
+                        <Ionicon name="ios-car" size={20} />
+                        <Text style={[styles.mainCategoryText, { marginLeft: 10 }]}>Car apaces</Text>
                     </View>
 
                     <View style={styles.buttonSetView}>
@@ -858,7 +875,6 @@ export default class SearchBarScreen extends Component {
                         </View>
                     </TouchableOpacity>
 
-
                 </View>
             </View>
         );
@@ -948,7 +964,6 @@ export default class SearchBarScreen extends Component {
             <View style={{ flex: 1, paddingTop: 20 }}>
                 {this.GooglePlacesInput()}
                 {this.showFilterModal()}
-
             </View>
         );
     }
@@ -979,8 +994,8 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         borderWidth: 1,
         marginBottom: 5,
-        alignItems:'center',
-        justifyContent:'center'
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     propertyTypeMainView: {
         marginHorizontal: 5,
