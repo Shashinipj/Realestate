@@ -60,6 +60,7 @@
 		D768A486EC1A451D93823FAA /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 38C8595A6FFF4548A249D715 /* Foundation.ttf */; };
 		D7F791AF7F394E93AE91DBC9 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C332CE47EFEC4C43B1CD98C4 /* FontAwesome5_Regular.ttf */; };
 		D8F17784A97D4C6C977EE7E3 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 548CE126C4494E4E809D1EB0 /* MaterialCommunityIcons.ttf */; };
+		E876168222D311AA002FAC2A /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E876165622D3118B002FAC2A /* libAirMaps.a */; };
 		E88E341222CA0ADB008B9041 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E88E341122CA0ADA008B9041 /* GoogleService-Info.plist */; };
 		E88E341322CA0ADB008B9041 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E88E341122CA0ADA008B9041 /* GoogleService-Info.plist */; };
 		E88E341422CA0ADB008B9041 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E88E341122CA0ADA008B9041 /* GoogleService-Info.plist */; };
@@ -372,6 +373,13 @@
 			remoteGlobalIDString = A39873CE1EA65EE60051E01A;
 			remoteInfo = "RNVectorIcons-tvOS";
 		};
+		E876165522D3118B002FAC2A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E876165122D3118A002FAC2A /* AirMaps.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 11FA5C511C4A1296003AC2EE;
+			remoteInfo = AirMaps;
+		};
 		E88E347A22CA14D9008B9041 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C40EAD0A78CE42F1A36E8EB0 /* RNFirebase.xcodeproj */;
@@ -446,6 +454,7 @@
 		E34B7A76755348928FCA02ED /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		E3E73FAAD2C0BE0112E38E4D /* Pods-Realestate-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Realestate-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Realestate-tvOSTests/Pods-Realestate-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		E4A00703C6AA4194BFD0F03A /* libRNVectorIcons-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNVectorIcons-tvOS.a"; sourceTree = "<group>"; };
+		E876165122D3118A002FAC2A /* AirMaps.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AirMaps.xcodeproj; path = "../node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; };
 		E88E341122CA0ADA008B9041 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
@@ -468,6 +477,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E876168222D311AA002FAC2A /* libAirMaps.a in Frameworks */,
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
 				11D1A2F320CAFA9E000508D9 /* libRCTAnimation.a in Frameworks */,
@@ -683,6 +693,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				E876165122D3118A002FAC2A /* AirMaps.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -798,6 +809,14 @@
 			children = (
 				E80504B222C394E600526410 /* libRNVectorIcons.a */,
 				E80504B422C394E600526410 /* libRNVectorIcons-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E876165222D3118A002FAC2A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E876165622D3118B002FAC2A /* libAirMaps.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -934,6 +953,10 @@
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = E876165222D3118A002FAC2A /* Products */;
+					ProjectRef = E876165122D3118A002FAC2A /* AirMaps.xcodeproj */;
+				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
 					ProjectRef = 00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */;
@@ -1295,6 +1318,13 @@
 			fileType = archive.ar;
 			path = "libRNVectorIcons-tvOS.a";
 			remoteRef = E80504B322C394E600526410 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E876165622D3118B002FAC2A /* libAirMaps.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libAirMaps.a;
+			remoteRef = E876165522D3118B002FAC2A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		E88E347B22CA14D9008B9041 /* libRNFirebase.a */ = {

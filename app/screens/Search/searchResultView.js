@@ -112,7 +112,7 @@ export default class SearchResultView extends Component<Props> {
                 <View style={{ flexDirection: 'row' }}>
 
                     <View style={{ marginLeft: 10 }}>
-                        <Text style={{ fontSize: 15, fontWeight: 600, marginTop: 10, marginBottom: 5 }}>{data.item.Price}/=</Text>
+                        <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{data.item.Price}/=</Text>
                         <Text style={{ fontSize: 12, color: 'gray' }}>{data.item.Address}</Text>
 
                         <View style={{ flexDirection: 'row' }}>

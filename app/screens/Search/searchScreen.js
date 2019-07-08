@@ -231,7 +231,7 @@ export default class SearchScreen extends Component {
                     <View style={{ flexDirection: 'row' }}>
                         <Text style={{ color: '#616161', fontSize: 12 }}>Don't have an account? {' '}</Text>
                         <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                            <Text style={{ color: '#49141E', fontSize: 12, fontWeight: 500 }}>Register</Text>
+                            <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Register</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -252,7 +252,7 @@ export default class SearchScreen extends Component {
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text>
                             <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                                <Text style={{ color: '#49141E', fontSize: 12, fontWeight: 500 }}>Sign in</Text>
+                                <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
                             </TouchableOpacity>
                         </View>
                     </TouchableOpacity>
@@ -434,7 +434,7 @@ export default class SearchScreen extends Component {
 
                         <View style={styles.textContainer}>
 
-                            <Text style={{ fontSize: 18, fontWeight: 400 }}>Never miss a property again</Text>
+                            <Text style={{ fontSize: 18, fontWeight: '400' }}>Never miss a property again</Text>
 
                             <View style={{ marginVertical: 20 }}>
                                 <Text style={{ textAlign: 'center', color: 'gray', fontSize: 13 }}>
@@ -461,7 +461,7 @@ export default class SearchScreen extends Component {
                     <Image source={require('../../assets/icons/marker.png')} style={styles.homeIcon} />
 
                     <View style={{ flexDirection: 'column', marginVertical: 5 }}>
-                        <Text style={{ fontSize: 13, fontWeight: 400 }}>Track your home</Text>
+                        <Text style={{ fontSize: 13, fontWeight: '400' }}>Track your home</Text>
                         <Text style={{ fontSize: 12, color: "gray" }}>Track its value against local sales</Text>
                     </View>
 

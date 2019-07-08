@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, Switch, TextInput } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import { Icon } from 'react-native-elements';
+import { Icon, ListItem } from 'react-native-elements';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import RangeSlider from 'rn-range-slider';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Collapse, CollapseHeader, CollapseBody, AccordionList } from 'accordion-collapse-react-native';
 
 
 const PropertyTypes = {
@@ -843,6 +844,31 @@ export default class SearchBarScreen extends Component {
                     <View style={styles.mainCategoryView}>
                         <Text style={styles.mainCategoryText}>Sort order</Text>
                     </View>
+                    {/* <View style={{ margin: 10 }}>
+                        <Collapse>
+                            <CollapseHeader>
+                                <View>
+                                    <Text>Most relevant</Text>
+                                </View>
+                            </CollapseHeader>
+                            <CollapseBody>
+                                <ListItem>
+                                    <Text>Price (High - Low)</Text>
+                                </ListItem>
+                                <ListItem>
+                                    <Text>Price (Low - High)</Text>
+                                </ListItem>
+                                <ListItem>
+                                    <Text>Date (Newest - Oldest)</Text>
+                                </ListItem>
+                                <ListItem>
+                                    <Text>Date (Oldest - Newest)</Text>
+                                </ListItem>
+
+                            </CollapseBody>
+
+                        </Collapse>
+                    </View> */}
 
                     <View style={styles.separatorView}></View>
 
