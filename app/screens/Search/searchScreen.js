@@ -175,7 +175,7 @@ export default class SearchScreen extends Component {
                         this.setModalVisible(!this.state.modalVisible);
                     }}
                 >
-                    <Text style={{ textAlign: 'center', color: '#49141E' }}>Join</Text>
+                    <Text style={{ textAlign: 'center', color: '#49141E', fontWeight:'600' }}>Join</Text>
 
                 </TouchableOpacity>
             );

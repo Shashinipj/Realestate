@@ -38,8 +38,14 @@ export default class SearchResultView extends Component<Props> {
         let bathRooms = propData.bathRooms;
         let carSpace = propData.carSpace;
         let location = propData.location;
+        let minPrice = propData.rangeLow;
+        let maxPrice = propData.rangeHigh;
+        let priceRange = maxPrice - minPrice;
+        let landSize = propData.landSize;
+        let featureKeywords = propData.keyWords;
 
-        console.log(this.props.navigation.state.params.data);
+        // console.log(this.props.navigation.state.params.data);
+
 
         let filteredProperties = [];
 
@@ -68,11 +74,52 @@ export default class SearchResultView extends Component<Props> {
 
                                             if (carSpace == -1 || propObj.CarPark >= bathRooms) {
 
-                                                filteredProperties.push(propObj);
-                                                console.log(filteredProperties);
-                                                this.setState({
-                                                    propProperties: filteredProperties
-                                                });
+                                                if (landSize == 0 || propObj.LandSize >= landSize) {
+
+                                                    if (priceRange == 0 || ((maxPrice >= propObj.Price) && (propObj.Price >= minPrice))) {
+
+                                                        let hasKeyword = false;
+                                                        if (featureKeywords != "") {
+                                                            const arrFeatureKeywords = featureKeywords.split(",");
+
+                                                            // loopKeyword:
+                                                            for (let i = 0; i < arrFeatureKeywords.length; i++) {
+                                                                const keyWord = arrFeatureKeywords[i];
+
+                                                                let keywordFound = false;
+                                                                if (propObj.Features) {
+                                                                    for (let j = 0; j < propObj.Features.length; j++) {
+                                                                        const featureName = propObj.Features[j];
+    
+                                                                        const reg = new RegExp(featureName, "gi");
+                                                                        if (reg.test(keyWord)) {
+                                                                            keywordFound = true;
+                                                                            break;
+                                                                            // break loopKeyword;
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                if (keywordFound) {
+                                                                    hasKeyword = true;
+                                                                } else {
+                                                                    hasKeyword = false;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (featureKeywords == "" || hasKeyword) {
+
+                                                            filteredProperties.push(propObj);
+                                                            console.log(filteredProperties);
+                                                            this.setState({
+                                                                propProperties: filteredProperties
+                                                            });
+                                                            console.log(maxPrice >= (propObj.Price >= minPrice))
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -164,12 +211,12 @@ export default class SearchResultView extends Component<Props> {
         return (
             <View style={styles.container}>
                 {(this.state.propProperties.length == 0) ?
-                    <View style={{flex: 1,alignItems:'center', justifyContent:'center'}}>
-                        <Text style={{fontSize: 17}}>No data to show!</Text>
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 17 }}>No data to show!</Text>
                         <TouchableOpacity onPress={() => {
-                        this.props.navigation.navigate('Search');
-                    }}>
-                            <View style={{ height: 30, alignItems: 'center', borderRadius:10, backgroundColor:'#f3d500', justifyContent:'center', paddingHorizontal: 10, marginTop: 20}}>
+                            this.props.navigation.navigate('Search');
+                        }}>
+                            <View style={{ height: 30, alignItems: 'center', borderRadius: 10, backgroundColor: '#f3d500', justifyContent: 'center', paddingHorizontal: 10, marginTop: 20 }}>
                                 <Text>
                                     Back to home
                                 </Text>

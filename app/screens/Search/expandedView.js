@@ -197,6 +197,10 @@ export default class ExpandedView extends Component {
                                 <Ionicon name="ios-car" size={15} />
                                 <Text style={styles.subDetailsText}>{property.CarPark}</Text>
 
+                                <Image source={require('../../assets/images/land-size.png')} style={{width: 15, height: 15}} />
+                                <Text style={[styles.subDetailsText, {marginRight: 0}]}>{property.LandSize} m</Text>
+                                <Text style={{ fontSize: 10, lineHeight: 10 }}>2</Text>
+
                                 <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
 
                                 <Text style={styles.subDetailsText}>{property.PropType}</Text>

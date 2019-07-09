@@ -45,6 +45,13 @@ export default class SearchBarScreen extends Component {
             bedRooms: -1,
             bathRooms: -1,
             carSpace: -1,
+
+            rangeLow: 0,
+            rangeHigh: 0,
+
+            landSize: 0,
+            keyWords: '',
+            keyWordsArr: []
         };
 
     }
@@ -64,7 +71,25 @@ export default class SearchBarScreen extends Component {
             bedRooms: -1,
             bathRooms: -1,
             carSpace: -1,
+
+            rangeLow: 0,
+            rangeHigh: 0,
+
+            landSize: 0,
+            keyWords: '',
+            keyWordsArr: []
         });
+    }
+
+    getKeyWords(text) {
+
+        // let arr = ke
+
+        this.setState({
+            keyWords: text,
+            keyWordsArr: text.split(",")
+        });
+        console.log(this.state.keyWordsArr)
     }
 
     Onpress_PropertyTypeFilter(type) {
@@ -211,19 +236,23 @@ export default class SearchBarScreen extends Component {
                         <Text style={styles.mainCategoryText}>Price range</Text>
                     </View>
 
-                    <Text style={{ textAlign: 'center', fontSize: 15 }}>Any Price</Text>
+                    {this.displayPriceRange()}
                     <View style={{ backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
                         <RangeSlider
                             style={{ width: '50%', height: 80 }}
                             gravity={'center'}
-                            min={200}
-                            max={1000}
-                            step={20}
+                            min={100000}
+                            max={10000000}
+                            // step={20}
                             selectionColor="#000000"
                             blankColor='blue'
-                        // onValueChanged={(low, high, fromUser) => {
-                        //     this.setState({ rangeLow: low, rangeHigh: high })
-                        // }} 
+                            labelBackgroundColor='#424242'
+                            labelBorderColor='#424242'
+                            initialLowValue={100000}
+                            initialHighValue={10000000}
+                            onValueChanged={(low, high, fromUser) => {
+                                this.setState({ rangeLow: low, rangeHigh: high })
+                            }}
                         />
                     </View>
                 </View>
@@ -236,22 +265,26 @@ export default class SearchBarScreen extends Component {
 
                 <View>
                     <View style={{ marginHorizontal: 5 }}>
-                        <Text style={styles.mainCategoryText}>Price per week</Text>
+                        <Text style={styles.mainCategoryText}>Price range</Text>
                     </View>
 
-                    <Text style={{ textAlign: 'center', fontSize: 15 }}>Any Price</Text>
+                    {this.displayPriceRange()}
                     <View style={{ backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
                         <RangeSlider
                             style={{ width: 160, height: 80 }}
                             gravity={'center'}
-                            min={200}
-                            max={1000}
+                            min={100000}
+                            max={10000000}
                             step={20}
                             selectionColor="#000000"
                             blankColor='blue'
-                        // onValueChanged={(low, high, fromUser) => {
-                        //     this.setState({ rangeLow: low, rangeHigh: high })
-                        // }} 
+                            labelBackgroundColor='#424242'
+                            labelBorderColor='#424242'
+                            initialLowValue={100000}
+                            initialHighValue={10000000}
+                            onValueChanged={(low, high, fromUser) => {
+                                this.setState({ rangeLow: low, rangeHigh: high })
+                            }}
                         />
                     </View>
                 </View>
@@ -267,25 +300,62 @@ export default class SearchBarScreen extends Component {
                         <Text style={styles.mainCategoryText}>Price range</Text>
                     </View>
 
-                    <Text style={{ textAlign: 'center', fontSize: 15 }}>Any Price</Text>
+                    {this.displayPriceRange()}
                     <View style={{ backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
                         <RangeSlider
                             style={{ width: 160, height: 80 }}
                             gravity={'center'}
-                            min={200}
-                            max={1000}
+                            min={100000}
+                            max={10000000}
                             step={20}
                             selectionColor="#000000"
                             blankColor='blue'
-                        // onValueChanged={(low, high, fromUser) => {
-                        //     this.setState({ rangeLow: low, rangeHigh: high })
-                        // }} 
+                            labelBackgroundColor='#424242'
+                            labelBorderColor='#424242'
+                            initialLowValue={100000}
+                            initialHighValue={10000000}
+                            onValueChanged={(low, high, fromUser) => {
+                                this.setState({ rangeLow: low, rangeHigh: high })
+                            }}
                         />
                     </View>
                 </View>
             );
 
         }
+
+    }
+
+    displayPriceRange() {
+
+        let priceRange = this.state.rangeHigh - this.state.rangeLow;
+
+        if (priceRange == 0 || (this.state.rangeLow == 100000 && this.state.rangeHigh == 10000000)) {
+            return (
+                <Text style={{ textAlign: 'center', fontSize: 15 }}>Any Price</Text>
+            );
+        }
+        else if ((this.state.rangeLow == 100000 && this.state.rangeHigh < 10000000)) {
+            return (
+                <Text style={{ textAlign: 'center', fontSize: 15 }}>Up to {this.state.rangeHigh}</Text>
+            );
+
+        }
+        else if ((this.state.rangeLow > 100000 && this.state.rangeHigh == 10000000)) {
+            return (
+                <Text style={{ textAlign: 'center', fontSize: 15 }}>More than {this.state.rangeLow}</Text>
+            );
+
+        }
+        else {
+            return (
+                <Text style={{ textAlign: 'center', fontSize: 15 }}>{this.state.rangeLow} - {this.state.rangeHigh}</Text>
+            );
+        }
+
+
+
+
 
     }
 
@@ -790,7 +860,9 @@ export default class SearchBarScreen extends Component {
                     <View style={{ justifyContent: 'center', flexDirection: 'row', marginVertical: 20 }}>
                         <Text style={{ fontSize: 15 }}>At leaset </Text>
                         <TextInput
-                            style={{ borderColor: 'black', borderBottomWidth: 1, width: 70 }}
+                            style={{ borderColor: 'black', borderBottomWidth: 1, width: 70, textAlign: 'center' }}
+                            value={this.state.landSize}
+                            onChangeText={landSize => this.setState({ landSize })}
                         // onChangeText={(text) => this.setState({ text })}
                         // value={this.state.text}
                         />
@@ -801,10 +873,9 @@ export default class SearchBarScreen extends Component {
 
                     </View>
 
-                    <View style={[styles.buttonSetView, { marginHorizontal: 80 }]}>
+                    {/* <View style={[styles.buttonSetView, { marginHorizontal: 80 }]}>
                         <TouchableOpacity style={{ flex: 1 }}>
                             <View style={[styles.subButtonView, { borderRightWidth: 1, height: 20 }]}>
-                                {/* <Text style={styles.propertyTypeText}>Metres(2)</Text> */}
                                 <View style={{ flexDirection: 'row' }}>
                                     <Text style={{ fontSize: 12 }}>Metres</Text>
                                     <Text style={{ fontSize: 9, lineHeight: 12 }}>2</Text>
@@ -824,7 +895,7 @@ export default class SearchBarScreen extends Component {
                             </View>
                         </TouchableOpacity>
 
-                    </View>
+                    </View> */}
 
                     <View style={styles.separatorView}></View>
 
@@ -835,8 +906,12 @@ export default class SearchBarScreen extends Component {
                     <TextInput
                         style={{ marginHorizontal: 5 }}
                         placeholder='e.g Pool, garage'
-                    // onChangeText={(text) => this.setState({ text })}
-                    // value={this.state.text}
+                        onChangeText={
+                            (keyWords) => this.getKeyWords(keyWords)
+                        }
+                        // onChangeText={keyWords => this.setState({ keyWords })}
+                        value={this.state.keyWords}
+                    // onChange={(keyWords) => this.getKeyWords(keyWords)}
                     />
 
                     <View style={styles.separatorView}></View>
@@ -872,9 +947,9 @@ export default class SearchBarScreen extends Component {
 
                     <View style={styles.separatorView}></View>
 
-                    <Text> Exclude under contract/offer</Text>
+                    {/* <Text> Exclude under contract/offer</Text>
 
-                    <View style={styles.separatorView}></View>
+                    <View style={styles.separatorView}></View> */}
 
                 </ScrollView>
                 <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
@@ -929,6 +1004,7 @@ export default class SearchBarScreen extends Component {
                     this.setState({
                         location: data.description
                     });
+                    this.ResetFilters();
                 }}
 
                 getDefaultValue={() => ''}
