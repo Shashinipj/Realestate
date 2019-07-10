@@ -144,8 +144,11 @@ export default class SearchScreen extends Component {
                 },
                 {
                     text: 'Yes', onPress: () => {
-                        this.setState({ loginState: false });
-                        this.loginReset();
+                        firebase.auth().signOut()
+                            .then(() => {
+                                this.setState({ loginState: false });
+                                this.loginReset();
+                            });
                     }
                 },
             ],
@@ -175,7 +178,7 @@ export default class SearchScreen extends Component {
                         this.setModalVisible(!this.state.modalVisible);
                     }}
                 >
-                    <Text style={{ textAlign: 'center', color: '#49141E', fontWeight:'600' }}>Join</Text>
+                    <Text style={{ textAlign: 'center', color: '#49141E', fontWeight: '600' }}>Join</Text>
 
                 </TouchableOpacity>
             );
@@ -185,7 +188,7 @@ export default class SearchScreen extends Component {
             return (
                 <TouchableOpacity style={styles.joinButton}
                     onPress={() => {
-                        firebase.auth().signOut();
+
                         this.onPressSignOutButton();
                     }}
                 >
@@ -415,7 +418,7 @@ export default class SearchScreen extends Component {
                         </View>
 
                         {/* <Image source={require('../../assets/images/search-home.jpg')} style={styles.imageTop} /> */}
-                            {this.loginScreenImage()}
+                        {this.loginScreenImage()}
                     </View>
 
                     <View style={styles.bottomContainer}>
