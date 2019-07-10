@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, Switch, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, Switch, TextInput, LayoutAnimation } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon, ListItem } from 'react-native-elements';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -51,7 +51,10 @@ export default class SearchBarScreen extends Component {
 
             landSize: 0,
             keyWords: '',
-            keyWordsArr: []
+            keyWordsArr: [],
+
+            sortOderTextViewVisible: true,
+            sortOrder: -1,
         };
 
     }
@@ -77,13 +80,143 @@ export default class SearchBarScreen extends Component {
 
             landSize: 0,
             keyWords: '',
-            keyWordsArr: []
+            keyWordsArr: [],
+
+            sortOderTextViewVisible: true,
+            sortOrder: -1,
         });
     }
 
-    getKeyWords(text) {
+    RenderSortOrderTextView() {
+        if (this.state.sortOderTextViewVisible) {
+            return (
+                <TouchableOpacity onPress={() => {
+                    this.RenderSortOrder();
+                    this.OnPress_SortOrder();
+                }}>
+                    <View style={{ marginLeft: 10 }}>
+                        {this.setTextForSortFilter()}
+                    </View>
+                </TouchableOpacity>
+            );
+        }
 
-        // let arr = ke
+        return null;
+    }
+
+    OnPress_SortOrder() {
+
+        LayoutAnimation.configureNext({
+            update: {
+                type: LayoutAnimation.Types.linear,
+                duration: 200
+            }
+        });
+
+        this.setState({
+            sortOderTextViewVisible: !this.state.sortOderTextViewVisible
+        })
+    }
+
+    RenderSortOrder() {
+
+        if (!this.state.sortOderTextViewVisible) {
+            return (
+                <View style={{ marginLeft: 10 }}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            this.sortOrderSelected(-1);
+                            this.OnPress_SortOrder();
+                        }}
+                    >
+                        <Text style={
+                            this.state.sortOrder == -1 ? styles.sortTextSelected : styles.sortText
+                        }>Most Relevant</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => {
+                            this.sortOrderSelected(1);
+                            this.OnPress_SortOrder();
+                        }}
+                    >
+                        <Text style={
+                            this.state.sortOrder == 1 ? styles.sortTextSelected : styles.sortText
+                        }>Price (High - Low)</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => {
+                            this.sortOrderSelected(2);
+                            this.OnPress_SortOrder();
+                        }}
+                    >
+                        <Text style={
+                            this.state.sortOrder == 2 ? styles.sortTextSelected : styles.sortText
+                        }>Price (Low - High)</Text>
+                    </TouchableOpacity>
+
+                    {/* <TouchableOpacity
+                        onPress={() => {
+                            this.sortOrderSelected(3);
+                            this.OnPress_SortOrder();
+                        }}
+                    >
+                        <Text style={
+                            this.state.sortOrder == 3 ? styles.sortTextSelected : styles.sortText
+                        }>Date (Newest - Oldest)</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => {
+                            this.sortOrderSelected(4);
+                            this.OnPress_SortOrder();
+                        }}
+                    >
+                        <Text style={
+                            this.state.sortOrder == 4 ? styles.sortTextSelected : styles.sortText
+                        }>Date (Oldest - Newest)</Text>
+                    </TouchableOpacity> */}
+
+                </View>
+
+            );
+        }
+
+        return null;
+    }
+
+    setTextForSortFilter() {
+        const no = this.state.sortOrder;
+
+        if (no == -1) {
+            return (
+                <Text style={styles.sortText}>Most Relevant</Text>
+            )
+        }
+        else if (no == 1) {
+            return (
+                <Text style={styles.sortText}>Price (High - Low)</Text>
+            )
+        }
+        else if (no == 2) {
+            return (
+                <Text style={styles.sortText}>Price (Low - High)</Text>
+            )
+        }
+        else if (no == 3) {
+            return (
+                <Text style={styles.sortText}>Date (Newest - Oldest)</Text>
+            )
+        }
+        else if (no == 4) {
+            return (
+                <Text style={styles.sortText}>Date (Oldest - Newest)</Text>
+            )
+        }
+    }
+
+    getKeyWords(text) {
 
         this.setState({
             keyWords: text,
@@ -181,6 +314,13 @@ export default class SearchBarScreen extends Component {
         });
     }
 
+    sortOrderSelected(sortType) {
+
+        this.setState({
+            sortOrder: sortType
+        });
+    }
+
     bedRoomsButtonPress(buttonNo) {
         this.setState({
             bedRooms: buttonNo
@@ -237,7 +377,7 @@ export default class SearchBarScreen extends Component {
                     </View>
 
                     {this.displayPriceRange()}
-                    <View style={{ backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={styles.priceDetailView}>
                         <RangeSlider
                             style={{ width: '50%', height: 80 }}
                             gravity={'center'}
@@ -269,7 +409,7 @@ export default class SearchBarScreen extends Component {
                     </View>
 
                     {this.displayPriceRange()}
-                    <View style={{ backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={styles.priceDetailView}>
                         <RangeSlider
                             style={{ width: 160, height: 80 }}
                             gravity={'center'}
@@ -301,7 +441,7 @@ export default class SearchBarScreen extends Component {
                     </View>
 
                     {this.displayPriceRange()}
-                    <View style={{ backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={styles.priceDetailView}>
                         <RangeSlider
                             style={{ width: 160, height: 80 }}
                             gravity={'center'}
@@ -332,30 +472,26 @@ export default class SearchBarScreen extends Component {
 
         if (priceRange == 0 || (this.state.rangeLow == 100000 && this.state.rangeHigh == 10000000)) {
             return (
-                <Text style={{ textAlign: 'center', fontSize: 15 }}>Any Price</Text>
+                <Text style={styles.displayPriceRangeText}>Any Price</Text>
             );
         }
         else if ((this.state.rangeLow == 100000 && this.state.rangeHigh < 10000000)) {
             return (
-                <Text style={{ textAlign: 'center', fontSize: 15 }}>Up to {this.state.rangeHigh}</Text>
+                <Text style={styles.displayPriceRangeText}>Up to {this.state.rangeHigh}</Text>
             );
 
         }
         else if ((this.state.rangeLow > 100000 && this.state.rangeHigh == 10000000)) {
             return (
-                <Text style={{ textAlign: 'center', fontSize: 15 }}>More than {this.state.rangeLow}</Text>
+                <Text style={styles.displayPriceRangeText}>More than {this.state.rangeLow}</Text>
             );
 
         }
         else {
             return (
-                <Text style={{ textAlign: 'center', fontSize: 15 }}>{this.state.rangeLow} - {this.state.rangeHigh}</Text>
+                <Text style={styles.displayPriceRangeText}>{this.state.rangeLow} - {this.state.rangeHigh}</Text>
             );
         }
-
-
-
-
 
     }
 
@@ -919,31 +1055,9 @@ export default class SearchBarScreen extends Component {
                     <View style={styles.mainCategoryView}>
                         <Text style={styles.mainCategoryText}>Sort order</Text>
                     </View>
-                    {/* <View style={{ margin: 10 }}>
-                        <Collapse>
-                            <CollapseHeader>
-                                <View>
-                                    <Text>Most relevant</Text>
-                                </View>
-                            </CollapseHeader>
-                            <CollapseBody>
-                                <ListItem>
-                                    <Text>Price (High - Low)</Text>
-                                </ListItem>
-                                <ListItem>
-                                    <Text>Price (Low - High)</Text>
-                                </ListItem>
-                                <ListItem>
-                                    <Text>Date (Newest - Oldest)</Text>
-                                </ListItem>
-                                <ListItem>
-                                    <Text>Date (Oldest - Newest)</Text>
-                                </ListItem>
 
-                            </CollapseBody>
-
-                        </Collapse>
-                    </View> */}
+                    {this.RenderSortOrderTextView()}
+                    {this.RenderSortOrder()}
 
                     <View style={styles.separatorView}></View>
 
@@ -1074,7 +1188,6 @@ export default class SearchBarScreen extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-
     },
     searchBarView: {
         marginTop: 15,
@@ -1139,6 +1252,23 @@ const styles = StyleSheet.create({
     },
     landSizeButtonText: {
         fontSize: 10
+    },
+    sortTextSelected: {
+        color: '#49141E',
+        marginVertical: 5
+    },
+    sortText: {
+        color: '#616161',
+        marginVertical: 5
+    },
+    priceDetailView: {
+        backgroundColor: 'white',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    displayPriceRangeText: {
+        textAlign: 'center',
+        fontSize: 15
     }
 
 });

@@ -90,7 +90,7 @@ export default class SearchResultView extends Component<Props> {
                                                                 if (propObj.Features) {
                                                                     for (let j = 0; j < propObj.Features.length; j++) {
                                                                         const featureName = propObj.Features[j];
-    
+
                                                                         const reg = new RegExp(featureName, "gi");
                                                                         if (reg.test(keyWord)) {
                                                                             keywordFound = true;
@@ -113,9 +113,6 @@ export default class SearchResultView extends Component<Props> {
 
                                                             filteredProperties.push(propObj);
                                                             console.log(filteredProperties);
-                                                            this.setState({
-                                                                propProperties: filteredProperties
-                                                            });
                                                             console.log(maxPrice >= (propObj.Price >= minPrice))
                                                         }
                                                     }
@@ -129,6 +126,43 @@ export default class SearchResultView extends Component<Props> {
                     }
                 }
             }
+
+            const sortType = propData.sortOrder;
+
+
+            if (sortType == 1) {
+
+                filteredProperties.sort((a, b) => {
+
+                    if (a.Price < b.Price) {
+                        return 1;
+                    } else if (a.Price > b.Price) {
+                        return -1;
+                    }
+
+                    return 0;
+                });
+            }
+
+            else if (sortType == 2) {
+
+                filteredProperties.sort((a, b) => {
+
+                    if (a.Price < b.Price) {
+                        return -1;
+                    } else if (a.Price > b.Price) {
+                        return 1;
+                    }
+
+                    return 0;
+                });
+            }
+
+            this.setState({
+                propProperties: filteredProperties
+            });
+
+
         });
 
         console.log(this.state.filteredProperties)
