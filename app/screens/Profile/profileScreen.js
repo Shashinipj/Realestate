@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, TouchableOpacity } from 'react-native';
-import { NavigationProp, NavigationEvents, Alert } from 'react-navigation';
+import { View, StyleSheet, Text, TextInputProps, TouchableOpacity, Alert } from 'react-native';
+import { NavigationProp, NavigationEvents } from 'react-navigation';
 import firebase from 'react-native-firebase';
 
 type Props = {
@@ -20,7 +20,6 @@ export default class ProfileScreen extends Component<Props> {
             userEmail: '',
             loggedIn: false
         };
-
     }
 
     componentDidMount() {
@@ -38,54 +37,49 @@ export default class ProfileScreen extends Component<Props> {
                 loggedIn: true
             });
         }
-
+        else {
+            this.setState({
+                userEmail: '',
+                loggedIn: false
+            });
+        }
     }
 
     renderProfileView() {
-        if (this.state.loggedIn) {
+        if (!this.state.loggedIn) {
             return (
-                <View style={{ flex: 1, alignContent: 'center', justifyContent: 'center' }}>
-                    <Text style={{ backgroundColor: 'red', textAlign: 'center' }}>
+                <View style={styles.buttonContainer}>
+                    <Text style={{ textAlign: 'center', fontWeight: '400', fontSize: 15 }}>
                         Please Login to see user details
                 </Text>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                    <View style={{ justifyContent: 'center', alignContent: 'center' }}>
                         {/* {this.checkUserLogin()} */}
                         <TouchableOpacity onPress={() => {
                             // this.setFilterModalVisible();
                             this.props.navigation.navigate('Search');
                         }}>
-                            <View style={{ backgroundColor: 'blue', borderRadius: 4, padding: 5, margin: 10 }}>
-                                <Text>
+                            <View style={styles.buttons}>
+                                <Text style={styles.buttonText}>
                                     Home
                         </Text>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity>
-                            <View style={{ backgroundColor: 'blue', borderRadius: 4, padding: 5, margin: 10 }}>
-                                <Text>
-                                    Login
-                        </Text>
-                            </View>
-                        </TouchableOpacity>
-
                     </View>
 
                 </View>
             );
         }
 
-        else if (!this.state.loggedIn) {
+        else if (this.state.loggedIn) {
             return (
-                <View style={{ flex: 1, alignContent: 'center', justifyContent: 'center' }}>
-                    <Text style={{ backgroundColor: 'blue', textAlign: 'center' }}>
-                        user
-                </Text>
+                <View style={styles.buttonContainer}>
+
                     <TouchableOpacity onPress={() => {
                         this.onPressSignOutButton();
                     }}>
-                        <View style={{ backgroundColor: 'blue', borderRadius: 4, padding: 5, margin: 10 }}>
-                            <Text>
+                        <View style={styles.buttons}>
+                            <Text style={styles.buttonText}>
                                 SignOut
                         </Text>
                         </View>
@@ -93,7 +87,6 @@ export default class ProfileScreen extends Component<Props> {
                 </View>
             );
         }
-
     }
 
     onPressSignOutButton() {
@@ -112,6 +105,8 @@ export default class ProfileScreen extends Component<Props> {
                         firebase.auth().signOut()
                             .then(() => {
                                 this.setState({ loggedIn: false });
+                                this.loginReset();
+                                this.props.navigation.navigate('Search');
                             });
                     }
                 },
@@ -120,12 +115,45 @@ export default class ProfileScreen extends Component<Props> {
         );
     }
 
+    loginReset() {
+        this.setState({
+            userEmail: '',
+            loggedIn: false
+        })
+    }
+
     render() {
         return (
-            <View style={{ backgroundColor: 'green', flex: 1 }}>
+            <View style={styles.container}>
                 {this.renderProfileView()}
 
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f3d500'
+    },
+    buttons: {
+        backgroundColor: '#49141E',
+        borderRadius: 4,
+        paddingVertical: 7,
+        margin: 10,
+        paddingHorizontal: 15,
+        width: '25%',
+        alignSelf: 'center'
+    },
+    buttonContainer: {
+        flex: 1,
+        alignContent: 'center',
+        justifyContent: 'center'
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: '500',
+        textAlign: 'center'
+    }
+})

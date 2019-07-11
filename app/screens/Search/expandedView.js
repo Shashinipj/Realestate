@@ -7,7 +7,7 @@ import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
 import ReadMore from 'react-native-read-more-text';
 import ImageSlider from 'react-native-image-slider';
-
+import Accounting from 'accounting-js'
 
 
 export default class ExpandedView extends Component {
@@ -98,7 +98,7 @@ export default class ExpandedView extends Component {
 
 
                         </MapView>
-                        <View style={{ flexDirection: 'row', padding: 10, backgroundColor: 'white', justifyContent: 'center', position: 'absolute', zIndex: 2, bottom: 70 }}>
+                        <View style={{ flexDirection: 'row', padding: 10, backgroundColor: 'white', justifyContent: 'center', position: 'absolute', zIndex: 2, bottom: 50 }}>
                             <TouchableOpacity style={{ flex: 1, }}>
                                 <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
                                     <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Street View</Text>
@@ -169,21 +169,22 @@ export default class ExpandedView extends Component {
                             </View>
                         </View>
                         {/* <ImageBackground style={styles.imageBackground}> */}
-                        {/* <Image source={require('../../assets/images/house.jpg')} style={styles.imageTop} /> */}
+                        {/* <Image source={{uri:'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/index.jpg?alt=media&token=3ba7172f-9e37-4eab-a082-f84cd17e16bb'}} style={styles.imageTop} /> */}
 
                         <ImageSlider
                             style={styles.imageTop}
                             images={[
-                                require('../../assets/images/house.jpg'),
-                                require('../../assets/images/house2.jpg'),
-                                require('../../assets/images/house3.jpg'),
-                                require('../../assets/images/house4.jpg')
+                                // url('https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/index.jpg?alt=media&token=3ba7172f-9e37-4eab-a082-f84cd17e16bb'),
+                                { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house.jpg?alt=media&token=6f42610b-51b1-4ee1-bdca-32984e41694c' },
+                                { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house2.jpg?alt=media&token=0ccbf59c-2358-4aa1-89d6-b1d3b7e620a8' },
+                                { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house3.jpg?alt=media&token=dc364972-504f-452b-a9a3-f2e96e37e5e5' },
+                                { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house4.jpg?alt=media&token=850bf1ef-a0d3-42bd-8e76-745cbbcc7055' },
                             ]} />
 
                         {/* </ImageBackground> */}
 
                         <View style={{ marginLeft: 10 }}>
-                            <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{property.Price}/=</Text>
+                            <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{Accounting.formatMoney(property.Price)}</Text>
                             <Text style={{ fontSize: 12, color: 'gray' }}>{property.Address}</Text>
 
                             <View style={{ flexDirection: 'row', marginTop: 5 }}>
@@ -197,8 +198,8 @@ export default class ExpandedView extends Component {
                                 <Ionicon name="ios-car" size={15} />
                                 <Text style={styles.subDetailsText}>{property.CarPark}</Text>
 
-                                <Image source={require('../../assets/images/land-size.png')} style={{width: 15, height: 15}} />
-                                <Text style={[styles.subDetailsText, {marginRight: 0}]}>{property.LandSize} m</Text>
+                                <Image source={require('../../assets/images/land-size.png')} style={{ width: 15, height: 15 }} />
+                                <Text style={[styles.subDetailsText, { marginRight: 0 }]}>{property.LandSize} m</Text>
                                 <Text style={{ fontSize: 10, lineHeight: 10 }}>2</Text>
 
                                 <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
@@ -273,14 +274,11 @@ export default class ExpandedView extends Component {
                                     <TouchableOpacity style={{ alignContent: 'flex-start', width: '10%', alignItems: 'center', justifyContent: 'center' }} onPress={() => {
                                         this.setModalVisible(!this.state.mapModalVisible);
                                     }}>
-
                                         <Meticon
                                             name="arrow-expand"
                                             size={25}
                                             color='gray'
                                         />
-
-
                                     </TouchableOpacity>
                                 </View>
 
@@ -305,9 +303,8 @@ export default class ExpandedView extends Component {
                                     <Text style={{ textAlign: 'center' }}>Get Directions</Text>
                                 </View>
                             </TouchableOpacity>
-
-
                         </View>
+
                         {this.showMapModal()}
 
                     </View>
@@ -333,32 +330,17 @@ export default class ExpandedView extends Component {
 
 
                 <View style={{ height: 60, backgroundColor: 'white', alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => {
-                        // this.setFilterModalVisible();
-                        // this.props.navigation.navigate('SearchResultView', {
-                        //     data: {
-                        //         ...this.state
-                        //     }
-                        // });
-                        console.log('search button clicked');
-                    }}>
+                    <TouchableOpacity>
+
                         <View style={{
                             backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10, width: 300,
                             borderRadius: 7, alignItems: 'center', justifyContent: 'center'
                         }}>
                             <Text style={{ color: 'white', fontWeight: '600' }}>Email agent</Text>
-                            {/* <Icon
-                                name="search"
-                                type='MaterialIcons'
-                                size={30}
-                                color='white'
-                            /> */}
                         </View>
+
                     </TouchableOpacity>
-
-
                 </View>
-
             </View >
         );
     }
@@ -394,7 +376,6 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         borderColor: 'white'
         // position: "absolute",
-
     },
     listViewTop: {
         position: "absolute",

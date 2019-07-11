@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
 import { NavigationProp } from 'react-navigation';
 // import firebase from 'react-native-firebase';
 import { Icon } from 'react-native-elements';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Accounting from 'accounting-js'
 import { db } from '../../Database/db'
+
+import Dialog from "react-native-dialog";
+// import firebase from 'react-native-firebase';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -24,9 +28,20 @@ export default class SearchResultView extends Component<Props> {
         super(props);
         this.state = {
             propId: '',
-            propProperties: []
+            propProperties: [],
+            createNewCollectionDialogVisible: false,
+            collectionName: ''
         };
     }
+
+    showCreateNewCollectionDialog() {
+        console.log("show dialog")
+        this.setState({ createNewCollectionDialogVisible: true });
+    };
+
+    handleCreateNewCollectionCancel() {
+        this.setState({ createNewCollectionDialogVisible: false });
+    };
 
     componentDidMount() {
         let propData = this.props.navigation.state.params.data;
@@ -45,7 +60,6 @@ export default class SearchResultView extends Component<Props> {
         let featureKeywords = propData.keyWords;
 
         // console.log(this.props.navigation.state.params.data);
-
 
         let filteredProperties = [];
 
@@ -129,7 +143,6 @@ export default class SearchResultView extends Component<Props> {
 
             const sortType = propData.sortOrder;
 
-
             if (sortType == 1) {
 
                 filteredProperties.sort((a, b) => {
@@ -161,12 +174,46 @@ export default class SearchResultView extends Component<Props> {
             this.setState({
                 propProperties: filteredProperties
             });
-
-
         });
 
         console.log(this.state.filteredProperties)
     }
+
+    createCollection() {
+        console.log(this.state.collectionName);
+
+        // db.ref('Collections/').set(
+        //     {
+        //         PropertyName: 'bhhbhkjh',     
+        //     }
+        // ).then(() => {
+        //     console.log('Inserted!')
+        // }).catch((error) => {
+        //     console.log(error)
+        // });
+    }
+
+    renderCreateNewCollectionDialog() {
+
+        return (
+
+            <Dialog.Container visible={this.state.createNewCollectionDialogVisible}>
+                {/* <Dialog.Container visible={this.state.createNewCollectionDialogVisible}></Dialog.Container> */}
+                <Dialog.Title>Create a Collection</Dialog.Title>
+                <Dialog.Description>
+                    Please enter a name for the collection
+          </Dialog.Description>
+                <Dialog.Input
+                    value={this.state.collectionName}
+                    onChangeText={collectionName => this.setState({ collectionName })}
+                ></Dialog.Input>
+                <Dialog.Button label="Create" onPress={this.createCollection()} />
+                <Dialog.Button label="Cancel" onPress={() => { this.handleCreateNewCollectionCancel() }} />
+            </Dialog.Container>
+        );
+
+    }
+
 
     renderItem = (data) =>
         <TouchableOpacity style={styles.list_item} onPress={() => {
@@ -193,7 +240,7 @@ export default class SearchResultView extends Component<Props> {
                 <View style={{ flexDirection: 'row' }}>
 
                     <View style={{ marginLeft: 10 }}>
-                        <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{data.item.Price}/=</Text>
+                        <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{Accounting.formatMoney(data.item.Price)}</Text>
                         <Text style={{ fontSize: 12, color: 'gray' }}>{data.item.Address}</Text>
 
                         <View style={{ flexDirection: 'row' }}>
@@ -214,11 +261,14 @@ export default class SearchResultView extends Component<Props> {
                     </View>
 
                     <View style={styles.sideButtons}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            this.showCreateNewCollectionDialog();
 
-                            <Meticon
-                                name="square-edit-outline"
-                                size={25}
+                        }}>
+
+                            <AntDesign
+                                name="addfolder"
+                                size={24}
                                 style={{ marginRight: 10 }}
                             // color='gray'
                             />
@@ -266,6 +316,8 @@ export default class SearchResultView extends Component<Props> {
                     />
                 }
 
+                {this.renderCreateNewCollectionDialog()}
+
             </View>
         );
     }
@@ -296,7 +348,6 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         borderColor: 'white'
         // position: "absolute",
-
     },
     listViewTop: {
         position: "absolute",

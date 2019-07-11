@@ -27,7 +27,6 @@ export default class SearchScreen extends Component {
             modalVisible: false,
             searchModalVisible: false,
 
-            // loginButton: 'Sign in',
             signUpVisible: false,
 
             email: '',
@@ -40,6 +39,32 @@ export default class SearchScreen extends Component {
         this.forgotPassword_Alert = this.forgotPassword_Alert.bind(this);
     }
 
+    componentDidMount() {
+
+        firebase.auth().onAuthStateChanged(user => {
+            this.fetchUser(user);
+            console.log("USER: " + user);
+
+        });
+    }
+
+    fetchUser(user) {
+        if (user) {
+            this.setState({
+                email: user.email,
+                loginState: true
+            });
+        }
+        else {
+            this.setState({
+                email: '',
+                loginState: false,
+                password: '',
+                error: '',
+                success: '',
+            });
+        }
+    }
 
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
@@ -185,18 +210,24 @@ export default class SearchScreen extends Component {
         }
 
         else {
-            return (
-                <TouchableOpacity style={styles.joinButton}
-                    onPress={() => {
-
-                        this.onPressSignOutButton();
-                    }}
-                >
-                    <Text style={{ textAlign: 'center', color: '#49141E' }}>Sign Out</Text>
-
-                </TouchableOpacity>
+            return(
+                <View style={{backgroundColor:'blue', height: 100}}>
+                </View>
             );
         }
+
+        // else {
+        //     return (
+        //         <TouchableOpacity style={styles.joinButton}
+        //             onPress={() => {
+        //                 this.onPressSignOutButton();
+        //             }}
+        //         >
+        //             <Text style={{ textAlign: 'center', color: '#49141E' }}>Sign Out</Text>
+
+        //         </TouchableOpacity>
+        //     );
+        // }
     }
 
     loginScreenImage() {
@@ -365,9 +396,7 @@ export default class SearchScreen extends Component {
                 </View>
 
             </Modal>
-
         );
-
     }
 
     showSearchModal() {
@@ -417,7 +446,6 @@ export default class SearchScreen extends Component {
 
                         </View>
 
-                        {/* <Image source={require('../../assets/images/search-home.jpg')} style={styles.imageTop} /> */}
                         {this.loginScreenImage()}
                     </View>
 
@@ -569,8 +597,8 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderColor: 'gray'
     },
-
     errorTextStyle: {
+        textAlign:'justify',
         fontSize: 13,
         alignSelf: 'center',
         justifyContent: 'flex-end',
