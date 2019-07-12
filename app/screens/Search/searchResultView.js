@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
 import { NavigationProp } from 'react-navigation';
-// import firebase from 'react-native-firebase';
-import { Icon } from 'react-native-elements';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Accounting from 'accounting-js'
 import { db } from '../../Database/db'
+// import Firebase from 'firebase';
 
 import Dialog from "react-native-dialog";
-// import firebase from 'react-native-firebase';
+import firebase from 'react-native-firebase';
+import ModalSelector from 'react-native-modal-selector'
 
 let PropRef = db.ref('/PropertyType');
 
@@ -27,21 +27,82 @@ export default class SearchResultView extends Component<Props> {
     constructor(props) {
         super(props);
         this.state = {
-            propId: '',
+            propertyID: '',
             propProperties: [],
             createNewCollectionDialogVisible: false,
-            collectionName: ''
+            modalVisible: false,
+            collectionName: '',
+            collectionList: [],
+
         };
+    }
+
+
+
+    renderModal(){
+        this.setState({
+            modalVisible: !this.state.modalVisible
+        });
     }
 
     showCreateNewCollectionDialog() {
         console.log("show dialog")
-        this.setState({ createNewCollectionDialogVisible: true });
+        this.setState({
+            createNewCollectionDialogVisible: true,
+            collectionName: ''
+        });
     };
 
     handleCreateNewCollectionCancel() {
-        this.setState({ createNewCollectionDialogVisible: false });
+        // this.state.collectionList.push(this.state.collectionName);
+        // console.log(this.state.collectionList)
+
+        this.setState({
+            createNewCollectionDialogVisible: false,
+            propertyID: ''
+        });
     };
+
+    renderModalView() {
+
+        // let index = 0;
+        const data = [
+            // { key: index++, section: true, label: 'Fruits' },
+            // { key: index++, label: 'Red Apples' },
+            // { key: index++, label: 'Cherries' },
+            // { key: index++, label: 'Cranberries', accessibilityLabel: 'Tap here for cranberries' },
+            // { key: index++, label: 'Vegetable', customKey: 'Not a fruit' }
+        ];
+
+
+        for (let i = 0; i < this.state.collectionList.length; i++) {
+            const colName = this.state.collectionList[i];
+            data.push({
+                key: i,
+                label: colName
+            });
+        }
+
+
+        if (this.state.modalVisible) {
+            return (
+                // <View style={{ flex: 1, justifyContent: 'space-around', padding: 50, backgroundColor:'green' }}>
+                <ModalSelector
+                    // data={this.state.collectionList}
+                    data={data}
+                    visible={this.state.modalVisible}
+                    // initValue="Select something yummy!"
+                    onChange={(option) => {
+                        this.renderModal()
+                        // alert(`nom nom nom`);
+                        console.log(option);
+                    }}
+
+                />
+                // </View>
+            );
+        }
+    }
 
     componentDidMount() {
         let propData = this.props.navigation.state.params.data;
@@ -176,21 +237,42 @@ export default class SearchResultView extends Component<Props> {
             });
         });
 
-        console.log(this.state.filteredProperties)
+        console.log(this.state.filteredProperties);
+        console.log("this.state.filteredProperties")
+        { this.getCollectionNames() }
     }
+
+    getCollectionNames() {
+        const user = firebase.auth().currentUser;
+
+        db.ref('Collections/').child(user.uid).on('value', (snapshot) => {
+            const collections = snapshot.val();
+            console.log(collections);
+
+            for (const collectionId in collections) {
+                console.log(collectionId);
+                this.state.collectionList.push(collectionId);
+                this.setState({});
+                console.log(this.state.collectionList);
+            }
+        });
+    }
+
+
 
     createCollection() {
         console.log(this.state.collectionName);
+        const user = firebase.auth().currentUser;
 
-        // db.ref('Collections/').set(
-        //     {
-        //         PropertyName: 'bhhbhkjh',     
-        //     }
-        // ).then(() => {
-        //     console.log('Inserted!')
-        // }).catch((error) => {
-        //     console.log(error)
-        // });
+
+        db.ref('Collections/').child(user.uid).child(this.state.collectionName).child(this.state.propertyID).set(true)
+            .then(() => {
+                console.log('Inserted!');
+                this.handleCreateNewCollectionCancel();
+            }).catch((error) => {
+                console.log(error)
+            });
+
     }
 
     renderCreateNewCollectionDialog() {
@@ -207,7 +289,7 @@ export default class SearchResultView extends Component<Props> {
                     value={this.state.collectionName}
                     onChangeText={collectionName => this.setState({ collectionName })}
                 ></Dialog.Input>
-                <Dialog.Button label="Create" onPress={this.createCollection()} />
+                <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
                 <Dialog.Button label="Cancel" onPress={() => { this.handleCreateNewCollectionCancel() }} />
             </Dialog.Container>
         );
@@ -261,10 +343,13 @@ export default class SearchResultView extends Component<Props> {
                     </View>
 
                     <View style={styles.sideButtons}>
-                        <TouchableOpacity onPress={() => {
+                        <TouchableOpacity onPress={((data) => {
+                            this.setState({
+                                propertyID: data.item.PropId
+                            });
                             this.showCreateNewCollectionDialog();
-
-                        }}>
+                            // this.renderModal();
+                        }).bind(this, data)}>
 
                             <AntDesign
                                 name="addfolder"
@@ -273,9 +358,16 @@ export default class SearchResultView extends Component<Props> {
                             // color='gray'
                             />
 
+
                         </TouchableOpacity>
 
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={((data) => {
+                            this.setState({
+                                propertyID: data.item.PropId
+                            });
+                            // this.showCreateNewCollectionDialog();
+                            this.renderModal();
+                        }).bind(this, data)}>
                             <Ionicon
                                 name="ios-star-outline"
                                 size={25}
@@ -317,6 +409,7 @@ export default class SearchResultView extends Component<Props> {
                 }
 
                 {this.renderCreateNewCollectionDialog()}
+                {this.renderModalView()}
 
             </View>
         );
