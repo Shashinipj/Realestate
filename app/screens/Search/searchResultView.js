@@ -4,14 +4,11 @@ import { NavigationProp } from 'react-navigation';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Accounting from 'accounting-js'
-import { db } from '../../Database/db'
-// import Firebase from 'firebase';
-
+import Accounting from 'accounting-js';
+import { db } from '../../Database/db';
 import Dialog from "react-native-dialog";
 import firebase from 'react-native-firebase';
-import ModalSelector from 'react-native-modal-selector'
-
+import ModalSelector from 'react-native-modal-selector';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -21,18 +18,15 @@ type Props = {
 
 export default class SearchResultView extends Component<Props> {
 
-    static navigationOptions = ({ navigation }) => {
-        // header: null,
+    static navigationOptions({ navigation }){
         return {
             headerRight: <TouchableOpacity onPress={() => {
                 navigation.navigate('Search');
             }}>
-                {/* <Text>Home</Text> */}
                 <AntDesign
                     name="home"
                     size={24}
                     style={{ marginRight: 10 }}
-                // color='gray'
                 />
             </TouchableOpacity>
         };
@@ -255,6 +249,12 @@ export default class SearchResultView extends Component<Props> {
 
     }
 
+    componentWillUnmount() {
+        const user = firebase.auth().currentUser;
+
+        db.ref('Collections/').child(user.uid).off('value', this.onValueCollection);
+    }
+
     getCollectionNames(user) {
         db.ref('Collections/').child(user.uid).on('value', this.onValueCollection);
     }
@@ -276,13 +276,6 @@ export default class SearchResultView extends Component<Props> {
         this.setState({
             collectionList: arrColl
         });
-    }
-
-
-    componentDidUnmount() {
-        const user = firebase.auth().currentUser;
-
-        db.ref('Collections/').child(user.uid).off('value', this.onValueCollection);
     }
 
     createCollection() {
@@ -473,7 +466,9 @@ export default class SearchResultView extends Component<Props> {
                     <FlatList
                         data={this.state.propProperties}
                         renderItem={item => this.renderItem(item)}
-                        keyExtractor={item => "" + item.propId}
+                        keyExtractor={(item, index) => {
+                            return "" + index;
+                        }}
                     />
                 }
 

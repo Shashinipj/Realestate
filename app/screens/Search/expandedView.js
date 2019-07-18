@@ -7,7 +7,7 @@ import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
 import ReadMore from 'react-native-read-more-text';
 import ImageSlider from 'react-native-image-slider';
-import Accounting from 'accounting-js'
+import Accounting from 'accounting-js';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 
@@ -33,7 +33,6 @@ export default class ExpandedView extends Component {
                 />
             </TouchableOpacity>
         };
-
     };
 
     constructor(props) {
@@ -42,7 +41,6 @@ export default class ExpandedView extends Component {
         this.state = {
             mapModalVisible: false,
         };
-
     }
 
     setModalVisible(visible) {
@@ -114,10 +112,10 @@ export default class ExpandedView extends Component {
                                 description={property.PropType}
 
                             />
-
-
                         </MapView>
+
                         <View style={{ flexDirection: 'row', padding: 10, backgroundColor: 'white', justifyContent: 'center', position: 'absolute', zIndex: 2, bottom: 50 }}>
+
                             <TouchableOpacity style={{ flex: 1, }}>
                                 <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
                                     <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Street View</Text>
@@ -129,7 +127,6 @@ export default class ExpandedView extends Component {
                                 </View>
                             </TouchableOpacity>
 
-
                         </View>
 
                     </View>
@@ -139,9 +136,6 @@ export default class ExpandedView extends Component {
 
         );
     }
-
-
-
 
     handleTextReady = () => {
         console.log('ready!');
@@ -346,7 +340,6 @@ export default class ExpandedView extends Component {
 
                 </ScrollView>
                 {/* {this.showMapModal()} */}
-
 
                 <View style={{ height: 60, backgroundColor: 'white', alignItems: 'center' }}>
                     <TouchableOpacity>

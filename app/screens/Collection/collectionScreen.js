@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, FlatList, Alert } from 'react-native';
-import { db } from '../../Database/db'
-
+import { View, StyleSheet, Text, FlatList, Alert } from 'react-native';
+import { db } from '../../Database/db';
 import firebase from 'react-native-firebase';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
 
 type CollectionItem = {
     name: string;

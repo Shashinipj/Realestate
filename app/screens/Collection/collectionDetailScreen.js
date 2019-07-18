@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
-import { NavigationProp } from 'react-navigation';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { db } from '../../Database/db'
-import Accounting from 'accounting-js'
+import { db } from '../../Database/db';
+import Accounting from 'accounting-js';
 
-import firebase from 'react-native-firebase';
 let PropRef = db.ref('/PropertyType');
 
 export default class CollectionDetailScreen extends Component {
 
-    static navigationOptions = {
+    static navigationOptions({ navigation }) {
+
+        const collection = navigation.getParam('CollectionData');
+
+        return {
+            title: collection.name
+        };
 
     };
 
@@ -47,13 +50,9 @@ export default class CollectionDetailScreen extends Component {
                         for (const propId in propTypeObj.Property) {
                             const propObj = propTypeObj.Property[propId];
 
-                            console.log(propObj.PropId);
-                            console.log('collection.propIds');
-                            console.log(propID);
-
                             if (propObj.PropId == collectPropId) {
                                 filteredProperties.push(propObj);
-                                console.log(filteredProperties);
+                                // console.log(filteredProperties);
                             }
                         }
                     }
@@ -84,7 +83,6 @@ export default class CollectionDetailScreen extends Component {
                     </View>
                     {/* <ImageBackground style={styles.imageBackground}> */}
                     <Image source={require('../../assets/images/house.jpg')} style={styles.imageTop} />
-
                     {/* </ImageBackground> */}
 
                     <View style={{ flexDirection: 'row' }}>
@@ -109,13 +107,11 @@ export default class CollectionDetailScreen extends Component {
                                 <Text style={styles.subDetailsText}>{data.item.PropType}</Text>
                             </View>
                         </View>
-
                     </View>
                 </View>
             </TouchableOpacity>
 
         );
-
     }
 
 
@@ -125,7 +121,9 @@ export default class CollectionDetailScreen extends Component {
                 <FlatList
                     data={this.state.propProperties}
                     renderItem={item => this.renderItem(item)}
-                    keyExtractor={item => "" + item.propId}
+                    keyExtractor={(item, index) => {
+                        return "" + index;
+                    }}
                 />
             </View>
         );
@@ -166,7 +164,6 @@ const styles = StyleSheet.create({
         width: "100%",
         height: 40,
         zIndex: 2,
-
         backgroundColor: '#49141E',
         padding: 5,
         flexDirection: 'row',

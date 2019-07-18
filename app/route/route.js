@@ -7,10 +7,10 @@ import ProfileScreen from '../screens/Profile/profileScreen';
 import { Icon } from 'react-native-elements';
 import Icon2 from 'react-native-vector-icons/FontAwesome';
 // import Login from '../screens/login/loginScreen'
-import SearchBarScreen from '../screens/Search/searchBarScreen'
-import SearchResultView from '../screens/Search/searchResultView'
-import ExpandedView from '../screens/Search/expandedView'
-import CollectionDetailScreen from '../screens/Collection/collectionDetailScreen'
+import SearchBarScreen from '../screens/Search/searchBarScreen';
+import SearchResultView from '../screens/Search/searchResultView';
+import ExpandedView from '../screens/Search/expandedView';
+import CollectionDetailScreen from '../screens/Collection/collectionDetailScreen';
 
 
 const searchStack = createStackNavigator({

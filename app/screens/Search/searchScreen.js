@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, TextInputProps, Image, Text, TouchableOpacity, Switch, Modal, Button, Alert } from 'react-native';
-import { SearchBar } from 'react-native-elements';
+import { View, StyleSheet, TextInput, Image, Text, TouchableOpacity, Switch, Modal, Button, Alert } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
-
 import { db } from '../../Database/db'
 import firebase from 'react-native-firebase';
+import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 
 let PropRef = db.ref('/PropertyType');
-
-import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 
 export default class SearchScreen extends Component {
 
@@ -73,13 +70,6 @@ export default class SearchScreen extends Component {
 
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
-    }
-
-    setSearchModalVisible(visible) {
-        this.setState({ searchModalVisible: visible },
-            () => {
-                console.log(this.state.searchModalVisible);
-            });
     }
 
     handleChange(checked) {
@@ -221,18 +211,6 @@ export default class SearchScreen extends Component {
             );
         }
 
-        // else {
-        //     return (
-        //         <TouchableOpacity style={styles.joinButton}
-        //             onPress={() => {
-        //                 this.onPressSignOutButton();
-        //             }}
-        //         >
-        //             <Text style={{ textAlign: 'center', color: '#49141E' }}>Sign Out</Text>
-
-        //         </TouchableOpacity>
-        //     );
-        // }
     }
 
     loginScreenImage() {
@@ -243,58 +221,10 @@ export default class SearchScreen extends Component {
         }
 
         else {
-
-            const numberOfUsers = 20;
-            const randomIndex = Math.floor(Math.random() * numberOfUsers);
-
-
-            PropRef.once('value').then(snapshot =>
-                Math.floor((Math.random() * snapshot.numChildren()))
-            );
-
-
-            PropRef.limitToFirst(randomIndex).once('value').then(snapshot => {
-                const propTypes = snapshot.val();
-                // do something with the user data
-                console.log('random user');
-                console.log(propTypes);
-
-                for (const propTypeId in propTypes) {
-                    const propTypeObj = propTypes[propTypeId];
-
-                    if (propTypeObj.Property) {
-                        for (const propId in propTypeObj.Property) {
-                            const propObj = propTypeObj.Property[propId];
-                            console.log(propObj);
-
-                        }
-                    }
-                }
-
-
-            });
             return (
                 <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
-                // <IndicatorViewPager
-                //     // style={styles.imageTop}
-                //     indicator={this._renderDotIndicator()}
-                // >
-                //     <View style={{}}>
-                //         <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
-                //     </View>
-                //     <View style={{}}>
-                //         <Image source={require('../../assets/images/house3.jpg')} style={styles.imageTop} />
-                //     </View>
-                //     <View style={{}}>
-                //         <Image source={require('../../assets/images/house5.jpg')} style={styles.imageTop} />
-                //     </View>
-                // </IndicatorViewPager>
             );
         }
-    }
-
-    _renderDotIndicator() {
-        return <PagerDotIndicator pageCount={3} />;
     }
 
     renderSignUpSignInView() {
@@ -336,12 +266,14 @@ export default class SearchScreen extends Component {
 
                     <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}>
                         {/* <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text> */}
+
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text>
                             <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
                                 <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
                             </TouchableOpacity>
                         </View>
+
                     </TouchableOpacity>
 
                 </View>
@@ -452,36 +384,17 @@ export default class SearchScreen extends Component {
         );
     }
 
-    showSearchModal() {
-
-        return (
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={this.state.searchModalVisible}
-                onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                }}>
-                <View style={{ margin: 10 }}>
-
-                    <ScrollView></ScrollView>
-                </View>
-            </Modal>
-        );
-    }
-
-
     render() {
 
         return (
             <View style={styles.container}>
+
                 <ScrollView>
 
                     <View style={{ paddingTop: 20, padding: 5 }}>
                         <View style={styles.searchBarView}>
 
                             <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
-                                // this.setSearchModalVisible(!this.state.searchModalVisible);
                                 this.props.navigation.navigate('SearchBarScreen');
                             }}>
 
@@ -503,7 +416,7 @@ export default class SearchScreen extends Component {
                     </View>
 
                     <View style={styles.bottomContainer}>
-                        <View style={{ flexDirection: 'row' }}>
+                        {/* <View style={{ flexDirection: 'row' }}>
                             <Text style={{ fontSize: 12, color: 'gray', marginVertical: 10 }}> Saved Searches</Text>
 
                             <Switch
@@ -514,7 +427,7 @@ export default class SearchScreen extends Component {
                                 width={48}
                             />
 
-                        </View>
+                        </View> */}
 
                         <View style={styles.textContainer}>
 
@@ -534,11 +447,7 @@ export default class SearchScreen extends Component {
 
                 </ScrollView>
 
-                {/* show Join modal */}
-
                 {this.showJoinModal()}
-                {this.showSearchModal()}
-
 
                 <TouchableOpacity style={styles.footer}>
 
@@ -578,7 +487,7 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         backgroundColor: "#ffffff",
-        padding: 6
+        padding: 26
     },
     textContainer: {
         alignItems: 'center',

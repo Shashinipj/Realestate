@@ -6,7 +6,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import RangeSlider from 'rn-range-slider';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Accounting from 'accounting-js'
+import Accounting from 'accounting-js';
 
 const PropertyTypes = {
     House: 1,
@@ -140,7 +140,7 @@ export default class SearchBarScreen extends Component {
                     >
                         <Text style={
                             this.state.sortOrder == -1 ? styles.sortTextSelected : styles.sortText
-                        }>Non</Text>
+                        }>None</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -393,13 +393,11 @@ export default class SearchBarScreen extends Component {
                             gravity={'center'}
                             min={100000}
                             max={10000000}
-                            // step={20}
+                            step={100000}
                             selectionColor="#000000"
                             blankColor='blue'
                             labelBackgroundColor='#424242'
                             labelBorderColor='#424242'
-                            // initialLowValue={100000}
-                            // initialHighValue={10000000}
                             onValueChanged={(low, high, fromUser) => {
                                 this.setState({ rangeLow: low, rangeHigh: high })
                             }}
@@ -423,17 +421,15 @@ export default class SearchBarScreen extends Component {
                             ref={(ref) => {
                                 this._rangeSlider = ref;
                             }}
-                            style={{ width: 160, height: 80 }}
+                            style={{ width: '50%', height: 80 }}
                             gravity={'center'}
                             min={100000}
                             max={10000000}
-                            step={20}
+                            step={100000}
                             selectionColor="#000000"
                             blankColor='blue'
                             labelBackgroundColor='#424242'
                             labelBorderColor='#424242'
-                            // initialLowValue={100000}
-                            // initialHighValue={10000000}
                             onValueChanged={(low, high, fromUser) => {
                                 this.setState({ rangeLow: low, rangeHigh: high })
                             }}
@@ -457,17 +453,15 @@ export default class SearchBarScreen extends Component {
                             ref={(ref) => {
                                 this._rangeSlider = ref;
                             }}
-                            style={{ width: 160, height: 80 }}
+                            style={{ width: '50%', height: 80 }}
                             gravity={'center'}
                             min={100000}
                             max={10000000}
-                            step={20}
+                            step={100000}
                             selectionColor="#000000"
                             blankColor='blue'
                             labelBackgroundColor='#424242'
                             labelBorderColor='#424242'
-                            // initialLowValue={100000}
-                            // initialHighValue={10000000}
                             onValueChanged={(low, high, fromUser) => {
                                 this.setState({ rangeLow: low, rangeHigh: high })
                             }}
@@ -1004,7 +998,7 @@ export default class SearchBarScreen extends Component {
                         <Text style={{ fontSize: 15 }}>At leaset </Text>
                         <TextInput
                             style={{ borderColor: 'black', borderBottomWidth: 1, width: 70, textAlign: 'center' }}
-                            value={this.state.landSize}
+                            value={this.state.landSize + ''}
                             onChangeText={landSize => this.setState({ landSize })}
                             keyboardType='numeric'
                         // onChangeText={(text) => this.setState({ text })}
@@ -1110,7 +1104,7 @@ export default class SearchBarScreen extends Component {
             <GooglePlacesAutocomplete
                 placeholder='Search suburb, postcode, state'
                 minLength={2} // minimum length of text to search
-                autoFocus={false}
+                autoFocus={true}
                 value={search}
                 returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
                 listViewDisplayed='auto'    // true/false/undefined
@@ -1158,8 +1152,7 @@ export default class SearchBarScreen extends Component {
                 }}
                 GooglePlacesSearchQuery={{
                     // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
-                    rankby: 'distance',
-                    types: 'food'
+                    rankby: 'distance'
                 }}
 
                 filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
@@ -1178,7 +1171,6 @@ export default class SearchBarScreen extends Component {
             />
         );
     }
-
 
     render() {
         return (
