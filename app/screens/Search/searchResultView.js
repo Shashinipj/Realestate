@@ -12,6 +12,7 @@ import Dialog from "react-native-dialog";
 import firebase from 'react-native-firebase';
 import ModalSelector from 'react-native-modal-selector'
 
+
 let PropRef = db.ref('/PropertyType');
 
 type Props = {
@@ -20,8 +21,22 @@ type Props = {
 
 export default class SearchResultView extends Component<Props> {
 
-    static navigationOptions = {
+    static navigationOptions = ({ navigation }) => {
         // header: null,
+        return {
+            headerRight: <TouchableOpacity onPress={() => {
+                navigation.navigate('Search');
+            }}>
+                {/* <Text>Home</Text> */}
+                <AntDesign
+                    name="home"
+                    size={24}
+                    style={{ marginRight: 10 }}
+                // color='gray'
+                />
+            </TouchableOpacity>
+        };
+
     };
 
     constructor(props) {
@@ -33,13 +48,15 @@ export default class SearchResultView extends Component<Props> {
             modalVisible: false,
             collectionName: '',
             collectionList: [],
-
+            loggedUser: ''
         };
+
+        this.onValueCollection = this.onValueCollection.bind(this);
     }
 
 
-
-    renderModal(){
+    renderModal() {
+        console.log('render modal')
         this.setState({
             modalVisible: !this.state.modalVisible
         });
@@ -54,8 +71,6 @@ export default class SearchResultView extends Component<Props> {
     };
 
     handleCreateNewCollectionCancel() {
-        // this.state.collectionList.push(this.state.collectionName);
-        // console.log(this.state.collectionList)
 
         this.setState({
             createNewCollectionDialogVisible: false,
@@ -65,15 +80,7 @@ export default class SearchResultView extends Component<Props> {
 
     renderModalView() {
 
-        // let index = 0;
-        const data = [
-            // { key: index++, section: true, label: 'Fruits' },
-            // { key: index++, label: 'Red Apples' },
-            // { key: index++, label: 'Cherries' },
-            // { key: index++, label: 'Cranberries', accessibilityLabel: 'Tap here for cranberries' },
-            // { key: index++, label: 'Vegetable', customKey: 'Not a fruit' }
-        ];
-
+        const data = [];
 
         for (let i = 0; i < this.state.collectionList.length; i++) {
             const colName = this.state.collectionList[i];
@@ -86,20 +93,21 @@ export default class SearchResultView extends Component<Props> {
 
         if (this.state.modalVisible) {
             return (
-                // <View style={{ flex: 1, justifyContent: 'space-around', padding: 50, backgroundColor:'green' }}>
                 <ModalSelector
-                    // data={this.state.collectionList}
                     data={data}
                     visible={this.state.modalVisible}
-                    // initValue="Select something yummy!"
                     onChange={(option) => {
+
+                        console.log(option.label);
+                        this.addToCollection(option.label);
                         this.renderModal()
-                        // alert(`nom nom nom`);
-                        console.log(option);
+                    }}
+                    closeOnChange={true}
+                    onModalClose={() => {
+                        // this.renderModal();
                     }}
 
                 />
-                // </View>
             );
         }
     }
@@ -237,33 +245,49 @@ export default class SearchResultView extends Component<Props> {
             });
         });
 
-        console.log(this.state.filteredProperties);
-        console.log("this.state.filteredProperties")
-        { this.getCollectionNames() }
+        const user = firebase.auth().currentUser;
+        if (user) {
+            this.getCollectionNames(user);
+            this.setState({
+                loggedUser: user
+            })
+        }
+
     }
 
-    getCollectionNames() {
-        const user = firebase.auth().currentUser;
+    getCollectionNames(user) {
+        db.ref('Collections/').child(user.uid).on('value', this.onValueCollection);
+    }
 
-        db.ref('Collections/').child(user.uid).on('value', (snapshot) => {
-            const collections = snapshot.val();
-            console.log(collections);
+    /**
+     * @param {firebase.database.DataSnapshot} snapshot
+     */
+    onValueCollection(snapshot) {
+        const collections = snapshot.val();
+        console.log(collections);
 
-            for (const collectionId in collections) {
-                console.log(collectionId);
-                this.state.collectionList.push(collectionId);
-                this.setState({});
-                console.log(this.state.collectionList);
-            }
+        const arrColl = [];
+        for (const collectionId in collections) {
+            console.log(collectionId);
+            arrColl.push(collectionId);
+            // console.log(this.state.collectionList);
+        }
+
+        this.setState({
+            collectionList: arrColl
         });
     }
 
 
+    componentDidUnmount() {
+        const user = firebase.auth().currentUser;
+
+        db.ref('Collections/').child(user.uid).off('value', this.onValueCollection);
+    }
 
     createCollection() {
         console.log(this.state.collectionName);
         const user = firebase.auth().currentUser;
-
 
         db.ref('Collections/').child(user.uid).child(this.state.collectionName).child(this.state.propertyID).set(true)
             .then(() => {
@@ -272,7 +296,18 @@ export default class SearchResultView extends Component<Props> {
             }).catch((error) => {
                 console.log(error)
             });
+    }
 
+    addToCollection(collectionName) {
+        const user = firebase.auth().currentUser;
+
+        db.ref('Collections/').child(user.uid).child(collectionName).child(this.state.propertyID).set(true)
+            .then(() => {
+                console.log('Inserted!');
+                this.handleCreateNewCollectionCancel();
+            }).catch((error) => {
+                console.log(error)
+            });
     }
 
     renderCreateNewCollectionDialog() {
@@ -293,7 +328,27 @@ export default class SearchResultView extends Component<Props> {
                 <Dialog.Button label="Cancel" onPress={() => { this.handleCreateNewCollectionCancel() }} />
             </Dialog.Container>
         );
+    }
 
+    pleaseLoginInAlert() {
+
+        Alert.alert(
+            'Please Login',
+            'Do you want to login?',
+            [
+                {
+                    text: 'Home', onPress: () => {
+                        this.props.navigation.navigate('Search');
+                    }
+                },
+                {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true },
+        );
     }
 
 
@@ -347,7 +402,14 @@ export default class SearchResultView extends Component<Props> {
                             this.setState({
                                 propertyID: data.item.PropId
                             });
-                            this.showCreateNewCollectionDialog();
+
+                            if (this.state.loggedUser) {
+                                this.showCreateNewCollectionDialog();
+                            }
+                            else {
+                                this.pleaseLoginInAlert();
+                            }
+
                             // this.renderModal();
                         }).bind(this, data)}>
 
@@ -365,8 +427,15 @@ export default class SearchResultView extends Component<Props> {
                             this.setState({
                                 propertyID: data.item.PropId
                             });
-                            // this.showCreateNewCollectionDialog();
-                            this.renderModal();
+
+                            if (this.state.loggedUser) {
+                                this.renderModal();
+                            }
+                            else {
+                                this.pleaseLoginInAlert();
+                            }
+
+
                         }).bind(this, data)}>
                             <Ionicon
                                 name="ios-star-outline"

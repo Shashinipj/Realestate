@@ -25,7 +25,8 @@
     "react-navigation": "^3.11.0",
     "react-redux": "^7.1.0",
     "redux": "^4.0.1",
-    "rn-range-slider": "^1.2.4"
+    "rn-range-slider": "^1.2.4",
+    "rn-viewpager": "^1.2.9"
   },
   "devDependencies": {
     "@babel/core": "7.4.5",

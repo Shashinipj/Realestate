@@ -4,7 +4,12 @@ import { SearchBar } from 'react-native-elements';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 
+import { db } from '../../Database/db'
 import firebase from 'react-native-firebase';
+
+let PropRef = db.ref('/PropertyType');
+
+import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 
 export default class SearchScreen extends Component {
 
@@ -210,8 +215,8 @@ export default class SearchScreen extends Component {
         }
 
         else {
-            return(
-                <View style={{backgroundColor:'blue', height: 100}}>
+            return (
+                <View style={{ backgroundColor: 'blue', height: 100 }}>
                 </View>
             );
         }
@@ -238,10 +243,58 @@ export default class SearchScreen extends Component {
         }
 
         else {
+
+            const numberOfUsers = 20;
+            const randomIndex = Math.floor(Math.random() * numberOfUsers);
+
+
+            PropRef.once('value').then(snapshot =>
+                Math.floor((Math.random() * snapshot.numChildren()))
+            );
+
+
+            PropRef.limitToFirst(randomIndex).once('value').then(snapshot => {
+                const propTypes = snapshot.val();
+                // do something with the user data
+                console.log('random user');
+                console.log(propTypes);
+
+                for (const propTypeId in propTypes) {
+                    const propTypeObj = propTypes[propTypeId];
+
+                    if (propTypeObj.Property) {
+                        for (const propId in propTypeObj.Property) {
+                            const propObj = propTypeObj.Property[propId];
+                            console.log(propObj);
+
+                        }
+                    }
+                }
+
+
+            });
             return (
                 <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
+                // <IndicatorViewPager
+                //     // style={styles.imageTop}
+                //     indicator={this._renderDotIndicator()}
+                // >
+                //     <View style={{}}>
+                //         <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
+                //     </View>
+                //     <View style={{}}>
+                //         <Image source={require('../../assets/images/house3.jpg')} style={styles.imageTop} />
+                //     </View>
+                //     <View style={{}}>
+                //         <Image source={require('../../assets/images/house5.jpg')} style={styles.imageTop} />
+                //     </View>
+                // </IndicatorViewPager>
             );
         }
+    }
+
+    _renderDotIndicator() {
+        return <PagerDotIndicator pageCount={3} />;
     }
 
     renderSignUpSignInView() {
@@ -598,7 +651,7 @@ const styles = StyleSheet.create({
         borderColor: 'gray'
     },
     errorTextStyle: {
-        textAlign:'justify',
+        textAlign: 'justify',
         fontSize: 13,
         alignSelf: 'center',
         justifyContent: 'flex-end',

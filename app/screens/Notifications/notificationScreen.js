@@ -9,9 +9,9 @@ export default class NotificationScreen extends Component {
 
     render() {
         return (
-            <View style={{ backgroundColor: 'blue', flex: 1  }}>
+            <View style={{flex: 1  }}>
                 <Text>
-                    NotificationScreen
+                    {/* NotificationScreen */}
                 </Text>
             </View>
         );

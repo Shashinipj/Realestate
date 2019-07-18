@@ -10,6 +10,7 @@ import Icon2 from 'react-native-vector-icons/FontAwesome';
 import SearchBarScreen from '../screens/Search/searchBarScreen'
 import SearchResultView from '../screens/Search/searchResultView'
 import ExpandedView from '../screens/Search/expandedView'
+import CollectionDetailScreen from '../screens/Collection/collectionDetailScreen'
 
 
 const searchStack = createStackNavigator({
@@ -32,6 +33,9 @@ const collectionStack = createStackNavigator({
     Collections: {
         screen: CollectionScreen
     },
+    CollectionDetailScreen:{
+        screen: CollectionDetailScreen
+    }
 
 });
 

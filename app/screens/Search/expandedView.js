@@ -8,6 +8,7 @@ import MapView, { Marker } from 'react-native-maps';
 import ReadMore from 'react-native-read-more-text';
 import ImageSlider from 'react-native-image-slider';
 import Accounting from 'accounting-js'
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 
 export default class ExpandedView extends Component {
@@ -16,6 +17,24 @@ export default class ExpandedView extends Component {
      * @type {Marker}
      */
     refMarker = null;
+
+    static navigationOptions = ({ navigation }) => {
+        // header: null,
+        return {
+            headerRight: <TouchableOpacity onPress={() => {
+                navigation.navigate('Search');
+            }}>
+                {/* <Text>Home</Text> */}
+                <AntDesign
+                    name="home"
+                    size={24}
+                    style={{ marginRight: 10 }}
+                // color='gray'
+                />
+            </TouchableOpacity>
+        };
+
+    };
 
     constructor(props) {
         super(props);
