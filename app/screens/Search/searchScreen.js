@@ -151,31 +151,6 @@ export default class SearchScreen extends Component {
         })
     }
 
-    onPressSignOutButton() {
-
-        Alert.alert(
-            'Sign Out',
-            'Are you sure to want sign out?',
-            [
-                {
-                    text: 'No',
-                    onPress: () => console.log('Cancel Pressed'),
-                    style: 'cancel',
-                },
-                {
-                    text: 'Yes', onPress: () => {
-                        firebase.auth().signOut()
-                            .then(() => {
-                                this.setState({ loginState: false });
-                                this.loginReset();
-                            });
-                    }
-                },
-            ],
-            { cancelable: false },
-        );
-    }
-
     loginReset() {
         this.setState({
             email: '',
@@ -487,6 +462,7 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         backgroundColor: "#ffffff",
+        // backgroundColor:'#FFFDE7',
         padding: 26
     },
     textContainer: {

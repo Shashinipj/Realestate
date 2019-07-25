@@ -135,10 +135,11 @@ export default class ProfileScreen extends Component<Props> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f3d500'
+        backgroundColor: 'white'
     },
     buttons: {
-        backgroundColor: '#49141E',
+        // backgroundColor: '#49141E',
+        backgroundColor:'#f3d500',
         borderRadius: 4,
         paddingVertical: 7,
         margin: 10,
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     buttonText: {
-        color: 'white',
+        color: '#49141E',
         fontWeight: '500',
         textAlign: 'center'
     }

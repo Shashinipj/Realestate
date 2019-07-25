@@ -9,6 +9,7 @@ import { db } from '../../Database/db';
 import Dialog from "react-native-dialog";
 import firebase from 'react-native-firebase';
 import ModalSelector from 'react-native-modal-selector';
+import ImageSlider from 'react-native-image-slider';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -18,7 +19,7 @@ type Props = {
 
 export default class SearchResultView extends Component<Props> {
 
-    static navigationOptions({ navigation }){
+    static navigationOptions({ navigation }) {
         return {
             headerRight: <TouchableOpacity onPress={() => {
                 navigation.navigate('Search');
@@ -76,7 +77,12 @@ export default class SearchResultView extends Component<Props> {
 
         const data = [];
 
-        for (let i = 0; i < this.state.collectionList.length; i++) {
+        data.push({
+            key: 0,
+            label: '+ Add new...'
+        })
+
+        for (let i = 1; i < this.state.collectionList.length; i++) {
             const colName = this.state.collectionList[i];
             data.push({
                 key: i,
@@ -93,8 +99,10 @@ export default class SearchResultView extends Component<Props> {
                     onChange={(option) => {
 
                         console.log(option.label);
-                        this.addToCollection(option.label);
-                        this.renderModal()
+                        // this.addToCollection(option.label);
+                        this.renderModal();
+                        this.RenderModalSelectedItem(option);
+
                     }}
                     closeOnChange={true}
                     onModalClose={() => {
@@ -104,6 +112,27 @@ export default class SearchResultView extends Component<Props> {
                 />
             );
         }
+    }
+
+    RenderModalSelectedItem(option) {
+        if (option.key == 0) {
+
+            if (this.state.loggedUser) {
+                this.showCreateNewCollectionDialog();
+                console.log(option.key);
+                console.log('create new 11111');
+            }
+            else {
+                this.pleaseLoginInAlert();
+                console.log('pleaseLoginInAlert');
+
+            }
+        }
+        else {
+            this.addToCollection(option.label);
+            console.log(option.label);
+        }
+
     }
 
     componentDidMount() {
@@ -252,8 +281,13 @@ export default class SearchResultView extends Component<Props> {
     componentWillUnmount() {
         const user = firebase.auth().currentUser;
 
-        db.ref('Collections/').child(user.uid).off('value', this.onValueCollection);
+        if (user) {
+            db.ref('Collections/').child(user.uid).off('value', this.onValueCollection);
+        }
+
+
     }
+
 
     getCollectionNames(user) {
         db.ref('Collections/').child(user.uid).on('value', this.onValueCollection);
@@ -346,52 +380,82 @@ export default class SearchResultView extends Component<Props> {
 
 
     renderItem = (data) =>
-        <TouchableOpacity style={styles.list_item} onPress={() => {
-            this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
-        }}>
+        // <TouchableOpacity style={styles.list_item} onPress={() => {
+        //     this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
+        // }}>
+
+        <View style={styles.list_item}>
+
             <View style={styles.listView}>
+                {/* 
                 <View style={styles.listViewTop}>
                     <Text style={styles.ownerName}> {data.item.Owner}</Text>
                     <View style={styles.userProfileView}>
-                        {/* <Meticon
-                            name="account-outline"
-                            size={25}
-                            color='gray'
-                        /> */}
 
                         <Image source={require('../../assets/images/owner.jpg')} style={{ width: 40, height: 40, borderRadius: 20 }} />
                     </View>
-                </View>
+                </View> */}
+
+
                 {/* <ImageBackground style={styles.imageBackground}> */}
-                <Image source={require('../../assets/images/house.jpg')} style={styles.imageTop} />
+
+                <TouchableOpacity style={{}} onPress={() => {
+                    this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
+                }}>
+                    <Text style={{ marginVertical: 3, fontSize: 15, fontWeight: '600' }}>Text Title</Text>
+
+                </TouchableOpacity>
+
+
+                {/* <Image source={require('../../assets/images/house.jpg')} style={styles.imageTop} /> */}
+                <ImageSlider
+                    style={styles.imageTop}
+                    images={[
+                        // url('https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/index.jpg?alt=media&token=3ba7172f-9e37-4eab-a082-f84cd17e16bb'),
+                        { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house.jpg?alt=media&token=6f42610b-51b1-4ee1-bdca-32984e41694c' },
+                        { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house2.jpg?alt=media&token=0ccbf59c-2358-4aa1-89d6-b1d3b7e620a8' },
+                        { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house3.jpg?alt=media&token=dc364972-504f-452b-a9a3-f2e96e37e5e5' },
+                        { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house4.jpg?alt=media&token=850bf1ef-a0d3-42bd-8e76-745cbbcc7055' },
+                    ]} />
 
                 {/* </ImageBackground> */}
 
-                <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity onPress={() => {
+                    this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
+                }}>
 
-                    <View style={{ marginLeft: 10 }}>
-                        <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{Accounting.formatMoney(data.item.Price)}</Text>
-                        <Text style={{ fontSize: 12, color: 'gray' }}>{data.item.Address}</Text>
 
-                        <View style={{ flexDirection: 'row' }}>
 
-                            <Ionicon name="ios-bed" size={15} />
-                            <Text style={styles.subDetailsText}>{data.item.Bedrooms}</Text>
+                    <View style={{ flexDirection: 'row' }}>
 
-                            <Meticon name="shower" size={15} />
-                            <Text style={styles.subDetailsText}>{data.item.Bathrooms}</Text>
+                        <View style={{
+                            // marginLeft: 10 
+                        }}>
+                            <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{Accounting.formatMoney(data.item.Price)}</Text>
+                            <Text style={{ fontSize: 12, color: 'gray', marginBottom: 5 }}>{data.item.Address}</Text>
 
-                            <Ionicon name="ios-car" size={15} />
-                            <Text style={styles.subDetailsText}>{data.item.CarPark}</Text>
+                            <View style={{ flexDirection: 'row' }}>
 
-                            <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
+                                <Ionicon name="ios-bed" size={15} />
+                                <Text style={styles.subDetailsText}>{data.item.Bedrooms}</Text>
 
-                            <Text style={styles.subDetailsText}>{data.item.PropType}</Text>
+                                <Meticon name="shower" size={15} />
+                                <Text style={styles.subDetailsText}>{data.item.Bathrooms}</Text>
+
+                                <Ionicon name="ios-car" size={15} />
+                                <Text style={styles.subDetailsText}>{data.item.CarPark}</Text>
+
+                                <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
+
+                                <Text style={styles.subDetailsText}>{data.item.PropType}</Text>
+                            </View>
                         </View>
-                    </View>
 
-                    <View style={styles.sideButtons}>
-                        <TouchableOpacity onPress={((data) => {
+                        <View style={styles.sideButtons}>
+
+
+                            {/* create new folder */}
+                            {/* <TouchableOpacity onPress={((data) => {
                             this.setState({
                                 propertyID: data.item.PropId
                             });
@@ -403,46 +467,51 @@ export default class SearchResultView extends Component<Props> {
                                 this.pleaseLoginInAlert();
                             }
 
-                            // this.renderModal();
                         }).bind(this, data)}>
 
                             <AntDesign
                                 name="addfolder"
                                 size={24}
                                 style={{ marginRight: 10 }}
-                            // color='gray'
                             />
 
-
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={((data) => {
-                            this.setState({
-                                propertyID: data.item.PropId
-                            });
-
-                            if (this.state.loggedUser) {
-                                this.renderModal();
-                            }
-                            else {
-                                this.pleaseLoginInAlert();
-                            }
+                        </TouchableOpacity> */}
 
 
-                        }).bind(this, data)}>
-                            <Ionicon
-                                name="ios-star-outline"
-                                size={25}
-                                // color='gray'
-                                style={{ marginRight: 10 }}
-                            />
-                            {/* <Text> jhsgdjhasgd</Text> */}
-                        </TouchableOpacity>
 
+                            <TouchableOpacity onPress={((data) => {
+                                this.setState({
+                                    propertyID: data.item.PropId
+                                });
+
+                                if (this.state.loggedUser) {
+                                    this.renderModal();
+                                }
+                                else {
+                                    this.pleaseLoginInAlert();
+                                }
+
+
+                            }).bind(this, data)}>
+                                <Meticon
+                                    name="heart-outline"
+                                    size={25}
+                                    // color='gray'
+                                    style={{ marginRight: 10 }}
+                                />
+                                {/* <Text> jhsgdjhasgd</Text> */}
+                            </TouchableOpacity>
+
+                        </View>
+
+                        {/* sadasd */}
                     </View>
-                </View>
+                </TouchableOpacity>
+
             </View>
-        </TouchableOpacity>
+
+        </View>
+    // {/* </TouchableOpacity> */}
 
 
     render() {
@@ -485,13 +554,14 @@ const styles = StyleSheet.create({
         flex: 1,
         // padding: 10,
         paddingTop: 0,
-        backgroundColor: '#E0E0E0'
+        // backgroundColor: '#E0E0E0'
     },
     list_item: {
         // flexDirection: "row",
         borderRadius: 5,
         // padding: 5,
-        paddingTop: 5
+        paddingTop: 5,
+        padding: 10
     },
     userProfileView: {
         width: 40,
@@ -535,8 +605,9 @@ const styles = StyleSheet.create({
     listView: {
         backgroundColor: 'white',
         // borderBottomWidth: 1,
-        paddingBottom: 10,
-        marginBottom: 10
+        // paddingBottom: 10,
+        marginBottom: 5,
+        padding: 10
     },
     ownerName: {
         fontSize: 14,
@@ -544,14 +615,15 @@ const styles = StyleSheet.create({
         color: '#E0E0E0'
     },
     imageTop: {
-        marginTop: 40,
+        // marginTop: 40,
+        // marginTop:10,
         width: '100%',
         height: 300,
     },
     sideButtons: {
         alignItems: 'flex-end',
         position: 'absolute',
-        right: 5,
+        right: -5,
         top: 15,
         flexDirection: 'row',
         flex: 1,

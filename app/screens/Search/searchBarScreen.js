@@ -63,8 +63,8 @@ export default class SearchBarScreen extends Component {
     }
 
     ResetFilters() {
-        this.setState({
 
+        this.setState({
             agreementType: 1,
 
             isSelectedHouse: false,
@@ -87,7 +87,6 @@ export default class SearchBarScreen extends Component {
 
             sortOderTextViewVisible: true,
             sortOrder: -1,
-
         });
 
         if (this._rangeSlider) {
@@ -231,7 +230,7 @@ export default class SearchBarScreen extends Component {
             keyWords: text,
             keyWordsArr: text.split(",")
         });
-        console.log(this.state.keyWordsArr)
+        // console.log(this.state.keyWordsArr)
     }
 
     Onpress_PropertyTypeFilter(type) {
@@ -363,7 +362,9 @@ export default class SearchBarScreen extends Component {
                         Alert.alert('Modal has been closed.');
                     }}>
 
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, 
+                        // backgroundColor:'#FFFDE7'
+                        }}>
                         {this.showFilters()}
                     </View>
 
@@ -542,7 +543,9 @@ export default class SearchBarScreen extends Component {
                 }}>
 
                     <View style={{ position: 'relative', alignSelf: 'flex-end' }}>
-                        <TouchableOpacity style={styles.resetFilterButton} onPress={() => this.ResetFilters()}>
+                        <TouchableOpacity style={styles.resetFilterButton} 
+                        onPress={() => this.ResetFilters()}
+                        >
 
                             <Text style={{ fontSize: 10 }}>RESET FILTERS</Text>
 

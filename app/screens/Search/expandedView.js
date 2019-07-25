@@ -84,6 +84,7 @@ export default class ExpandedView extends Component {
 
                         </TouchableOpacity>
                     </View>
+
                     <View>
                         <MapView
                             style={styles.mapViewExpand}
@@ -132,16 +133,17 @@ export default class ExpandedView extends Component {
                     </View>
 
                 </Modal>
+
             </View>
 
         );
     }
 
-    handleTextReady = () => {
+    handleTextReady(){
         console.log('ready!');
     }
 
-    renderTruncatedFooter = (handlePress) => {
+    renderTruncatedFooter(handlePress){
         return (
             <View style={{ backgroundColor: '#EEEEEE', borderRadius: 4, flex: 1, alignContent: 'center', justifyContent: 'center', margin: 10 }}>
                 <Text style={{ alignSelf: 'center', margin: 5, fontSize: 13, fontWeight: '500' }} onPress={handlePress}>
@@ -152,7 +154,7 @@ export default class ExpandedView extends Component {
         );
     }
 
-    renderRevealedFooter = (handlePress) => {
+    renderRevealedFooter(handlePress) {
         return (
             <View style={{ backgroundColor: '#EEEEEE', borderRadius: 4, flex: 1, alignContent: 'center', justifyContent: 'center', margin: 10 }}>
 

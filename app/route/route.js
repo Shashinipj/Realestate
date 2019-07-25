@@ -11,6 +11,7 @@ import SearchBarScreen from '../screens/Search/searchBarScreen';
 import SearchResultView from '../screens/Search/searchResultView';
 import ExpandedView from '../screens/Search/expandedView';
 import CollectionDetailScreen from '../screens/Collection/collectionDetailScreen';
+import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const searchStack = createStackNavigator({
@@ -72,9 +73,9 @@ const TabNavigator = createBottomTabNavigator({
 
         navigationOptions: {
             tabBarIcon: ({ tintColor }) => (
-                <Icon
-                    name="collections"
-                    type='MaterialIcons'
+                <Meticon
+                    name="heart-outline"
+                    type='MaterialCommunityIcons'
                     size={25}
                     color='gray' />
             )

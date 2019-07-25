@@ -128,7 +128,6 @@ export default class CollectionScreen extends Component {
         );
     }
 
-
     renderCollectionView() {
         if (!this.state.loggedUser) {
             return (
@@ -170,7 +169,6 @@ export default class CollectionScreen extends Component {
         }
     }
 
-
     render() {
         return (
             <View style={{ flex: 1 }}>
@@ -187,7 +185,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f3d500'
     },
     buttons: {
-        backgroundColor: '#49141E',
+        backgroundColor: '#f3d500',
         borderRadius: 4,
         paddingVertical: 7,
         margin: 10,
@@ -201,7 +199,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     buttonText: {
-        color: 'white',
+        color: '#49141E',
         fontWeight: '500',
         textAlign: 'center'
     }
