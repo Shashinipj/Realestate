@@ -7,6 +7,7 @@ import RangeSlider from 'rn-range-slider';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Accounting from 'accounting-js';
+// import AsyncStorage from '@react-native-community/async-storage';
 
 const PropertyTypes = {
     House: 1,
@@ -59,6 +60,9 @@ export default class SearchBarScreen extends Component {
 
             sortOderTextViewVisible: true,
             sortOrder: -1,
+
+            loading: true,
+            recentSearchList: []
         };
     }
 
@@ -94,6 +98,34 @@ export default class SearchBarScreen extends Component {
             this._rangeSlider.setLowValue(100000);
         }
     }
+
+    // setValue = async (location) => {
+    //     // var myArray = ['one','two','three'];
+    //     let locationArr = [];
+    //     locationArr.push(location)
+
+    //     try {
+    //         await AsyncStorage.setItem('@MyLocationList:key', JSON.stringify(locationArr))
+    //         console.log('locationArr');
+    //         console.log(locationArr);
+    //     } catch (e) {
+    //         // save error
+    //     }
+
+    //     console.log('Done.')
+    // }
+
+    // getMyValue = async () => {
+    //     try {
+    //         const value = await AsyncStorage.getItem('@MyLocationList:key')
+    //         console.log(value);
+    //     } catch (e) {
+    //         // read error
+    //     }
+
+    //     console.log('Done')
+
+    // }
 
     RenderSortOrderTextView() {
         if (this.state.sortOderTextViewVisible) {
@@ -199,7 +231,7 @@ export default class SearchBarScreen extends Component {
 
         if (no == -1) {
             return (
-                <Text style={styles.sortText}>Non</Text>
+                <Text style={styles.sortText}>None</Text>
             )
         }
         else if (no == 1) {
@@ -362,9 +394,10 @@ export default class SearchBarScreen extends Component {
                         Alert.alert('Modal has been closed.');
                     }}>
 
-                    <View style={{ flex: 1, 
+                    <View style={{
+                        flex: 1,
                         // backgroundColor:'#FFFDE7'
-                        }}>
+                    }}>
                         {this.showFilters()}
                     </View>
 
@@ -543,8 +576,8 @@ export default class SearchBarScreen extends Component {
                 }}>
 
                     <View style={{ position: 'relative', alignSelf: 'flex-end' }}>
-                        <TouchableOpacity style={styles.resetFilterButton} 
-                        onPress={() => this.ResetFilters()}
+                        <TouchableOpacity style={styles.resetFilterButton}
+                            onPress={() => this.ResetFilters()}
                         >
 
                             <Text style={{ fontSize: 10 }}>RESET FILTERS</Text>
@@ -1102,6 +1135,7 @@ export default class SearchBarScreen extends Component {
     GooglePlacesInput() {
 
         const { search } = this.state;
+        let locationTempList = [];
 
         return (
             <GooglePlacesAutocomplete
@@ -1121,6 +1155,11 @@ export default class SearchBarScreen extends Component {
                         location: data.description
                     });
                     this.ResetFilters();
+                    // locationTempList.push(data.description);
+                    // this.setState({
+                    //     recentSearchList: locationTempList
+                    // })
+                    // this.setValue(data.description);
                 }}
 
                 getDefaultValue={() => ''}

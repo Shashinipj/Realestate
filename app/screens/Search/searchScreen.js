@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, Image, Text, TouchableOpacity, Switch, Modal, Button, Alert } from 'react-native';
+import { View, StyleSheet, TextInput, Image, Text, TouchableOpacity, Switch, Modal, Button, Alert, FlatList, ActivityIndicator } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import { db } from '../../Database/db'
 import firebase from 'react-native-firebase';
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
+import Accounting from 'accounting-js';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -24,7 +25,8 @@ export default class SearchScreen extends Component {
 
         this.state = {
             checked: true,
-            dataSource: [],
+            propertiesBuy: [],
+            propertiesRent: [],
             search: '',
             modalVisible: false,
             searchModalVisible: false,
@@ -35,7 +37,9 @@ export default class SearchScreen extends Component {
             password: '',
             error: '',
             success: '',
-            loginState: false
+            loginState: false,
+
+            loading: true
         };
 
         this.forgotPassword_Alert = this.forgotPassword_Alert.bind(this);
@@ -46,6 +50,42 @@ export default class SearchScreen extends Component {
         firebase.auth().onAuthStateChanged(user => {
             this.fetchUser(user);
             console.log("USER: " + user);
+
+        });
+
+        let buyProperties = [];
+        let rentProperties = [];
+
+        PropRef.on('value', (snapshot) => {
+            console.log("VAL ", snapshot);
+
+            const propTypes = snapshot.val();
+
+            for (const propTypeId in propTypes) {
+                const propTypeObj = propTypes[propTypeId];
+
+                if (propTypeObj.Property) {
+                    for (const propId in propTypeObj.Property) {
+                        const propObj = propTypeObj.Property[propId];
+                        if (propObj.PropAction == 1) {
+                            buyProperties.push(propObj);
+                            console.log(buyProperties);
+                        }
+                        if (propObj.PropAction == 2) {
+                            rentProperties.push(propObj);
+                            console.log(rentProperties);
+                        }
+                    }
+
+                }
+
+                this.setState({
+                    propertiesBuy: buyProperties,
+                    propertiesRent: rentProperties,
+                    loading: false
+                });
+
+            }
 
         });
     }
@@ -168,25 +208,99 @@ export default class SearchScreen extends Component {
     renderJoinButton() {
         if (!this.state.loginState) {
             return (
-                <TouchableOpacity style={styles.joinButton}
-                    onPress={() => {
-                        this.setModalVisible(!this.state.modalVisible);
-                    }}
-                >
-                    <Text style={{ textAlign: 'center', color: '#49141E', fontWeight: '600' }}>Join</Text>
+                <View style={styles.textContainer}>
 
-                </TouchableOpacity>
+                    <Text style={{ fontSize: 18, fontWeight: '400' }}>Never miss a property again</Text>
+
+                    <View style={{ marginVertical: 20 }}>
+                        <Text style={{ textAlign: 'center', color: 'gray', fontSize: 13 }}>
+                            Save your searches and be notified when {"\n"}new matching properties hit the market
+                                </Text>
+                    </View>
+
+
+
+                    <TouchableOpacity style={styles.joinButton}
+                        onPress={() => {
+                            this.setModalVisible(!this.state.modalVisible);
+                        }}
+                    >
+                        <Text style={{ textAlign: 'center', color: '#49141E', fontWeight: '600' }}>Join</Text>
+
+                    </TouchableOpacity>
+                </View>
             );
         }
 
-        else {
+        else if (this.state.loginState) {
             return (
-                <View style={{ backgroundColor: 'blue', height: 100 }}>
+
+                <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties to Buy in Sri Lanka</Text>
+                    {(this.state.loading) ?
+                        <View style={styles.loader}>
+                            <ActivityIndicator 
+                            size='small' 
+                            color="#757575" 
+                            style={styles.activityIndicator}
+                            />
+                        </View>
+                        :
+                        <FlatList
+                            data={this.state.propertiesBuy}
+                            renderItem={item => this.renderItem(item)}
+                            keyExtractor={(item, index) => {
+                                return "" + index;
+                            }}
+                            horizontal={true}
+                        />
+                    }
+
+
+                    <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties for Rent in Sri Lanka</Text>
+
+                    {(this.state.loading) ?
+                        <View style={styles.loader}>
+                            <ActivityIndicator 
+                            size='small' 
+                            color="#757575" 
+                            style={styles.activityIndicator}
+                            />
+                        </View>
+                        :
+                        <FlatList
+                            data={this.state.propertiesRent}
+                            renderItem={item => this.renderItem(item)}
+                            keyExtractor={(item, index) => {
+                                return "" + index;
+                            }}
+                            horizontal={true}
+                        />
+                    }
                 </View>
             );
         }
 
     }
+
+    renderItem({ item, index }) {
+        return (
+
+            <TouchableOpacity onPress={() => {
+                this.props.navigation.navigate("ExpandedView", { PropertyData: item });
+            }}>
+
+                <View style={{ borderRadius: 4, margin: 5, width: 100, height: 120 }}>
+                    <Image source={require('../../assets/images/house.jpg')} style={{ height: 70, width: 100, borderRadius: 4, marginBottom: 5 }} />
+                    <Text style={{ fontSize: 11, fontWeight: '600' }}>Property Title </Text>
+                    <Text style={{ fontSize: 10, fontWeight: '600', color: '#424242' }}>{Accounting.formatMoney(item.Price)} </Text>
+                    <Text style={{ fontSize: 10, color: 'gray', marginTop: 2 }}>{item.Address} | {item.PropType}</Text>
+
+                </View>
+            </TouchableOpacity>
+        );
+    }
+
 
     loginScreenImage() {
         if (!this.state.loginState) {
@@ -404,7 +518,7 @@ export default class SearchScreen extends Component {
 
                         </View> */}
 
-                        <View style={styles.textContainer}>
+                        {/* <View style={styles.textContainer}>
 
                             <Text style={{ fontSize: 18, fontWeight: '400' }}>Never miss a property again</Text>
 
@@ -416,7 +530,9 @@ export default class SearchScreen extends Component {
 
                             {this.renderJoinButton()}
 
-                        </View>
+                        </View> */}
+
+                        {this.renderJoinButton()}
 
                     </View>
 
@@ -424,7 +540,7 @@ export default class SearchScreen extends Component {
 
                 {this.showJoinModal()}
 
-                <TouchableOpacity style={styles.footer}>
+                {/* <TouchableOpacity style={styles.footer}>
 
                     <Image source={require('../../assets/icons/marker.png')} style={styles.homeIcon} />
 
@@ -442,7 +558,7 @@ export default class SearchScreen extends Component {
                         />
                     </View>
 
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
             </View>
         );
@@ -452,7 +568,7 @@ export default class SearchScreen extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#E0E0E0',
+        // backgroundColor: '#E0E0E0',
     },
     imageTop: {
         width: '100%',
@@ -463,7 +579,7 @@ const styles = StyleSheet.create({
     bottomContainer: {
         backgroundColor: "#ffffff",
         // backgroundColor:'#FFFDE7',
-        padding: 26
+        padding: 5
     },
     textContainer: {
         alignItems: 'center',
@@ -541,6 +657,13 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         justifyContent: 'flex-end',
         color: 'red',
+    },
+    activityIndicator: {
+        flex: 1,
+        height: 120
+        // marginTop: '45%',
+        // justifyContent: 'center',
+        // alignContent: 'center',
     }
 
 });

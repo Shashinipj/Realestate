@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
+import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
 import { NavigationProp } from 'react-navigation';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -43,7 +43,8 @@ export default class SearchResultView extends Component<Props> {
             modalVisible: false,
             collectionName: '',
             collectionList: [],
-            loggedUser: ''
+            loggedUser: '',
+            loading: true
         };
 
         this.onValueCollection = this.onValueCollection.bind(this);
@@ -264,7 +265,8 @@ export default class SearchResultView extends Component<Props> {
             }
 
             this.setState({
-                propProperties: filteredProperties
+                propProperties: filteredProperties,
+                loading: false
             });
         });
 
@@ -284,7 +286,6 @@ export default class SearchResultView extends Component<Props> {
         if (user) {
             db.ref('Collections/').child(user.uid).off('value', this.onValueCollection);
         }
-
 
     }
 
@@ -416,7 +417,16 @@ export default class SearchResultView extends Component<Props> {
                         { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house2.jpg?alt=media&token=0ccbf59c-2358-4aa1-89d6-b1d3b7e620a8' },
                         { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house3.jpg?alt=media&token=dc364972-504f-452b-a9a3-f2e96e37e5e5' },
                         { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house4.jpg?alt=media&token=850bf1ef-a0d3-42bd-8e76-745cbbcc7055' },
-                    ]} />
+                    ]}
+                // autoPlayWithInterval={3000}
+                // customSlide={({ index, item, style, width }) => (
+                //     // It's important to put style here because it's got offset inside
+                //     <View key={index} style={{}}>
+                //       <Image source={{ uri: item }} style={[styles.imageTop,{resizeMode:'cover'}]} />
+                //       </View>
+
+                //   )}
+                />
 
                 {/* </ImageBackground> */}
 
@@ -514,10 +524,54 @@ export default class SearchResultView extends Component<Props> {
     // {/* </TouchableOpacity> */}
 
 
+    renderResultView() {
+        if (this.state.loading) {
+            return (
+                <View style={styles.loader}>
+                    <ActivityIndicator
+                        size='large'
+                        color="#757575"
+                    />
+                </View>
+            );
+        }
+        else
+            return (
+                (this.state.propProperties.length == 0) ?
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 17 }}>No data to show!</Text>
+                        <TouchableOpacity onPress={() => {
+                            this.props.navigation.navigate('Search');
+                        }}>
+                            <View style={{ height: 30, alignItems: 'center', borderRadius: 10, backgroundColor: '#f3d500', justifyContent: 'center', paddingHorizontal: 10, marginTop: 20 }}>
+                                <Text>
+                                    Back to home
+                            </Text>
+
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    :
+
+                    <FlatList
+                        data={this.state.propProperties}
+                        renderItem={item => this.renderItem(item)}
+                        keyExtractor={(item, index) => {
+                            return "" + index;
+                        }}
+                    />
+            );
+
+    }
+
+
     render() {
         return (
             <View style={styles.container}>
-                {(this.state.propProperties.length == 0) ?
+
+                {this.renderResultView()}
+
+                {/* {(this.state.propProperties.length == 0) ?
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: 17 }}>No data to show!</Text>
                         <TouchableOpacity onPress={() => {
@@ -532,6 +586,7 @@ export default class SearchResultView extends Component<Props> {
                         </TouchableOpacity>
                     </View>
                     :
+
                     <FlatList
                         data={this.state.propProperties}
                         renderItem={item => this.renderItem(item)}
@@ -539,7 +594,7 @@ export default class SearchResultView extends Component<Props> {
                             return "" + index;
                         }}
                     />
-                }
+                } */}
 
                 {this.renderCreateNewCollectionDialog()}
                 {this.renderModalView()}
@@ -618,7 +673,8 @@ const styles = StyleSheet.create({
         // marginTop: 40,
         // marginTop:10,
         width: '100%',
-        height: 300,
+        height: 200,
+        resizeMode: 'cover'
     },
     sideButtons: {
         alignItems: 'flex-end',
@@ -628,6 +684,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flex: 1,
         // backgroundColor:'blue'
-    }
+    },
+    loader: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff"
+    },
 
 });

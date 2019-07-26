@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, FlatList, Alert } from 'react-native';
+import { View, StyleSheet, Text, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { db } from '../../Database/db';
 import firebase from 'react-native-firebase';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -31,7 +31,8 @@ export default class CollectionScreen extends Component {
              * @type {CollectionItem[]}
              */
             collectionList: [],
-            loggedUser: ''
+            loggedUser: '',
+            loading: true
         };
     }
 
@@ -102,7 +103,8 @@ export default class CollectionScreen extends Component {
                 }
 
                 this.setState({
-                    collectionList: arrCont
+                    collectionList: arrCont,
+                    loading: false
                 });
             });
 
@@ -155,14 +157,24 @@ export default class CollectionScreen extends Component {
         else {
             return (
                 <View style={{ flex: 1 }}>
-                    <FlatList
-                        data={this.state.collectionList}
-                        extraData={this.state}
-                        renderItem={item => this.renderItem(item)}
-                        keyExtractor={(item, index) => {
-                            return "" + index;
-                        }}
-                    />
+                    {(this.state.loading) ?
+                        <View style={styles.loader}>
+                            <ActivityIndicator 
+                            size='large' 
+                            color="#757575" 
+                            style={styles.activityIndicator}
+                            />
+                        </View>
+                        :
+                        <FlatList
+                            data={this.state.collectionList}
+                            extraData={this.state}
+                            renderItem={item => this.renderItem(item)}
+                            keyExtractor={(item, index) => {
+                                return "" + index;
+                            }}
+                        />
+                    }
 
                 </View>
             );
@@ -202,5 +214,16 @@ const styles = StyleSheet.create({
         color: '#49141E',
         fontWeight: '500',
         textAlign: 'center'
-    }
+    },
+    activityIndicator: {
+        // marginTop: '45%',
+        // justifyContent: 'center',
+        // alignContent: 'center',
+    },
+    loader: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff"
+    },
 })
