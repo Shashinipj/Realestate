@@ -401,16 +401,14 @@ export default class SearchResultView extends Component<Props> {
                 <TouchableOpacity style={{}} onPress={() => {
                     this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
                 }}>
-                    <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 5 }}>Luxury House in Colombo</Text>
+                    <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>Luxury House in Colombo</Text>
 
                 </TouchableOpacity>
-                
 
-                {/* <Image source={{  }} style={styles.imageTop} /> */}
-                <ImageSlider
-                    style={{height: 200, 
-                        // width: deviceWidth-25
-                    }}
+                <View style={{flexDirection:'row'}}>
+                    <Image source={require('../../assets/images/house.jpg')} style={[styles.imageTop,{marginRight: 10}]} />
+                    {/* <ImageSlider
+                    style={{height: 200, width: deviceWidth-25}}
                     images={[
                         // url('https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/index.jpg?alt=media&token=3ba7172f-9e37-4eab-a082-f84cd17e16bb'),
                         { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house.jpg?alt=media&token=6f42610b-51b1-4ee1-bdca-32984e41694c' },
@@ -418,54 +416,47 @@ export default class SearchResultView extends Component<Props> {
                         { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house3.jpg?alt=media&token=dc364972-504f-452b-a9a3-f2e96e37e5e5' },
                         { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house4.jpg?alt=media&token=850bf1ef-a0d3-42bd-8e76-745cbbcc7055' },
                     ]}
-                // autoPlayWithInterval={3000}
-                // customSlide={({ index, item, style, width }) => (
-                //     // It's important to put style here because it's got offset inside
-                //     <View key={index} style={{}}>
-                //       <Image source={{ uri: item }} style={[styles.imageTop,{resizeMode:'cover'}]} />
-                //       </View>
+               
+                /> */}
 
-                //   )}
-                />
+                    {/* </ImageBackground> */}
 
-                {/* </ImageBackground> */}
-
-                <TouchableOpacity onPress={() => {
-                    this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
-                }}>
+                    <TouchableOpacity style={{ flex: 1}} onPress={() => {
+                        this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
+                    }}>
 
 
 
-                    <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flexDirection: 'row' }}>
 
-                        <View style={{
-                            // marginLeft: 10 
-                        }}>
-                            <Text style={{ fontSize: 20, fontWeight: '600', marginTop: 15, marginBottom: 5, color: '#F57C00' }}>{Accounting.formatMoney(data.item.Price)}</Text>
-                            <Text style={{ fontSize: 15, color: 'gray', marginBottom: 5 }}>{data.item.Address}</Text>
+                            <View style={{
+                                // marginLeft: 10 
+                            }}>
+                                <Text style={{ fontSize: 20, fontWeight: '600', marginTop: 5, marginBottom: 5, color: '#F57C00' }}>{Accounting.formatMoney(data.item.Price)}</Text>
+                                <Text style={{ fontSize: 15, color: 'gray', marginBottom: 5 }}>{data.item.Address}</Text>
 
-                            <View style={{ flexDirection: 'row' }}>
+                                <View style={{ flexDirection: 'row' }}>
 
-                                <Ionicon name="ios-bed" size={17} />
-                                <Text style={styles.subDetailsText}>{data.item.Bedrooms}</Text>
+                                    <Ionicon name="ios-bed" size={17} />
+                                    <Text style={styles.subDetailsText}>{data.item.Bedrooms}</Text>
 
-                                <Meticon name="shower" size={17} />
-                                <Text style={styles.subDetailsText}>{data.item.Bathrooms}</Text>
+                                    <Meticon name="shower" size={17} />
+                                    <Text style={styles.subDetailsText}>{data.item.Bathrooms}</Text>
 
-                                <Ionicon name="ios-car" size={17} />
-                                <Text style={styles.subDetailsText}>{data.item.CarPark}</Text>
+                                    <Ionicon name="ios-car" size={17} />
+                                    <Text style={styles.subDetailsText}>{data.item.CarPark}</Text>
 
-                                <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
+                                    <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
 
-                                <Text style={styles.subDetailsText}>{data.item.PropType}</Text>
+                                    <Text style={styles.subDetailsText}>{data.item.PropType}</Text>
+                                </View>
                             </View>
-                        </View>
 
-                        <View style={styles.sideButtons}>
+                            <View style={styles.sideButtons}>
 
 
-                            {/* create new folder */}
-                            {/* <TouchableOpacity onPress={((data) => {
+                                {/* create new folder */}
+                                {/* <TouchableOpacity onPress={((data) => {
                         this.setState({
                             propertyID: data.item.PropId
                         });
@@ -489,34 +480,38 @@ export default class SearchResultView extends Component<Props> {
 
 
 
-                            <TouchableOpacity onPress={((data) => {
-                                this.setState({
-                                    propertyID: data.item.PropId
-                                });
+                                <TouchableOpacity onPress={((data) => {
+                                    this.setState({
+                                        propertyID: data.item.PropId
+                                    });
 
-                                if (this.state.loggedUser) {
-                                    this.renderModal();
-                                }
-                                else {
-                                    this.pleaseLoginInAlert();
-                                }
+                                    if (this.state.loggedUser) {
+                                        this.renderModal();
+                                    }
+                                    else {
+                                        this.pleaseLoginInAlert();
+                                    }
 
 
-                            }).bind(this, data)}>
-                                <Meticon
-                                    name="heart-outline"
-                                    size={25}
-                                    // color='gray'
-                                    style={{ marginRight: 10 }}
-                                />
-                                {/* <Text> jhsgdjhasgd</Text> */}
-                            </TouchableOpacity>
+                                }).bind(this, data)}>
+                                    <Meticon
+                                        name="heart-outline"
+                                        size={25}
+                                        // color='gray'
+                                        style={{ marginRight: 0 }}
+                                    />
+                                    {/* <Text> jhsgdjhasgd</Text> */}
+                                </TouchableOpacity>
 
+                            </View>
+
+                            {/* sadasd */}
                         </View>
+                    </TouchableOpacity>
 
-                        {/* sadasd */}
-                    </View>
-                </TouchableOpacity>
+                </View>
+
+
 
             </View>
 
@@ -676,8 +671,8 @@ const styles = StyleSheet.create({
     imageTop: {
         // marginTop: 40,
         // marginTop:10,
-        width: '100%',
-        height: 200,
+        width: 80,
+        height: 80,
         resizeMode: 'cover'
     },
     sideButtons: {
