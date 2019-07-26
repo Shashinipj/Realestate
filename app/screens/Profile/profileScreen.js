@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage } from 'react-native';
 import { NavigationProp, NavigationEvents } from 'react-navigation';
 import firebase from 'react-native-firebase';
 
@@ -107,12 +107,17 @@ export default class ProfileScreen extends Component<Props> {
                                 this.setState({ loggedIn: false });
                                 this.loginReset();
                                 this.props.navigation.navigate('Search');
+                                this.clearAsyncStorage();
                             });
                     }
                 },
             ],
             { cancelable: false },
         );
+    }
+
+    clearAsyncStorage = async () => {
+        AsyncStorage.clear();
     }
 
     loginReset() {
@@ -139,7 +144,7 @@ const styles = StyleSheet.create({
     },
     buttons: {
         // backgroundColor: '#49141E',
-        backgroundColor:'#f3d500',
+        backgroundColor: '#f3d500',
         borderRadius: 4,
         paddingVertical: 7,
         margin: 10,

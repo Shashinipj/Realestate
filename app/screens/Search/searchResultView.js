@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator, Dimensions } from 'react-native';
 import { NavigationProp } from 'react-navigation';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -380,22 +380,20 @@ export default class SearchResultView extends Component<Props> {
     }
 
 
-    renderItem = (data) =>
-        // <TouchableOpacity style={styles.list_item} onPress={() => {
-        //     this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
-        // }}>
+    renderItem(data) {
 
-        <View style={styles.list_item}>
+        let deviceWidth = Dimensions.get('window').width
 
+        return (
             <View style={styles.listView}>
                 {/* 
-                <View style={styles.listViewTop}>
-                    <Text style={styles.ownerName}> {data.item.Owner}</Text>
-                    <View style={styles.userProfileView}>
+            <View style={styles.listViewTop}>
+                <Text style={styles.ownerName}> {data.item.Owner}</Text>
+                <View style={styles.userProfileView}>
 
-                        <Image source={require('../../assets/images/owner.jpg')} style={{ width: 40, height: 40, borderRadius: 20 }} />
-                    </View>
-                </View> */}
+                    <Image source={require('../../assets/images/owner.jpg')} style={{ width: 40, height: 40, borderRadius: 20 }} />
+                </View>
+            </View> */}
 
 
                 {/* <ImageBackground style={styles.imageBackground}> */}
@@ -403,14 +401,16 @@ export default class SearchResultView extends Component<Props> {
                 <TouchableOpacity style={{}} onPress={() => {
                     this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
                 }}>
-                    <Text style={{ marginVertical: 3, fontSize: 15, fontWeight: '600' }}>Text Title</Text>
+                    <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 5 }}>Luxury House in Colombo</Text>
 
                 </TouchableOpacity>
+                
 
-
-                {/* <Image source={require('../../assets/images/house.jpg')} style={styles.imageTop} /> */}
+                {/* <Image source={{  }} style={styles.imageTop} /> */}
                 <ImageSlider
-                    style={styles.imageTop}
+                    style={{height: 200, 
+                        // width: deviceWidth-25
+                    }}
                     images={[
                         // url('https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/index.jpg?alt=media&token=3ba7172f-9e37-4eab-a082-f84cd17e16bb'),
                         { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house.jpg?alt=media&token=6f42610b-51b1-4ee1-bdca-32984e41694c' },
@@ -441,18 +441,18 @@ export default class SearchResultView extends Component<Props> {
                         <View style={{
                             // marginLeft: 10 
                         }}>
-                            <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{Accounting.formatMoney(data.item.Price)}</Text>
-                            <Text style={{ fontSize: 12, color: 'gray', marginBottom: 5 }}>{data.item.Address}</Text>
+                            <Text style={{ fontSize: 20, fontWeight: '600', marginTop: 15, marginBottom: 5, color: '#F57C00' }}>{Accounting.formatMoney(data.item.Price)}</Text>
+                            <Text style={{ fontSize: 15, color: 'gray', marginBottom: 5 }}>{data.item.Address}</Text>
 
                             <View style={{ flexDirection: 'row' }}>
 
-                                <Ionicon name="ios-bed" size={15} />
+                                <Ionicon name="ios-bed" size={17} />
                                 <Text style={styles.subDetailsText}>{data.item.Bedrooms}</Text>
 
-                                <Meticon name="shower" size={15} />
+                                <Meticon name="shower" size={17} />
                                 <Text style={styles.subDetailsText}>{data.item.Bathrooms}</Text>
 
-                                <Ionicon name="ios-car" size={15} />
+                                <Ionicon name="ios-car" size={17} />
                                 <Text style={styles.subDetailsText}>{data.item.CarPark}</Text>
 
                                 <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
@@ -466,26 +466,26 @@ export default class SearchResultView extends Component<Props> {
 
                             {/* create new folder */}
                             {/* <TouchableOpacity onPress={((data) => {
-                            this.setState({
-                                propertyID: data.item.PropId
-                            });
+                        this.setState({
+                            propertyID: data.item.PropId
+                        });
 
-                            if (this.state.loggedUser) {
-                                this.showCreateNewCollectionDialog();
-                            }
-                            else {
-                                this.pleaseLoginInAlert();
-                            }
+                        if (this.state.loggedUser) {
+                            this.showCreateNewCollectionDialog();
+                        }
+                        else {
+                            this.pleaseLoginInAlert();
+                        }
 
-                        }).bind(this, data)}>
+                    }).bind(this, data)}>
 
-                            <AntDesign
-                                name="addfolder"
-                                size={24}
-                                style={{ marginRight: 10 }}
-                            />
+                        <AntDesign
+                            name="addfolder"
+                            size={24}
+                            style={{ marginRight: 10 }}
+                        />
 
-                        </TouchableOpacity> */}
+                    </TouchableOpacity> */}
 
 
 
@@ -520,8 +520,11 @@ export default class SearchResultView extends Component<Props> {
 
             </View>
 
-        </View>
-    // {/* </TouchableOpacity> */}
+        );
+    }
+
+
+
 
 
     renderResultView() {
@@ -615,7 +618,7 @@ const styles = StyleSheet.create({
         // flexDirection: "row",
         borderRadius: 5,
         // padding: 5,
-        paddingTop: 5,
+        // paddingTop: 5,
         padding: 10
     },
     userProfileView: {
@@ -655,14 +658,15 @@ const styles = StyleSheet.create({
     subDetailsText: {
         marginLeft: 5,
         marginRight: 10,
-        fontSize: 12
+        fontSize: 14
     },
     listView: {
         backgroundColor: 'white',
         // borderBottomWidth: 1,
         // paddingBottom: 10,
         marginBottom: 5,
-        padding: 10
+        padding: 10,
+        paddingHorizontal: 25
     },
     ownerName: {
         fontSize: 14,

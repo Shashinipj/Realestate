@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, Switch, TextInput, LayoutAnimation } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, Switch, TextInput, LayoutAnimation, AsyncStorage } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon, ListItem } from 'react-native-elements';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -66,6 +66,10 @@ export default class SearchBarScreen extends Component {
         };
     }
 
+    async componentDidMount() {
+        this.getMyValue();
+    }
+
     ResetFilters() {
 
         this.setState({
@@ -99,33 +103,52 @@ export default class SearchBarScreen extends Component {
         }
     }
 
-    // setValue = async (location) => {
-    //     // var myArray = ['one','two','three'];
-    //     let locationArr = [];
-    //     locationArr.push(location)
+    setValue = async (location) => {
 
-    //     try {
-    //         await AsyncStorage.setItem('@MyLocationList:key', JSON.stringify(locationArr))
-    //         console.log('locationArr');
-    //         console.log(locationArr);
-    //     } catch (e) {
-    //         // save error
-    //     }
+        try {
+            const value = await AsyncStorage.getItem('@LocationList')
+            let arr = [];
+            if (value) {
+                try {
+                    arr = JSON.parse(value);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
 
-    //     console.log('Done.')
-    // }
+            arr = [
+                location,
+                ...arr
+            ];
 
-    // getMyValue = async () => {
-    //     try {
-    //         const value = await AsyncStorage.getItem('@MyLocationList:key')
-    //         console.log(value);
-    //     } catch (e) {
-    //         // read error
-    //     }
+            this.state.recentSearchList = arr;
 
-    //     console.log('Done')
+            await AsyncStorage.setItem('@LocationList', JSON.stringify(arr))
+            // console.log(this.state.recentSearchList);
 
-    // }
+        } catch (e) {
+            // save error
+        }
+
+
+    }
+
+    getMyValue = async () => {
+        try {
+            const value = await AsyncStorage.getItem('@LocationList')
+            if (value) {
+                this.setState({
+                    recentSearchList: JSON.parse(value)
+                });
+            }
+
+        } catch (e) {
+            console.log(e);
+        }
+
+        console.log('Done')
+
+    }
 
     RenderSortOrderTextView() {
         if (this.state.sortOderTextViewVisible) {
@@ -1159,7 +1182,7 @@ export default class SearchBarScreen extends Component {
                     // this.setState({
                     //     recentSearchList: locationTempList
                     // })
-                    // this.setValue(data.description);
+                    this.setValue(data);
                 }}
 
                 getDefaultValue={() => ''}
@@ -1176,13 +1199,13 @@ export default class SearchBarScreen extends Component {
                 styles={{
                     textInputContainer: {
                         width: '100%',
-                        backgroundColor: '#ffffff'
+                        backgroundColor: '#ffffff',
                     },
                     description: {
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
                     },
                     predefinedPlacesDescription: {
-                        color: '#1faadb'
+                        color: '#757575'
                     }
                 }}
 
@@ -1199,6 +1222,7 @@ export default class SearchBarScreen extends Component {
 
                 filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
                 // predefinedPlaces={[homePlace, workPlace]}
+                predefinedPlaces={this.state.recentSearchList}
 
                 debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
                 // renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
