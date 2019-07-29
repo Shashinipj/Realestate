@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, Image, Text, TouchableOpacity, Switch, Modal, Button, Alert, FlatList, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, TextInput, Image, Text, TouchableOpacity, Switch, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import { db } from '../../Database/db'
@@ -172,12 +172,17 @@ export default class SearchScreen extends Component {
             .signInWithEmailAndPassword(email, password)
             .then(() => {
                 this.onLoginSuccess();
+                this.clearAsyncStorage();
             })
             .catch((error) => {
                 let errorCode = error.code
                 let errorMessage = error.message;
                 this.onLoginFailure(errorMessage)
             });
+    }
+
+    clearAsyncStorage = async () => {
+        AsyncStorage.clear();
     }
 
     onLoginSuccess() {

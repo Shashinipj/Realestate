@@ -68,6 +68,7 @@ export default class SearchBarScreen extends Component {
 
     async componentDidMount() {
         this.getMyValue();
+
     }
 
     ResetFilters() {
@@ -106,7 +107,17 @@ export default class SearchBarScreen extends Component {
     setValue = async (location) => {
 
         try {
+            console.log('location');
+            console.log(location.description);
             const value = await AsyncStorage.getItem('@LocationList')
+
+            let locationFound = false;
+
+            // let arrayLocation = JSON.parse(value);
+
+            /**
+             * @type {Array}
+             */
             let arr = [];
             if (value) {
                 try {
@@ -116,6 +127,27 @@ export default class SearchBarScreen extends Component {
                 }
             }
 
+
+            for (let i = 0; i < arr.length; i++) {
+                const obj = arr[i];
+
+                console.log('loc.description');
+                console.log(obj.description);
+
+                if (location.description == obj.description) {
+                    locationFound = true;
+                    arr.splice(i, 1);
+                    break
+                }
+            }
+
+            if (arr.length > 4) {
+                // this.state.recentSearchList.splice(0, 1);
+                // arr.splice(arr.length - 1, 1);
+                arr.splice(arr.length - 1, 1);
+                console.log(arr.length);
+            }
+
             arr = [
                 location,
                 ...arr
@@ -123,17 +155,20 @@ export default class SearchBarScreen extends Component {
 
             this.state.recentSearchList = arr;
 
-            await AsyncStorage.setItem('@LocationList', JSON.stringify(arr))
-            // console.log(this.state.recentSearchList);
+            await AsyncStorage.setItem('@LocationList', JSON.stringify(arr));
+
+            // }
+            
 
         } catch (e) {
-            // save error
+            console.log(e);
         }
 
 
     }
 
     getMyValue = async () => {
+
         try {
             const value = await AsyncStorage.getItem('@LocationList')
             if (value) {
@@ -147,6 +182,7 @@ export default class SearchBarScreen extends Component {
         }
 
         console.log('Done')
+        console.log(this.state.recentSearchList.length);
 
     }
 
@@ -1178,10 +1214,6 @@ export default class SearchBarScreen extends Component {
                         location: data.description
                     });
                     this.ResetFilters();
-                    // locationTempList.push(data.description);
-                    // this.setState({
-                    //     recentSearchList: locationTempList
-                    // })
                     this.setValue(data);
                 }}
 

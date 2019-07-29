@@ -511,15 +511,10 @@ export default class SearchResultView extends Component<Props> {
 
                 </View>
 
-
-
             </View>
 
         );
     }
-
-
-
 
 
     renderResultView() {
