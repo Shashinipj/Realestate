@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, Image, Text, TouchableOpacity, Switch, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, TextInput, Image, Text, TouchableOpacity, Dimensions, Animated, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import { db } from '../../Database/db'
 import firebase from 'react-native-firebase';
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 import Accounting from 'accounting-js';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -39,10 +40,12 @@ export default class SearchScreen extends Component {
             success: '',
             loginState: false,
 
-            loading: true
+            loading: true,
+            scroll: false
         };
 
         this.forgotPassword_Alert = this.forgotPassword_Alert.bind(this);
+        this.animatedValue = new Animated.Value(0)
     }
 
     componentDidMount() {
@@ -244,10 +247,10 @@ export default class SearchScreen extends Component {
                     <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties to Buy in Sri Lanka</Text>
                     {(this.state.loading) ?
                         <View style={styles.loader}>
-                            <ActivityIndicator 
-                            size='small' 
-                            color="#757575" 
-                            style={styles.activityIndicator}
+                            <ActivityIndicator
+                                size='small'
+                                color="#757575"
+                                style={styles.activityIndicator}
                             />
                         </View>
                         :
@@ -266,10 +269,10 @@ export default class SearchScreen extends Component {
 
                     {(this.state.loading) ?
                         <View style={styles.loader}>
-                            <ActivityIndicator 
-                            size='small' 
-                            color="#757575" 
-                            style={styles.activityIndicator}
+                            <ActivityIndicator
+                                size='small'
+                                color="#757575"
+                                style={styles.activityIndicator}
                             />
                         </View>
                         :
@@ -315,8 +318,12 @@ export default class SearchScreen extends Component {
         }
 
         else {
+
             return (
-                <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
+                <View style={{ paddingTop: 50 }}>
+
+                    <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
+                </View>
             );
         }
     }
@@ -478,64 +485,89 @@ export default class SearchScreen extends Component {
         );
     }
 
+    onScroll(event) {
+
+        if (event && event.nativeEvent) {
+            const offset = event.nativeEvent.contentOffset;
+            // console.log(event.nativeEvent.contentInset, event.nativeEvent.contentOffset);
+
+            // const maxVal = 5;
+            // if (offset.y < 0) {
+            //     this.animatedValue.setValue(0);
+            // }
+            // else if (offset.y > maxVal) {
+            //     this.animatedValue.setValue(1);
+            // }
+            // else if (offset.y >= 0 && offset.y <= maxVal) {
+            //     const stepVal = 1 / maxVal;
+            //     const inputVal = stepVal * offset.y;
+
+            //     this.animatedValue.setValue(inputVal);
+            // }
+
+            if (offset.y <= 0) {
+                this.setState({
+                    scroll: false
+                });
+            }
+            else if (offset.y > 0) {
+
+                this.setState({
+                    scroll: true
+                });
+            }
+
+        }
+
+
+    }
+
     render() {
+
+
+        const viewHeight = this.animatedValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [50, 20]
+        });
+
+        let addPropertyView = {
+            height: viewHeight
+        };
 
         return (
             <View style={styles.container}>
 
-                <ScrollView>
+                {/* <ScrollView> */}
 
-                    <View style={{ paddingTop: 20, padding: 5 }}>
-                        <View style={styles.searchBarView}>
+                <View style={{ paddingTop: 20 }}>
+                    <View style={styles.searchBarView}>
 
-                            <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
-                                this.props.navigation.navigate('SearchBarScreen');
-                            }}>
+                        <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
+                            this.props.navigation.navigate('SearchBarScreen');
+                        }}>
 
-                                <View style={{ height: 30, alignItems: 'center', flexDirection: 'row' }}>
-                                    <Icon
-                                        name="search"
-                                        type='MaterialIcons'
-                                        size={20}
-                                        color='gray'
-                                    />
-                                    <Text style={{ color: 'gray', marginLeft: 10 }}>Search suburb, postcode, state</Text>
-                                </View>
-
-                            </TouchableWithoutFeedback>
-
-                        </View>
-
-                        {this.loginScreenImage()}
-                    </View>
-
-                    <View style={styles.bottomContainer}>
-                        {/* <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ fontSize: 12, color: 'gray', marginVertical: 10 }}> Saved Searches</Text>
-
-                            <Switch
-                                style={{ position: 'absolute', right: 5 }}
-                                onChange={this.handleChange}
-                                checked={this.state.checked}
-                                height={10}
-                                width={48}
-                            />
-
-                        </View> */}
-
-                        {/* <View style={styles.textContainer}>
-
-                            <Text style={{ fontSize: 18, fontWeight: '400' }}>Never miss a property again</Text>
-
-                            <View style={{ marginVertical: 20 }}>
-                                <Text style={{ textAlign: 'center', color: 'gray', fontSize: 13 }}>
-                                    Save your searches and be notified when {"\n"}new matching properties hit the market
-                                </Text>
+                            <View style={{ height: 30, alignItems: 'center', flexDirection: 'row' }}>
+                                <Icon
+                                    name="search"
+                                    type='MaterialIcons'
+                                    size={20}
+                                    color='gray'
+                                />
+                                <Text style={{ color: 'gray', marginLeft: 10 }}>Search suburb, postcode, state</Text>
                             </View>
 
-                            {this.renderJoinButton()}
+                        </TouchableWithoutFeedback>
 
-                        </View> */}
+                    </View>
+
+
+                </View>
+
+                <ScrollView onScroll={this.onScroll.bind(this)} style={{ }}>
+
+                    {this.loginScreenImage()}
+
+                    <View style={styles.bottomContainer}>
 
                         {this.renderJoinButton()}
 
@@ -543,27 +575,28 @@ export default class SearchScreen extends Component {
 
                 </ScrollView>
 
+                {
+                    !this.state.scroll ? 
+                    <TouchableOpacity 
+                    style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 60 }}
+                    onPress={() => {
+                        this.props.navigation.navigate('AddPropertyScreen');
+                    }}>
+
+                        <View style={styles.addNewPropertyView}>
+                            <Ionicon name="md-add-circle" size={30} color='#49141E' />
+                            <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add my property</Text>
+                        </View>
+                    </TouchableOpacity> :
+                        <View style={styles.addNewSubButton} >
+                             <Ionicon name="md-add" size={20} color='#000000' />
+                            <Text style={{marginLeft:5}}>Add</Text>
+
+
+                        </View>
+                }
+
                 {this.showJoinModal()}
-
-                {/* <TouchableOpacity style={styles.footer}>
-
-                    <Image source={require('../../assets/icons/marker.png')} style={styles.homeIcon} />
-
-                    <View style={{ flexDirection: 'column', marginVertical: 5 }}>
-                        <Text style={{ fontSize: 13, fontWeight: '400' }}>Track your home</Text>
-                        <Text style={{ fontSize: 12, color: "gray" }}>Track its value against local sales</Text>
-                    </View>
-
-                    <View style={{ position: 'absolute', right: 5 }}>
-                        <Icon
-                            name="chevron-right"
-                            // type="FontAwesome"
-                            size={25}
-                            color='gray'
-                        />
-                    </View>
-
-                </TouchableOpacity> */}
 
             </View>
         );
@@ -669,6 +702,29 @@ const styles = StyleSheet.create({
         // marginTop: '45%',
         // justifyContent: 'center',
         // alignContent: 'center',
+    },
+    addNewPropertyView: {
+        height: 50,
+        backgroundColor: '#f3d500',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        position: 'absolute',
+        width: '100%'
+    },
+    addNewSubButton: {
+        justifyContent:'center',
+        alignItems:'center',
+        flexDirection:'row',
+        backgroundColor: '#ffffff',
+        position: 'absolute',
+        height: 30,
+        width: 70,
+        borderRadius: 15,
+        right: 15,
+        top: 100,
+        zIndex: 5,
+        // elevation:3
     }
 
 });

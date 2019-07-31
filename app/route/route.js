@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
 import { createStackNavigator, createBottomTabNavigator, createAppContainer, createSwitchNavigator } from 'react-navigation';
+
 import CollectionScreen from '../screens/Collection/collectionScreen';
 import SearchScreen from '../screens/Search/searchScreen';
 import NotificationScreen from '../screens/Notifications/notificationScreen';
 import ProfileScreen from '../screens/Profile/profileScreen';
-import { Icon } from 'react-native-elements';
-import Icon2 from 'react-native-vector-icons/FontAwesome';
-// import Login from '../screens/login/loginScreen'
 import SearchBarScreen from '../screens/Search/searchBarScreen';
 import SearchResultView from '../screens/Search/searchResultView';
 import ExpandedView from '../screens/Search/expandedView';
 import CollectionDetailScreen from '../screens/Collection/collectionDetailScreen';
+import AddPropertyScreen from '../screens/AddProperties/addProperty';
+
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Icon } from 'react-native-elements';
+import Icon2 from 'react-native-vector-icons/FontAwesome';
 
 
 const searchStack = createStackNavigator({
     Search: {
-        screen: SearchScreen,
+        screen: SearchScreen
     },
     SearchBarScreen: {
         screen: SearchBarScreen
@@ -24,7 +26,7 @@ const searchStack = createStackNavigator({
     SearchResultView: {
         screen: SearchResultView
     },
-    ExpandedView:{
+    ExpandedView: {
         screen: ExpandedView
     }
 
@@ -34,7 +36,7 @@ const collectionStack = createStackNavigator({
     Collections: {
         screen: CollectionScreen
     },
-    CollectionDetailScreen:{
+    CollectionDetailScreen: {
         screen: CollectionDetailScreen
     }
 
@@ -51,8 +53,18 @@ const profileStack = createStackNavigator({
     Profile: {
         screen: ProfileScreen
     },
-
+    AddPropertyScreen: {
+        screen: AddPropertyScreen
+    }
+},{
+    mode:'modal'
 });
+
+const addPropertyStack = createStackNavigator({
+    AddPropertyScreen: {
+        screen: AddPropertyScreen
+    }
+})
 
 const TabNavigator = createBottomTabNavigator({
 
