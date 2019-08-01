@@ -1,14 +1,25 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, TextInputProps, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import { Icon, ListItem } from 'react-native-elements';
+import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // var ImagePicker = NativeModules.ImageCropPicker;
+
+const PropertyTypes = {
+    House: 1,
+    Apartment: 2,
+    Townhouse: 3,
+    Villa: 4,
+    All: -1
+}
 
 export default class AddPropertyScreen extends Component {
 
     static navigationOptions = {
         // header: null,
+        title: 'Add Property'
     };
 
     constructor() {
@@ -16,7 +27,18 @@ export default class AddPropertyScreen extends Component {
         this.state = {
             image: null,
             images: null,
-            defaultImage: null
+            defaultImage: null,
+            title: '',
+            description: '',
+            price: '',
+
+            advertisementType: 1,
+            propertyType: 1,
+
+            bedrooms: null,
+            bathrooms: null,
+            parkingSlots: null
+
         };
     }
 
@@ -116,18 +138,26 @@ export default class AddPropertyScreen extends Component {
     }
 
     pickMultiple() {
+        const { images: savedImages } = this.state;
+
         ImagePicker.openPicker({
             multiple: true,
             waitAnimationEnd: false,
             includeExif: true,
             forceJpg: true,
+            maxFiles: 8 - (savedImages ? savedImages.length : 0)
         }).then(images => {
             this.setState({
                 image: null,
-                images: images.map(i => {
-                    console.log('received image', i);
-                    return { uri: i.path, width: i.width, height: i.height, mime: i.mime };
-                })
+                images: [
+                    ...(savedImages || []),
+                    ...(images.map(i => {
+                        console.log('received image', i);
+                        return { uri: i.path, width: i.width, height: i.height, mime: i.mime };
+                    }))
+                ],
+                // defaultImage: this.state.images[1]
+
             });
         }).catch(e => console.log(e));
 
@@ -147,7 +177,7 @@ export default class AddPropertyScreen extends Component {
                 })
             }} >
                 <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
-                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }}>
+                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
                         <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
                     </TouchableOpacity>
 
@@ -155,6 +185,16 @@ export default class AddPropertyScreen extends Component {
             </TouchableOpacity>
 
         );
+    }
+
+    removeImages(image) {
+        let arr = this.state.images;
+        arr.splice(image, 1);
+
+        this.setState({
+            images: arr
+        });
+
     }
 
     renderInitialImage(i) {
@@ -165,82 +205,381 @@ export default class AddPropertyScreen extends Component {
         );
     }
 
+    isAdvertisementTypeButtonPress(buttonNo) {
+        this.setState({
+            advertisementType: buttonNo
+        });
+    }
+
+    isPropertyTypeButtonPressed(btnNo) {
+        this.setState({
+            propertyType: btnNo
+        });
+    }
+
+
+    returnImageScrollView() {
+
+        const { images: savedImages } = this.state;
+        let arrLength = savedImages ? savedImages.length : 0
+
+
+        // if (arrLength == 0) {
+
+        // }
+
+        if (arrLength < 8) {
+            return (
+
+                <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                    <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                        <Icon
+                            name="add-a-photo"
+                            type='MaterialIcons'
+                            size={30}
+                        />
+                    </View>
+
+                </TouchableOpacity>
+
+            );
+        }
+        else {
+            return null
+        }
+
+
+
+    }
+
 
 
     render() {
+
+        const { images: savedImages } = this.state;
+        arrLength = savedImages ? savedImages.length : 0
+
         return (
 
             <View style={styles.container}>
+                <ScrollView style={{}}>
+                    <View style={{ alignItems: 'center' }}>
 
-                <View style={{ backgroundColor: 'grey', width: 300, height: 200 }}>
-                    
-                    {this.state.defaultImage ? <Image source={this.state.defaultImage} style={{ width: 300, height: 200 }} />
-                        : null
-                    }
+                        <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
 
-                </View>
+                            {this.state.defaultImage ? <Image source={this.state.defaultImage} style={{ width: 300, height: 200, alignItems: 'center' }} />
+                                : <Text style={{ fontWeight: '600', color: 'white' }}>Select a default image</Text>
+                            }
 
-                <View style={{ height: 140 }}>
+                        </View>
 
-                    <ScrollView horizontal={true}
-                        style={{ marginTop: 10 }}
+                        <View style={{ height: 130 }}>
 
-                    >
-                        {/* {this.state.image ? this.renderImage(this.state.image) :
-                            <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                <View style={{ height: 50, backgroundColor: 'grey', width: '100%' }}>
-                                    <Text>Click here to add images</Text>
+                            <ScrollView horizontal={true}
+                                style={{ marginTop: 10, flex: 1 }}
+                            >
+
+                                {/* {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
+                                    null
+                                } */}
+
+                                {/* {this.returnImageScrollView.bind(this)} */}
+
+                                {arrLength == 0 ?
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                            <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                                <Icon
+                                                    name="add-a-photo"
+                                                    type='MaterialIcons'
+                                                    size={30}
+                                                />
+                                            </View>
+
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                            <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                                {/* <Icon
+                                                    name="add-a-photo"
+                                                    type='MaterialIcons'
+                                                    size={30}
+                                                /> */}
+                                            </View>
+
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                            <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                                {/* <Icon
+                                                    name="add-a-photo"
+                                                    type='MaterialIcons'
+                                                    size={30}
+                                                /> */}
+                                            </View>
+
+                                        </TouchableOpacity>
+
+                                    </View>
+
+
+                                    :
+
+                                    // (arrLength == 1 ?
+                                    //     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                    //         <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                    //             <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                    //                 <Icon
+                                    //                     name="add-a-photo"
+                                    //                     type='MaterialIcons'
+                                    //                     size={30}
+                                    //                 />
+                                    //             </View>
+
+                                    //         </TouchableOpacity>
+
+                                    //         <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                    //             <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                    //                 {/* <Icon
+                                    //                 name="add-a-photo"
+                                    //                 type='MaterialIcons'
+                                    //                 size={30}
+                                    //             /> */}
+                                    //             </View>
+
+                                    //         </TouchableOpacity>
+
+                                    //     </View>
+
+                                    //     :
+
+                                    (
+                                        (arrLength < 8 ?
+                                            <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                                <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                                    <Icon
+                                                        name="add-a-photo"
+                                                        type='MaterialIcons'
+                                                        size={30}
+                                                    />
+                                                </View>
+
+                                            </TouchableOpacity>
+
+                                            : null))
+
+                                    // )
+                                }
+
+                                {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
+                                    null
+                                }
+
+                            </ScrollView>
+                        </View>
+
+                    </View>
+
+
+                    <View style={{ alignItems: 'flex-start', margin: 10, backgroundColor: '#ffffff' }}>
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Title</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                // maxLength={300}
+                                onChangeText={(title) => this.setState({ title })}
+                                value={this.state.text}
+                            />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Description</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                multiline={true}
+                                onChangeText={(description) => this.setState({ description })}
+                                value={this.state.text}
+                            />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Price</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                onChangeText={(price) => this.setState({ price })}
+                                value={this.state.price}
+                                keyboardType='numeric'
+                            />
+                        </View>
+
+                        <View style={{ margin: 10 }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Type of Advertisement</Text>
+                            <View style={styles.buttonSetView}>
+                                <TouchableOpacity
+                                    style={
+                                        this.state.advertisementType == 1
+                                            ? { flex: 1, backgroundColor: '#424242', borderTopLeftRadius: 5, borderBottomLeftRadius: 5 } : { flex: 1 }
+                                    }
+                                    onPress={() => this.isAdvertisementTypeButtonPress(1)}
+                                >
+                                    <View style={[styles.subButtonView, { borderRightWidth: 1, height: 30 }]}>
+                                        <Text style={
+                                            this.state.advertisementType == 1 ?
+                                                [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO SELL</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={
+                                        this.state.advertisementType == 2
+                                            ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                    }
+
+                                    onPress={() => this.isAdvertisementTypeButtonPress(2)}
+                                >
+                                    <View style={styles.subButtonView}>
+                                        <Text style={
+                                            this.state.advertisementType == 2 ?
+                                                [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO RENT</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                            </View>
+                        </View>
+
+                        <View style={{ margin: 10, height: 150 }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Type</Text>
+                            <ScrollView horizontal={true} >
+
+                                <View style={styles.propertyTypeView}>
+                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(1)}>
+                                        <View style={
+                                            this.state.propertyType == 1 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                : styles.propertTypeButtons
+                                        }>
+
+                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 1 ? 'white' : 'gray'} />
+
+                                        </View>
+                                    </TouchableOpacity>
+                                    <Text>House</Text>
                                 </View>
 
-                            </TouchableOpacity>
-                        } */}
-                        {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
-                            <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                <View style={{ height: 50, backgroundColor: 'grey', width: '100%' }}>
-                                    <Text>Click here to add images</Text>
+                                <View style={styles.propertyTypeView}>
+                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(2)}>
+                                        <View style={
+                                            this.state.propertyType == 2 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                : styles.propertTypeButtons
+                                        }>
+                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 2 ? 'white' : 'gray'} />
+
+                                        </View>
+                                    </TouchableOpacity>
+                                    <Text style={{ textAlign: 'center' }}>Apartment{"\n&"} house </Text>
                                 </View>
 
-                            </TouchableOpacity>
-                        }
-                    </ScrollView>
-                </View>
+                                <View style={styles.propertyTypeView}>
+                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(3)}>
+                                        <View style={
+                                            this.state.propertyType == 3 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                : styles.propertTypeButtons
+                                        }>
 
-                <View>
+                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 3 ? 'white' : 'gray'} />
 
-                    {/* <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} style={styles.button}>
+                                        </View>
+                                    </TouchableOpacity>
+                                    <Text>Townhouse</Text>
+                                </View>
+
+                                <View style={styles.propertyTypeView}>
+                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(4)}>
+                                        <View style={
+                                            this.state.propertyType == 4 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                : styles.propertTypeButtons
+                                        }>
+                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 4 ? 'white' : 'gray'} />
+
+                                        </View>
+                                    </TouchableOpacity>
+                                    <Text>Villa</Text>
+                                </View>
+                            </ScrollView>
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bedrooms</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                onChangeText={(bedrooms) => this.setState({ bedrooms })}
+                                value={this.state.bedrooms}
+                                keyboardType='numeric'
+                            />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bathrooms</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                onChangeText={(bathrooms) => this.setState({ bathrooms })}
+                                value={this.state.bathrooms}
+                                keyboardType='numeric'
+                            />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Parking Slots</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                onChangeText={(parkingSlots) => this.setState({ parkingSlots })}
+                                value={this.state.parkingSlots}
+                                keyboardType='numeric'
+                            />
+                        </View>
+
+
+                        {/* <View> */}
+
+                        {/* <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} style={styles.button}>
                         <Text style={styles.text}>Select Single Image With Camera</Text>
                     </TouchableOpacity> */}
-                    {/* <TouchableOpacity onPress={() => this.pickSingleWithCamera(true)} style={styles.button}>
+                        {/* <TouchableOpacity onPress={() => this.pickSingleWithCamera(true)} style={styles.button}>
                         <Text style={styles.text}>Select Single With Camera With Cropping</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.pickSingle(false)} style={styles.button}>
-                        <Text style={styles.text}>Select Single</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.cropLast()} style={styles.button}>
+                    </TouchableOpacity> */}
+                        {/* <TouchableOpacity onPress={() => this.pickSingle(false)} style={styles.button}>
+                                <Text style={styles.text}>Select Single</Text>
+                            </TouchableOpacity> */}
+                        {/* <TouchableOpacity onPress={() => this.cropLast()} style={styles.button}>
                         <Text style={styles.text}>Crop Last Selected Image</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.pickSingleBase64(false)} style={styles.button}>
+                    </TouchableOpacity> */}
+                        {/* <TouchableOpacity onPress={() => this.pickSingleBase64(false)} style={styles.button}>
                         <Text style={styles.text}>Select Single Returning Base64</Text>
                     </TouchableOpacity> */}
-                    {/* <TouchableOpacity onPress={() => this.pickSingle(true)} style={styles.button}>
+                        {/* <TouchableOpacity onPress={() => this.pickSingle(true)} style={styles.button}>
                         <Text style={styles.text}>Select Single With Cropping</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => this.pickSingle(true, true)} style={styles.button}>
                         <Text style={styles.text}>Select Single With Circular Cropping</Text>
                     </TouchableOpacity> */}
-                    {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)} style={styles.button}>
+                        {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)} style={styles.button}>
                         <Text style={styles.text}>*Select Multiple*</Text>
                     </TouchableOpacity> */}
-                    {/* <TouchableOpacity onPress={this.cleanupImages.bind(this)} style={styles.button}>
+                        {/* <TouchableOpacity onPress={this.cleanupImages.bind(this)} style={styles.button}>
                         <Text style={styles.text}>Cleanup All Images</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={this.cleanupSingleImage.bind(this)} style={styles.button}>
                         <Text style={styles.text}>Cleanup Single Image</Text>
                     </TouchableOpacity> */}
+                        {/* </View> */}
 
-                </View>
+                    </View>
 
-            </View>);
+                </ScrollView>
+
+
+
+            </View>
+
+        );
     }
 }
 
@@ -248,7 +587,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // justifyContent: 'center',
-        alignItems: 'center',
+        // alignItems: 'center',
         paddingTop: 20
     },
     button: {
@@ -259,5 +598,38 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 20,
         textAlign: 'center'
-    }
+    },
+    buttonSetView: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderRadius: 5,
+        borderWidth: 1,
+        marginTop: 15,
+        // marginBottom: 15,
+        borderColor: '#424242',
+        alignSelf: 'center',
+        // backgroundColor:'green'
+    },
+    propertyTypeText: {
+        fontSize: 12
+    },
+    subButtonView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    propertyTypeView: {
+        alignItems: 'center',
+        marginHorizontal: 10,
+        paddingTop: 10
+    },
+    propertTypeButtons: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        borderWidth: 1,
+        marginBottom: 5,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
 });

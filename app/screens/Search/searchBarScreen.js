@@ -1096,6 +1096,7 @@ export default class SearchBarScreen extends Component {
                             value={this.state.landSize + ''}
                             onChangeText={landSize => this.setState({ landSize })}
                             keyboardType='numeric'
+                            
                         // onChangeText={(text) => this.setState({ text })}
                         // value={this.state.text}
                         />
