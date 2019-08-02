@@ -5,7 +5,6 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import { Icon, ListItem } from 'react-native-elements';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// var ImagePicker = NativeModules.ImageCropPicker;
 
 const PropertyTypes = {
     House: 1,
@@ -37,7 +36,11 @@ export default class AddPropertyScreen extends Component {
 
             bedrooms: null,
             bathrooms: null,
-            parkingSlots: null
+            parkingSlots: null,
+            location: '',
+
+            keyWords: '',
+            keyWordsArr: [],
 
         };
     }
@@ -167,8 +170,6 @@ export default class AddPropertyScreen extends Component {
         return (oldH / oldW) * newW;
     }
 
-
-
     renderImage(image) {
         return (
             <TouchableOpacity style={{}} onPress={() => {
@@ -217,16 +218,10 @@ export default class AddPropertyScreen extends Component {
         });
     }
 
-
     returnImageScrollView() {
 
         const { images: savedImages } = this.state;
         let arrLength = savedImages ? savedImages.length : 0
-
-
-        // if (arrLength == 0) {
-
-        // }
 
         if (arrLength < 8) {
             return (
@@ -247,12 +242,16 @@ export default class AddPropertyScreen extends Component {
         else {
             return null
         }
-
-
-
     }
 
+    getKeyWords(text) {
 
+        this.setState({
+            keyWords: text,
+            keyWordsArr: text.split(",")
+        });
+        // console.log(this.state.keyWordsArr)
+    }
 
     render() {
 
@@ -533,6 +532,28 @@ export default class AddPropertyScreen extends Component {
                                 onChangeText={(parkingSlots) => this.setState({ parkingSlots })}
                                 value={this.state.parkingSlots}
                                 keyboardType='numeric'
+                            />
+                        </View>
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Location</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                // multiline={true}
+                                onChangeText={(location) => this.setState({ location })}
+                                value={this.state.text}
+                            />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                multiline={true}
+                                placeholder='e.g Pool, garage'
+                                onChangeText={
+                                    (keyWords) => this.getKeyWords(keyWords)
+                                }
+                                value={this.state.keyWords}
                             />
                         </View>
 

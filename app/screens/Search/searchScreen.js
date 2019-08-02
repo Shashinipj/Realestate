@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, Image, Text, TouchableOpacity, Dimensions, Animated, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator } from 'react-native';
+import {
+    View, StyleSheet, TextInput, Image, Text, TouchableOpacity,
+    Dimensions, Animated, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator
+} from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import { db } from '../../Database/db'
@@ -7,6 +10,8 @@ import firebase from 'react-native-firebase';
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 import Accounting from 'accounting-js';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import FeaturedListItem from '../../component/featuredListItemComponent';
+// import FeaturedListItem from "../../component/featuredListItemComponent";
 
 let PropRef = db.ref('/PropertyType');
 
@@ -45,10 +50,10 @@ export default class SearchScreen extends Component {
         };
 
         this.forgotPassword_Alert = this.forgotPassword_Alert.bind(this);
-        this.animatedValue = new Animated.Value(0)
     }
 
     componentDidMount() {
+
 
         firebase.auth().onAuthStateChanged(user => {
             this.fetchUser(user);
@@ -293,19 +298,11 @@ export default class SearchScreen extends Component {
 
     renderItem({ item, index }) {
         return (
-
-            <TouchableOpacity onPress={() => {
-                this.props.navigation.navigate("ExpandedView", { PropertyData: item });
-            }}>
-
-                <View style={{ borderRadius: 4, margin: 5, width: 100, height: 120 }}>
-                    <Image source={require('../../assets/images/house.jpg')} style={{ height: 70, width: 100, borderRadius: 4, marginBottom: 5 }} />
-                    <Text style={{ fontSize: 11, fontWeight: '600' }}>Property Title </Text>
-                    <Text style={{ fontSize: 10, fontWeight: '600', color: '#424242' }}>{Accounting.formatMoney(item.Price)} </Text>
-                    <Text style={{ fontSize: 10, color: 'gray', marginTop: 2 }}>{item.Address} | {item.PropType}</Text>
-
-                </View>
-            </TouchableOpacity>
+            <FeaturedListItem
+                propertyData={item}
+                onPressItem={(item) => {
+                    this.props.navigation.navigate("ExpandedView", { PropertyData: item });
+                }} />
         );
     }
 
@@ -489,21 +486,6 @@ export default class SearchScreen extends Component {
 
         if (event && event.nativeEvent) {
             const offset = event.nativeEvent.contentOffset;
-            // console.log(event.nativeEvent.contentInset, event.nativeEvent.contentOffset);
-
-            // const maxVal = 5;
-            // if (offset.y < 0) {
-            //     this.animatedValue.setValue(0);
-            // }
-            // else if (offset.y > maxVal) {
-            //     this.animatedValue.setValue(1);
-            // }
-            // else if (offset.y >= 0 && offset.y <= maxVal) {
-            //     const stepVal = 1 / maxVal;
-            //     const inputVal = stepVal * offset.y;
-
-            //     this.animatedValue.setValue(inputVal);
-            // }
 
             if (offset.y <= 0) {
                 this.setState({
@@ -516,23 +498,10 @@ export default class SearchScreen extends Component {
                     scroll: true
                 });
             }
-
         }
-
-
     }
 
     render() {
-
-
-        const viewHeight = this.animatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [50, 20]
-        });
-
-        let addPropertyView = {
-            height: viewHeight
-        };
 
         return (
             <View style={styles.container}>
@@ -557,13 +526,10 @@ export default class SearchScreen extends Component {
                             </View>
 
                         </TouchableWithoutFeedback>
-
                     </View>
-
-
                 </View>
 
-                <ScrollView onScroll={this.onScroll.bind(this)} style={{ }}>
+                <ScrollView onScroll={this.onScroll.bind(this)} style={{}}>
 
                     {this.loginScreenImage()}
 
@@ -576,24 +542,30 @@ export default class SearchScreen extends Component {
                 </ScrollView>
 
                 {
-                    !this.state.scroll ? 
-                    <TouchableOpacity 
-                    style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 60 }}
-                    onPress={() => {
-                        this.props.navigation.navigate('AddPropertyScreen');
-                    }}>
+                    !this.state.scroll ?
+                        <TouchableOpacity
+                            style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 60 }}
+                            onPress={() => {
+                                this.props.navigation.navigate('AddPropertyScreen');
+                            }}>
 
-                        <View style={styles.addNewPropertyView}>
-                            <Ionicon name="md-add-circle" size={30} color='#49141E' />
-                            <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add my property</Text>
-                        </View>
-                    </TouchableOpacity> :
-                        <View style={styles.addNewSubButton} >
-                             <Ionicon name="md-add" size={20} color='#000000' />
-                            <Text style={{marginLeft:5}}>Add</Text>
+                            <View style={styles.addNewPropertyView}>
+                                <Ionicon name="md-add-circle" size={30} color='#49141E' />
+                                <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add property</Text>
+                            </View>
+                        </TouchableOpacity> :
 
+                        <TouchableOpacity onPress={() => {
+                            this.props.navigation.navigate('AddPropertyScreen');
+                        }}>
 
-                        </View>
+                            <View style={styles.addNewSubButton} >
+                                <Ionicon name="md-add" size={20} color='#000000' />
+                                <Text style={{ marginLeft: 5 }}>Add</Text>
+
+                            </View>
+                        </TouchableOpacity>
+
                 }
 
                 {this.showJoinModal()}
@@ -623,11 +595,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 15
-    },
-    homeIcon: {
-        height: 25,
-        width: 25,
-        margin: 10
     },
     joinButton: {
         backgroundColor: '#f3d500',
@@ -699,9 +666,6 @@ const styles = StyleSheet.create({
     activityIndicator: {
         flex: 1,
         height: 120
-        // marginTop: '45%',
-        // justifyContent: 'center',
-        // alignContent: 'center',
     },
     addNewPropertyView: {
         height: 50,
@@ -713,9 +677,9 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     addNewSubButton: {
-        justifyContent:'center',
-        alignItems:'center',
-        flexDirection:'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
         backgroundColor: '#ffffff',
         position: 'absolute',
         height: 30,
@@ -724,7 +688,6 @@ const styles = StyleSheet.create({
         right: 15,
         top: 100,
         zIndex: 5,
-        // elevation:3
     }
 
 });

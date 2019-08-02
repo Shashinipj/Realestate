@@ -10,6 +10,7 @@ import Dialog from "react-native-dialog";
 import firebase from 'react-native-firebase';
 import ModalSelector from 'react-native-modal-selector';
 import ImageSlider from 'react-native-image-slider';
+import ListItem from '../../component/listItemComponent'
 
 let PropRef = db.ref('/PropertyType');
 
@@ -133,7 +134,6 @@ export default class SearchResultView extends Component<Props> {
             this.addToCollection(option.label);
             console.log(option.label);
         }
-
     }
 
     componentDidMount() {
@@ -286,9 +286,7 @@ export default class SearchResultView extends Component<Props> {
         if (user) {
             db.ref('Collections/').child(user.uid).off('value', this.onValueCollection);
         }
-
     }
-
 
     getCollectionNames(user) {
         db.ref('Collections/').child(user.uid).on('value', this.onValueCollection);
@@ -380,139 +378,28 @@ export default class SearchResultView extends Component<Props> {
     }
 
 
-    renderItem(data) {
-
-        let deviceWidth = Dimensions.get('window').width
+    renderItem({ item, index }) {
 
         return (
-            <View style={styles.listView}>
-                {/* 
-            <View style={styles.listViewTop}>
-                <Text style={styles.ownerName}> {data.item.Owner}</Text>
-                <View style={styles.userProfileView}>
 
-                    <Image source={require('../../assets/images/owner.jpg')} style={{ width: 40, height: 40, borderRadius: 20 }} />
-                </View>
-            </View> */}
-
-
-                {/* <ImageBackground style={styles.imageBackground}> */}
-
-                <TouchableOpacity style={{}} onPress={() => {
-                    this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
-                }}>
-                    <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>Luxury House in Colombo</Text>
-
-                </TouchableOpacity>
-
-                <View style={{flexDirection:'row'}}>
-                    <Image source={require('../../assets/images/house.jpg')} style={[styles.imageTop,{marginRight: 10}]} />
-                    {/* <ImageSlider
-                    style={{height: 200, width: deviceWidth-25}}
-                    images={[
-                        // url('https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/index.jpg?alt=media&token=3ba7172f-9e37-4eab-a082-f84cd17e16bb'),
-                        { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house.jpg?alt=media&token=6f42610b-51b1-4ee1-bdca-32984e41694c' },
-                        { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house2.jpg?alt=media&token=0ccbf59c-2358-4aa1-89d6-b1d3b7e620a8' },
-                        { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house3.jpg?alt=media&token=dc364972-504f-452b-a9a3-f2e96e37e5e5' },
-                        { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house4.jpg?alt=media&token=850bf1ef-a0d3-42bd-8e76-745cbbcc7055' },
-                    ]}
-               
-                /> */}
-
-                    {/* </ImageBackground> */}
-
-                    <TouchableOpacity style={{ flex: 1}} onPress={() => {
-                        this.props.navigation.navigate("ExpandedView", { PropertyData: data.item });
-                    }}>
-
-
-
-                        <View style={{ flexDirection: 'row' }}>
-
-                            <View style={{
-                                // marginLeft: 10 
-                            }}>
-                                <Text style={{ fontSize: 20, fontWeight: '600', marginTop: 5, marginBottom: 5, color: '#F57C00' }}>{Accounting.formatMoney(data.item.Price)}</Text>
-                                <Text style={{ fontSize: 15, color: 'gray', marginBottom: 5 }}>{data.item.Address}</Text>
-
-                                <View style={{ flexDirection: 'row' }}>
-
-                                    <Ionicon name="ios-bed" size={17} />
-                                    <Text style={styles.subDetailsText}>{data.item.Bedrooms}</Text>
-
-                                    <Meticon name="shower" size={17} />
-                                    <Text style={styles.subDetailsText}>{data.item.Bathrooms}</Text>
-
-                                    <Ionicon name="ios-car" size={17} />
-                                    <Text style={styles.subDetailsText}>{data.item.CarPark}</Text>
-
-                                    <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
-
-                                    <Text style={styles.subDetailsText}>{data.item.PropType}</Text>
-                                </View>
-                            </View>
-
-                            <View style={styles.sideButtons}>
-
-
-                                {/* create new folder */}
-                                {/* <TouchableOpacity onPress={((data) => {
-                        this.setState({
-                            propertyID: data.item.PropId
-                        });
-
-                        if (this.state.loggedUser) {
-                            this.showCreateNewCollectionDialog();
-                        }
-                        else {
-                            this.pleaseLoginInAlert();
-                        }
-
-                    }).bind(this, data)}>
-
-                        <AntDesign
-                            name="addfolder"
-                            size={24}
-                            style={{ marginRight: 10 }}
-                        />
-
-                    </TouchableOpacity> */}
-
-
-
-                                <TouchableOpacity onPress={((data) => {
-                                    this.setState({
-                                        propertyID: data.item.PropId
-                                    });
-
-                                    if (this.state.loggedUser) {
-                                        this.renderModal();
-                                    }
-                                    else {
-                                        this.pleaseLoginInAlert();
-                                    }
-
-
-                                }).bind(this, data)}>
-                                    <Meticon
-                                        name="heart-outline"
-                                        size={25}
-                                        // color='gray'
-                                        style={{ marginRight: 0 }}
-                                    />
-                                    {/* <Text> jhsgdjhasgd</Text> */}
-                                </TouchableOpacity>
-
-                            </View>
-
-                            {/* sadasd */}
-                        </View>
-                    </TouchableOpacity>
-
-                </View>
-
-            </View>
-
+            <ListItem
+                data1={item}
+                favouriteMarked={false}
+                showFavouriteIcon={true}
+                onPressItem={(item) => {
+                    this.props.navigation.navigate("ExpandedView", { PropertyData: item });
+                }}
+                onPressFavourite={(item, isMarked) => {
+                    if (this.state.loggedUser) {
+                        this.state.propertyID = item.PropId;
+    
+                        this.renderModal();
+                    }
+                    else {
+                        this.pleaseLoginInAlert();
+                    }
+                }}
+            />
         );
     }
 
@@ -563,32 +450,6 @@ export default class SearchResultView extends Component<Props> {
             <View style={styles.container}>
 
                 {this.renderResultView()}
-
-                {/* {(this.state.propProperties.length == 0) ?
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ fontSize: 17 }}>No data to show!</Text>
-                        <TouchableOpacity onPress={() => {
-                            this.props.navigation.navigate('Search');
-                        }}>
-                            <View style={{ height: 30, alignItems: 'center', borderRadius: 10, backgroundColor: '#f3d500', justifyContent: 'center', paddingHorizontal: 10, marginTop: 20 }}>
-                                <Text>
-                                    Back to home
-                                </Text>
-
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                    :
-
-                    <FlatList
-                        data={this.state.propProperties}
-                        renderItem={item => this.renderItem(item)}
-                        keyExtractor={(item, index) => {
-                            return "" + index;
-                        }}
-                    />
-                } */}
-
                 {this.renderCreateNewCollectionDialog()}
                 {this.renderModalView()}
 
@@ -600,84 +461,7 @@ export default class SearchResultView extends Component<Props> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // padding: 10,
         paddingTop: 0,
-        // backgroundColor: '#E0E0E0'
-    },
-    list_item: {
-        // flexDirection: "row",
-        borderRadius: 5,
-        // padding: 5,
-        // paddingTop: 5,
-        padding: 10
-    },
-    userProfileView: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        // backgroundColor: 'white',
-        marginBottom: -20,
-        borderWidth: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: 10,
-        borderColor: 'white'
-        // position: "absolute",
-    },
-    listViewTop: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: 40,
-        zIndex: 2,
-
-        backgroundColor: '#49141E',
-        padding: 5,
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        overflow: "visible"
-    },
-    imageBackground: {
-        height: 100,
-        width: '90%',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    subDetailsText: {
-        marginLeft: 5,
-        marginRight: 10,
-        fontSize: 14
-    },
-    listView: {
-        backgroundColor: 'white',
-        // borderBottomWidth: 1,
-        // paddingBottom: 10,
-        marginBottom: 5,
-        padding: 10,
-        paddingHorizontal: 25
-    },
-    ownerName: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#E0E0E0'
-    },
-    imageTop: {
-        // marginTop: 40,
-        // marginTop:10,
-        width: 80,
-        height: 80,
-        resizeMode: 'cover'
-    },
-    sideButtons: {
-        alignItems: 'flex-end',
-        position: 'absolute',
-        right: -5,
-        top: 15,
-        flexDirection: 'row',
-        flex: 1,
-        // backgroundColor:'blue'
     },
     loader: {
         flex: 1,
