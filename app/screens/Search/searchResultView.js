@@ -84,10 +84,10 @@ export default class SearchResultView extends Component<Props> {
             label: '+ Add new...'
         })
 
-        for (let i = 1; i < this.state.collectionList.length; i++) {
+        for (let i = 0; i < this.state.collectionList.length; i++) {
             const colName = this.state.collectionList[i];
             data.push({
-                key: i,
+                key: i + 1,
                 label: colName
             });
         }
@@ -121,8 +121,8 @@ export default class SearchResultView extends Component<Props> {
 
             if (this.state.loggedUser) {
                 this.showCreateNewCollectionDialog();
-                console.log(option.key);
-                console.log('create new 11111');
+                // console.log(option.key);
+                // console.log('create new 11111');
             }
             else {
                 this.pleaseLoginInAlert();
@@ -219,8 +219,8 @@ export default class SearchResultView extends Component<Props> {
                                                         if (featureKeywords == "" || hasKeyword) {
 
                                                             filteredProperties.push(propObj);
-                                                            console.log(filteredProperties);
-                                                            console.log(maxPrice >= (propObj.Price >= minPrice))
+                                                            // console.log(filteredProperties);
+                                                            // console.log(maxPrice >= (propObj.Price >= minPrice))
                                                         }
                                                     }
                                                 }
@@ -277,19 +277,18 @@ export default class SearchResultView extends Component<Props> {
                 loggedUser: user
             })
         }
-
     }
 
     componentWillUnmount() {
         const user = firebase.auth().currentUser;
 
         if (user) {
-            db.ref('Collections/').child(user.uid).off('value', this.onValueCollection);
+            db.ref(`Users/${user.uid}/Collections`).off('value', this.onValueCollection);
         }
     }
 
     getCollectionNames(user) {
-        db.ref('Collections/').child(user.uid).on('value', this.onValueCollection);
+        db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection);
     }
 
     /**
@@ -315,7 +314,8 @@ export default class SearchResultView extends Component<Props> {
         console.log(this.state.collectionName);
         const user = firebase.auth().currentUser;
 
-        db.ref('Collections/').child(user.uid).child(this.state.collectionName).child(this.state.propertyID).set(true)
+        // db.ref('Collections/').child(user.uid).child(this.state.collectionName).child(this.state.propertyID).set(true)
+        db.ref(`Users/${user.uid}/Collections/${this.state.collectionName}/${this.state.propertyID}`).set(true)
             .then(() => {
                 console.log('Inserted!');
                 this.handleCreateNewCollectionCancel();
@@ -327,7 +327,7 @@ export default class SearchResultView extends Component<Props> {
     addToCollection(collectionName) {
         const user = firebase.auth().currentUser;
 
-        db.ref('Collections/').child(user.uid).child(collectionName).child(this.state.propertyID).set(true)
+        db.ref(`Users/${user.uid}/Collections/${collectionName}/${this.state.propertyID}`).set(true)
             .then(() => {
                 console.log('Inserted!');
                 this.handleCreateNewCollectionCancel();
@@ -377,6 +377,10 @@ export default class SearchResultView extends Component<Props> {
         );
     }
 
+    getFavouritePropertyId(id){
+        console.log(id);
+    }
+
 
     renderItem({ item, index }) {
 
@@ -389,10 +393,12 @@ export default class SearchResultView extends Component<Props> {
                 onPressItem={(item) => {
                     this.props.navigation.navigate("ExpandedView", { PropertyData: item });
                 }}
+
                 onPressFavourite={(item, isMarked) => {
                     if (this.state.loggedUser) {
                         this.state.propertyID = item.PropId;
-    
+
+                        this.getFavouritePropertyId(item);
                         this.renderModal();
                     }
                     else {

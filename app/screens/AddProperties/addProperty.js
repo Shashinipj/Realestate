@@ -4,7 +4,11 @@ import ImagePicker from 'react-native-image-crop-picker';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { Icon, ListItem } from 'react-native-elements';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Switch from 'react-native-switch-pro'
+import firebase from 'react-native-firebase';
 
+import { db } from '../../Database/db';
+let PropRef = db.ref('/PropertyType');
 
 const PropertyTypes = {
     House: 1,
@@ -41,6 +45,13 @@ export default class AddPropertyScreen extends Component {
 
             keyWords: '',
             keyWordsArr: [],
+
+            contactNumber: null,
+            isFeatured: false,
+            houseCondition: '',
+            landSize: 0,
+            owner: '',
+            PropId: null
 
         };
     }
@@ -170,6 +181,42 @@ export default class AddPropertyScreen extends Component {
         return (oldH / oldW) * newW;
     }
 
+    resetPropertyView() {
+
+        return new Promise((resolve, reject) => {
+
+            this.setState({
+                image: null,
+                images: null,
+                defaultImage: null,
+                title: '',
+                description: '',
+                price: '',
+
+                advertisementType: 1,
+                propertyType: 1,
+
+                bedrooms: null,
+                bathrooms: null,
+                parkingSlots: null,
+                location: '',
+
+                keyWords: '',
+                keyWordsArr: [],
+
+                contactNumber: null,
+                isFeatured: false,
+                houseCondition: '',
+                landSize: 0,
+                owner: '',
+                PropId: null
+
+            }, () => {
+                resolve();
+            });
+        });
+    }
+
     renderImage(image) {
         return (
             <TouchableOpacity style={{}} onPress={() => {
@@ -215,6 +262,73 @@ export default class AddPropertyScreen extends Component {
     isPropertyTypeButtonPressed(btnNo) {
         this.setState({
             propertyType: btnNo
+        });
+    }
+
+    isFeaturedEnable(value) {
+
+        this.setState({
+            isFeatured: value
+        });
+    }
+
+    addNewProperty() {
+
+        db.ref(`PropertyType/${this.state.advertisementType}/Property`).push(
+            {
+
+                // Address: this.state.location,
+                // Bathrooms: this.state.bathrooms,
+                // Bedrooms: this.state.bedrooms,
+                // CarPark: this.state.parkingSlots,
+                // Description: this.state.description,
+                // // Features
+                // LandSize: this.state.landSize,
+                // Owner: this.state.owner,
+                // PropType: this.state.propertyType,
+                // Price: this.state.price,
+                // PropAction: this.state.advertisementType,
+                // PropId: 
+
+            }
+        ).then((fbRef) => {
+            console.log('Inserted!', fbRef.key)
+
+            this.setState({
+                PropId: fbRef.key
+            })
+
+            db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
+                .set(
+                    {
+                        Address: this.state.location,
+                        Bathrooms: this.state.bathrooms,
+                        Bedrooms: this.state.bedrooms,
+                        CarPark: this.state.parkingSlots,
+                        Description: this.state.description,
+                        Features: this.state.keyWordsArr,
+                        LandSize: this.state.landSize,
+                        Owner: this.state.owner,
+                        Price: this.state.price,
+                        PropAction: this.state.advertisementType,
+                        PropId: fbRef.key,
+                        PropTypeId: this.state.propertyType,
+                        isFeatured: this.state.isFeatured,
+                    }).then(() => {
+                        const user = firebase.auth().currentUser;
+
+                        db.ref(`Users/${user.uid}/UserProperties/${this.state.PropId}`).set(true)
+                            .then(() => {
+                                console.log('Inserted!');
+
+                                this.resetPropertyView();
+                            }).catch((error) => {
+                                console.log(error)
+                            });
+                    });
+
+        }).catch((error) => {
+            console.log(error)
         });
     }
 
@@ -297,26 +411,20 @@ export default class AddPropertyScreen extends Component {
                                             </View>
 
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+
+
+                                        {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
                                             <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                                {/* <Icon
-                                                    name="add-a-photo"
-                                                    type='MaterialIcons'
-                                                    size={30}
-                                                /> */}
+                                                
                                             </View>
 
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
                                             <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                                {/* <Icon
-                                                    name="add-a-photo"
-                                                    type='MaterialIcons'
-                                                    size={30}
-                                                /> */}
+                                              
                                             </View>
 
-                                        </TouchableOpacity>
+                                        </TouchableOpacity> */}
 
                                     </View>
 
@@ -545,6 +653,16 @@ export default class AddPropertyScreen extends Component {
                         </View>
 
                         <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                onChangeText={(landSize) => this.setState({ landSize })}
+                                value={this.state.landSize}
+                                keyboardType='numeric'
+                            />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
                             <TextInput
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
@@ -555,6 +673,49 @@ export default class AddPropertyScreen extends Component {
                                 }
                                 value={this.state.keyWords}
                             />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Condition of the House</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                onChangeText={(houseCondition) => this.setState({ houseCondition })}
+                                value={this.state.houseCondition}
+                            />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Owner</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                // maxLength={300}
+                                onChangeText={(owner) => this.setState({ owner })}
+                                value={this.state.owner}
+                            />
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Contact Number</Text>
+                            <TextInput
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                onChangeText={(contactNumber) => this.setState({ contactNumber })}
+                                value={this.state.contactNumber}
+                                keyboardType='numeric'
+                            />
+                        </View>
+
+
+
+                        <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>is Featured</Text>
+                            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                <Switch
+                                    value={this.state.isLocationEnable}
+                                    onSyncPress={() => { this.isFeaturedEnable(!this.state.isFeatured) }}
+                                    style={{}}
+                                />
+
+                            </View>
                         </View>
 
 
@@ -595,6 +756,37 @@ export default class AddPropertyScreen extends Component {
                     </View>
 
                 </ScrollView>
+
+
+                <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            // this.setFilterModalVisible();
+                            // this.props.navigation.navigate('SearchResultView', {
+                            //     data: {
+                            //         ...this.state
+                            //     }
+                            // });
+                            console.log('Add button clicked');
+                            this.addNewProperty();
+                        }}
+
+                    >
+                        <View style={{
+                            backgroundColor: '#49141E', marginVertical: 7, flex: 1, marginHorizontal: 10, width: 300,
+                            borderRadius: 7, alignItems: 'center', justifyContent: 'center'
+                        }}>
+                            {/* <Icon
+                                name="search"
+                                type='MaterialIcons'
+                                size={30}
+                                color='white'
+                            /> */}
+                            <Text style={{ color: 'white', fontWeight: '600' }}>Add</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                </View>
 
 
 

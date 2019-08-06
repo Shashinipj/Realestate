@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage, Image, ScrollView } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage, Image, ScrollView, FlatList } from 'react-native';
 import { NavigationProp, NavigationEvents } from 'react-navigation';
 import firebase from 'react-native-firebase';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -7,6 +7,9 @@ import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 import Switch from 'react-native-switch-pro'
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import { db } from '../../Database/db';
+
+let PropRef = db.ref('/PropertyType');
 
 type Props = {
     navigation: NavigationProp;
@@ -25,7 +28,9 @@ export default class ProfileScreen extends Component<Props> {
             userEmail: '',
             loggedIn: false,
             isLocationEnable: false,
-            receiveNotification: false
+            receiveNotification: false,
+            myProperties: [],
+            uid: ''
         };
     }
 
@@ -38,18 +43,110 @@ export default class ProfileScreen extends Component<Props> {
     }
 
     fetchUser(user) {
+        console.log("UUUSER:", user);
+
         if (user) {
+            this.getMyProperties(user);
             this.setState({
                 userEmail: user.email,
-                loggedIn: true
+                loggedIn: true,
+                uid: user.uid
             });
         }
         else {
             this.setState({
                 userEmail: '',
-                loggedIn: false
+                loggedIn: false,
+                uid: ''
             });
         }
+    }
+
+
+    getMyProperties(user) {
+        if (user) {
+            db.ref(`Users/${user.uid}/UserProperties`).on('value', (snapshot) => {
+                const UserProperties = snapshot.val();
+                console.log(UserProperties);
+
+                /**
+                 * @type {CollectionItem[]}
+                 */
+                const arrCont = [];
+                for (const i in UserProperties) {
+                    const coll = UserProperties[i];
+
+  
+                    console.log(i);
+                    arrCont.push({
+                        name: i,
+                        propIds: coll
+                    });
+                    // console.log(this.state.collectionList);
+                }
+
+                this.setState({
+                    myProperties: arrCont,
+                    // loading: false
+                });
+            });
+
+        }
+
+    }
+
+
+    switchLocationEnable(value) {
+
+        this.setState({
+            isLocationEnable: value
+        });
+    }
+
+    switchNotificationEnable(value) {
+
+        this.setState({
+            receiveNotification: value
+        });
+    }
+
+
+    onPressSignOutButton() {
+
+        Alert.alert(
+            'Sign Out',
+            'Are you sure to want sign out?',
+            [
+                {
+                    text: 'No',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes', onPress: () => {
+                        firebase.auth().signOut()
+                            .then(() => {
+                                this.setState({ loggedIn: false });
+                                this.loginReset();
+                                this.props.navigation.navigate('Search');
+                                this.clearAsyncStorage();
+                            });
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
+    }
+
+    clearAsyncStorage = async () => {
+        AsyncStorage.clear();
+    }
+
+    loginReset() {
+        this.setState({
+            userEmail: '',
+            loggedIn: false
+        })
     }
 
     renderProfileView() {
@@ -58,7 +155,7 @@ export default class ProfileScreen extends Component<Props> {
                 <View style={[styles.buttonContainer, { justifyContent: 'center' }]}>
                     <Text style={{ textAlign: 'center', fontWeight: '400', fontSize: 15, color: 'white' }}>
                         Please Login to see user details
-                </Text>
+                        </Text>
 
                     <View style={{ justifyContent: 'center', alignContent: 'center' }}>
                         {/* {this.checkUserLogin()} */}
@@ -69,7 +166,7 @@ export default class ProfileScreen extends Component<Props> {
                             <View style={styles.buttons}>
                                 <Text style={styles.buttonText}>
                                     Home
-                        </Text>
+                                </Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -79,6 +176,8 @@ export default class ProfileScreen extends Component<Props> {
         }
 
         else if (this.state.loggedIn) {
+            console.log("list: ", this.state.myProperties);
+
             return (
                 <View style={styles.buttonContainer}>
                     <View style={{ justifyContent: 'flex-start', backgroundColor: '#49141E' }}>
@@ -102,8 +201,8 @@ export default class ProfileScreen extends Component<Props> {
                                     <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
                                         <Meticon name="email-outline" size={25} style={{ color: '#49141E' }} />
                                     </View>
-                                    {/* <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text> */}
-                                    <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>robinpeiter@gmail.com</Text>
+                                    <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text>
+                                    {/* <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>robinpeiter@gmail.com</Text> */}
 
                                 </View>
 
@@ -193,10 +292,19 @@ export default class ProfileScreen extends Component<Props> {
                                         <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add my property</Text>
                                     </View>
                                 </TouchableOpacity>
+
+                                <View style={{  flex: 1}}>
+                                    <FlatList
+                                        data={this.state.myProperties}
+                                        extraData={this.state}
+                                        renderItem={item => this.renderMyProperties(item)}
+                                        keyExtractor={(item, index) => {
+                                            return "" + index;
+                                        }}
+                                    />
+                                </View>
                             </View>
-
                         </IndicatorViewPager>
-
                     </View>
 
 
@@ -206,26 +314,12 @@ export default class ProfileScreen extends Component<Props> {
                         <View style={styles.buttons}>
                             <Text style={styles.buttonText}>
                                 Sign Out
-                        </Text>
+                                </Text>
                         </View>
                     </TouchableOpacity>
                 </View>
             );
         }
-    }
-
-    switchLocationEnable(value) {
-
-        this.setState({
-            isLocationEnable: value
-        });
-    }
-
-    switchNotificationEnable(value) {
-
-        this.setState({
-            receiveNotification: value
-        });
     }
 
     renderTabIndicator() {
@@ -249,42 +343,14 @@ export default class ProfileScreen extends Component<Props> {
         />;
     }
 
-    onPressSignOutButton() {
+    renderMyProperties({ item, index }) {
+        return (
+            <View style={{padding: 10 }}>
+                <Text>{item.name}</Text>
+                <Text>item.name</Text>
 
-        Alert.alert(
-            'Sign Out',
-            'Are you sure to want sign out?',
-            [
-                {
-                    text: 'No',
-                    onPress: () => console.log('Cancel Pressed'),
-                    style: 'cancel',
-                },
-                {
-                    text: 'Yes', onPress: () => {
-                        firebase.auth().signOut()
-                            .then(() => {
-                                this.setState({ loggedIn: false });
-                                this.loginReset();
-                                this.props.navigation.navigate('Search');
-                                this.clearAsyncStorage();
-                            });
-                    }
-                },
-            ],
-            { cancelable: false },
+            </View>
         );
-    }
-
-    clearAsyncStorage = async () => {
-        AsyncStorage.clear();
-    }
-
-    loginReset() {
-        this.setState({
-            userEmail: '',
-            loggedIn: false
-        })
     }
 
     render() {

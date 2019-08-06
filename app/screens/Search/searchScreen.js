@@ -46,7 +46,8 @@ export default class SearchScreen extends Component {
             loginState: false,
 
             loading: true,
-            scroll: false
+            scroll: false,
+            uid: ''
         };
 
         this.forgotPassword_Alert = this.forgotPassword_Alert.bind(this);
@@ -65,7 +66,7 @@ export default class SearchScreen extends Component {
         let rentProperties = [];
 
         PropRef.on('value', (snapshot) => {
-            console.log("VAL ", snapshot);
+            // console.log("VAL ", snapshot);
 
             const propTypes = snapshot.val();
 
@@ -77,11 +78,11 @@ export default class SearchScreen extends Component {
                         const propObj = propTypeObj.Property[propId];
                         if (propObj.PropAction == 1) {
                             buyProperties.push(propObj);
-                            console.log(buyProperties);
+                            // console.log(buyProperties);
                         }
                         if (propObj.PropAction == 2) {
                             rentProperties.push(propObj);
-                            console.log(rentProperties);
+                            // console.log(rentProperties);
                         }
                     }
 
@@ -102,7 +103,8 @@ export default class SearchScreen extends Component {
         if (user) {
             this.setState({
                 email: user.email,
-                loginState: true
+                loginState: true,
+                uid: user.uid
             });
         }
         else {
@@ -315,13 +317,21 @@ export default class SearchScreen extends Component {
         }
 
         else {
+            if (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+                return (
+                    <View style={{ paddingTop: 50 }}>
+                        <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
+                    </View>
+                );
+            }
+            else {
+                return (
+                    <View style={{}}>
+                        <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
+                    </View>
+                );
+            }
 
-            return (
-                <View style={{ paddingTop: 50 }}>
-
-                    <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
-                </View>
-            );
         }
     }
 
@@ -501,6 +511,46 @@ export default class SearchScreen extends Component {
         }
     }
 
+    renderAddNewProperty() {
+        if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+
+            if (!this.state.scroll) {
+                return (
+                    <TouchableOpacity
+                        style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 60 }}
+                        onPress={() => {
+                            this.props.navigation.navigate('AddPropertyScreen');
+                        }}>
+
+                        <View style={styles.addNewPropertyView}>
+                            <Ionicon name="md-add-circle" size={30} color='#49141E' />
+                            <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add property</Text>
+                        </View>
+                    </TouchableOpacity>);
+            }
+
+            else {
+                return (
+                    <TouchableOpacity
+                        style={styles.addNewSubButton}
+                        onPress={() => {
+                            this.props.navigation.navigate('AddPropertyScreen');
+                        }}
+                    >
+                        <Ionicon name="md-add" size={20} color='#000000' />
+                        <Text style={{ marginLeft: 5 }}>Add</Text>
+                    </TouchableOpacity>
+                );
+            }
+
+        }
+
+        else {
+            return null;
+        }
+
+    }
+
     render() {
 
         return (
@@ -541,32 +591,8 @@ export default class SearchScreen extends Component {
 
                 </ScrollView>
 
-                {
-                    !this.state.scroll ?
-                        <TouchableOpacity
-                            style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 60 }}
-                            onPress={() => {
-                                this.props.navigation.navigate('AddPropertyScreen');
-                            }}>
 
-                            <View style={styles.addNewPropertyView}>
-                                <Ionicon name="md-add-circle" size={30} color='#49141E' />
-                                <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add property</Text>
-                            </View>
-                        </TouchableOpacity> :
-
-                        <TouchableOpacity onPress={() => {
-                            this.props.navigation.navigate('AddPropertyScreen');
-                        }}>
-
-                            <View style={styles.addNewSubButton} >
-                                <Ionicon name="md-add" size={20} color='#000000' />
-                                <Text style={{ marginLeft: 5 }}>Add</Text>
-
-                            </View>
-                        </TouchableOpacity>
-
-                }
+                {this.renderAddNewProperty()}
 
                 {this.showJoinModal()}
 
