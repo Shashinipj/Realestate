@@ -390,6 +390,7 @@ export default class SearchResultView extends Component<Props> {
                 data1={item}
                 favouriteMarked={false}
                 showFavouriteIcon={true}
+                showDeleteIcon={false}
                 onPressItem={(item) => {
                     this.props.navigation.navigate("ExpandedView", { PropertyData: item });
                 }}

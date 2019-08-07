@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Text, TextInputProps, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
+import { NavigationScreenProp } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { Icon, ListItem } from 'react-native-elements';
@@ -18,7 +19,11 @@ const PropertyTypes = {
     All: -1
 }
 
-export default class AddPropertyScreen extends Component {
+type Props = {
+    navigation: NavigationScreenProp;
+};
+
+export default class AddPropertyScreen extends Component<Props> {
 
     static navigationOptions = {
         // header: null,
@@ -48,6 +53,7 @@ export default class AddPropertyScreen extends Component {
 
             contactNumber: null,
             isFeatured: false,
+            // isVisible: false,
             houseCondition: '',
             landSize: 0,
             owner: '',
@@ -277,19 +283,6 @@ export default class AddPropertyScreen extends Component {
         db.ref(`PropertyType/${this.state.advertisementType}/Property`).push(
             {
 
-                // Address: this.state.location,
-                // Bathrooms: this.state.bathrooms,
-                // Bedrooms: this.state.bedrooms,
-                // CarPark: this.state.parkingSlots,
-                // Description: this.state.description,
-                // // Features
-                // LandSize: this.state.landSize,
-                // Owner: this.state.owner,
-                // PropType: this.state.propertyType,
-                // Price: this.state.price,
-                // PropAction: this.state.advertisementType,
-                // PropId: 
-
             }
         ).then((fbRef) => {
             console.log('Inserted!', fbRef.key)
@@ -301,6 +294,7 @@ export default class AddPropertyScreen extends Component {
             db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
                 .set(
                     {
+                        Title: this.state.title,
                         Address: this.state.location,
                         Bathrooms: this.state.bathrooms,
                         Bedrooms: this.state.bedrooms,
@@ -309,19 +303,21 @@ export default class AddPropertyScreen extends Component {
                         Features: this.state.keyWordsArr,
                         LandSize: this.state.landSize,
                         Owner: this.state.owner,
+                        ContactNumber: this.state.contactNumber,
                         Price: this.state.price,
                         PropAction: this.state.advertisementType,
                         PropId: fbRef.key,
                         PropTypeId: this.state.propertyType,
                         isFeatured: this.state.isFeatured,
+                        Condition: this.state.houseCondition,
                     }).then(() => {
                         const user = firebase.auth().currentUser;
 
                         db.ref(`Users/${user.uid}/UserProperties/${this.state.PropId}`).set(true)
                             .then(() => {
                                 console.log('Inserted!');
-
                                 this.resetPropertyView();
+                                this.props.navigation.pop();
                             }).catch((error) => {
                                 console.log(error)
                             });
@@ -494,7 +490,7 @@ export default class AddPropertyScreen extends Component {
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
                                 // maxLength={300}
                                 onChangeText={(title) => this.setState({ title })}
-                                value={this.state.text}
+                                value={this.state.title}
                             />
                         </View>
 
@@ -504,7 +500,7 @@ export default class AddPropertyScreen extends Component {
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
                                 multiline={true}
                                 onChangeText={(description) => this.setState({ description })}
-                                value={this.state.text}
+                                value={this.state.description}
                             />
                         </View>
 
@@ -648,7 +644,7 @@ export default class AddPropertyScreen extends Component {
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
                                 // multiline={true}
                                 onChangeText={(location) => this.setState({ location })}
-                                value={this.state.text}
+                                value={this.state.location}
                             />
                         </View>
 
@@ -769,6 +765,7 @@ export default class AddPropertyScreen extends Component {
                             // });
                             console.log('Add button clicked');
                             this.addNewProperty();
+                            // this.props.navigation.navigate('ProfileScreen');
                         }}
 
                     >

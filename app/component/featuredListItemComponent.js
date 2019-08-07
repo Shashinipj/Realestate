@@ -50,7 +50,10 @@ export default class FeaturedListItem extends Component<Props> {
 
                     <View style={{ borderRadius: 4, margin: 5, width: 100, height: 120 }}>
                         <Image source={require('../assets/images/house.jpg')} style={{ height: 70, width: 100, borderRadius: 4, marginBottom: 5 }} />
-                        <Text style={{ fontSize: 11, fontWeight: '600' }}>Property Title </Text>
+                        {
+                            (propertyData.Title) ? <Text style={{ fontSize: 11, fontWeight: '600' }}>{propertyData.Title}</Text> :
+                                <Text style={{ fontSize: 11, fontWeight: '600' }}>Property Title </Text>
+                        }
                         <Text style={{ fontSize: 10, fontWeight: '600', color: '#424242' }}>{Accounting.formatMoney(propertyData.Price)} </Text>
                         <Text style={{ fontSize: 10, color: 'gray', marginTop: 2 }}>{propertyData.Address} | {propertyData.PropType}</Text>
 

@@ -8,6 +8,7 @@ import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotInd
 import Switch from 'react-native-switch-pro'
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { db } from '../../Database/db';
+import ListItem from '../../component/listItemComponent'
 
 let PropRef = db.ref('/PropertyType');
 
@@ -21,6 +22,9 @@ export default class ProfileScreen extends Component<Props> {
         header: null,
     };
 
+
+    userProperties = {};
+
     constructor(props) {
         super(props);
 
@@ -30,7 +34,8 @@ export default class ProfileScreen extends Component<Props> {
             isLocationEnable: false,
             receiveNotification: false,
             myProperties: [],
-            uid: ''
+            uid: '',
+            propertyID: ''
         };
     }
 
@@ -40,6 +45,10 @@ export default class ProfileScreen extends Component<Props> {
             this.fetchUser(user);
             console.log("USER: " + user);
         });
+    }
+
+    componentWillUnmount() {
+        // TODO: Add event disposing (.off) here.
     }
 
     fetchUser(user) {
@@ -63,27 +72,38 @@ export default class ProfileScreen extends Component<Props> {
     }
 
 
-    getMyProperties(user) {
-        if (user) {
-            db.ref(`Users/${user.uid}/UserProperties`).on('value', (snapshot) => {
-                const UserProperties = snapshot.val();
-                console.log(UserProperties);
+    getMyProprties(user) {
+        if (useer) {
+            db.ref(`Users/${user.uid}/UserProperties`).once('value', (snapshot) => {
+                this.userProperties = snapshot.val();
+                console.log(this.userProperties);
 
-                /**
-                 * @type {CollectionItem[]}
-                 */
-                const arrCont = [];
-                for (const i in UserProperties) {
-                    const coll = UserProperties[i];
+                db.ref('/PropertyType').on('value', (snapshot) => {
+                    const propTypes = snapshot.val();
 
-  
-                    console.log(i);
-                    arrCont.push({
-                        name: i,
-                        propIds: coll
-                    });
-                    // console.log(this.state.collectionList);
-                }
+                    /**
+                     * @type {arrCont[]}
+                     */
+                    const arrCont = [];
+                    for (const i in this.userProperties) {
+                        for (const propTypeId in propTypes) {
+                            const propTypeObj = propTypes[propTypeId];
+
+                            if (propTypeObj.Property) {
+                                for (const propId in propTypeObj.Property) {
+                                    const propObj = propTypeObj.Property[propId];
+
+                                    if (propId == i) {
+                                        console.log("propObj", propObj);
+                                        arrCont.push(propObj);
+                                        console.log(arrCont);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                });
 
                 this.setState({
                     myProperties: arrCont,
@@ -138,6 +158,28 @@ export default class ProfileScreen extends Component<Props> {
         );
     }
 
+    onPressDeleteButton(propertyID, adType) {
+
+        Alert.alert(
+            'Delete',
+            'Do you really want to delete this property?',
+            [
+                {
+                    text: 'No',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => {
+                        this.deleteProperty(propertyID, adType);
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
+    }
+
     clearAsyncStorage = async () => {
         AsyncStorage.clear();
     }
@@ -149,6 +191,26 @@ export default class ProfileScreen extends Component<Props> {
         })
     }
 
+    deleteProperty(propertyID, adType) {
+
+        db.ref(`PropertyType/${adType}/Property/${propertyID}`).remove()
+            .then(() => {
+                console.log('successfully removed!');
+
+                const user = firebase.auth().currentUser;
+
+                db.ref(`Users/${user.uid}/UserProperties/${propertyID}`).remove()
+                    .then(() => {
+                        if (this.userProperties[propertyID] != undefined) {
+                            delete this.userProperties[propertyID];
+                        }
+                        console.log('Deleted!!');
+                    }).catch((error) => {
+                        console.log(error)
+                    });
+            });
+    }
+
     renderProfileView() {
         if (!this.state.loggedIn) {
             return (
@@ -158,9 +220,7 @@ export default class ProfileScreen extends Component<Props> {
                         </Text>
 
                     <View style={{ justifyContent: 'center', alignContent: 'center' }}>
-                        {/* {this.checkUserLogin()} */}
                         <TouchableOpacity onPress={() => {
-                            // this.setFilterModalVisible();
                             this.props.navigation.navigate('Search');
                         }}>
                             <View style={styles.buttons}>
@@ -249,7 +309,6 @@ export default class ProfileScreen extends Component<Props> {
                                         <Text style={{ color: 'grey', marginBottom: 5 }}>Get Current Location</Text>
                                         <View style={{ flexDirection: 'row' }}>
 
-
                                             <Text style={{ fontSize: 15 }}>{this.state.isLocationEnable ? 'Enable' : 'Disable'}</Text>
                                             <View style={{ flex: 1, alignItems: 'flex-end' }}>
                                                 <Switch
@@ -265,7 +324,6 @@ export default class ProfileScreen extends Component<Props> {
                                     <View style={{ marginTop: 20 }}>
                                         <Text style={{ color: 'grey', marginBottom: 5 }}>Receive Notifications</Text>
                                         <View style={{ flexDirection: 'row' }}>
-
 
                                             <Text style={{ fontSize: 15 }}>{this.state.receiveNotification ? 'Enable' : 'Disable'}</Text>
                                             <View style={{ flex: 1, alignItems: 'flex-end' }}>
@@ -289,14 +347,14 @@ export default class ProfileScreen extends Component<Props> {
 
                                     <View style={{ height: 50, backgroundColor: '#f3d500', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                                         <Ionicon name="md-add-circle" size={30} color='#49141E' />
-                                        <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add my property</Text>
+                                        <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add new property</Text>
                                     </View>
                                 </TouchableOpacity>
 
-                                <View style={{  flex: 1}}>
+                                <View style={{ flex: 1 }}>
                                     <FlatList
                                         data={this.state.myProperties}
-                                        extraData={this.state}
+                                        // extraData={this.state}
                                         renderItem={item => this.renderMyProperties(item)}
                                         keyExtractor={(item, index) => {
                                             return "" + index;
@@ -345,11 +403,23 @@ export default class ProfileScreen extends Component<Props> {
 
     renderMyProperties({ item, index }) {
         return (
-            <View style={{padding: 10 }}>
-                <Text>{item.name}</Text>
-                <Text>item.name</Text>
 
-            </View>
+            <ListItem
+                data1={item}
+                favouriteMarked={false}
+                showFavouriteIcon={false}
+                showDeleteIcon={true}
+                onPressItem={(item) => {
+                    this.props.navigation.navigate("ExpandedView", { PropertyData: item });
+                }}
+
+                onPressDelete={(item, isMarked) => {
+                    this.state.propertyID = item.propId;
+                    console.log(item.PropId);
+                    this.onPressDeleteButton(item.PropId, item.PropAction);
+
+                }}
+            />
         );
     }
 

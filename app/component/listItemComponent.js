@@ -12,9 +12,16 @@ type Props = {
     enableFavouriteIcon: boolean;
     favouriteMarked: boolean;
 
+    showDeleteIcon: boolean;
+    enableDeleteIcon: boolean;
+    deleted: boolean;
+
+
+
 
     onPressItem: (item: any) => void;
     onPressFavourite: (item: any, isMarked: boolean) => void;
+    onPressDelete: (item: any, isMarked: boolean) => void;
 };
 
 export default class ListItem extends Component<Props> {
@@ -28,8 +35,13 @@ export default class ListItem extends Component<Props> {
         showFavouriteIcon: false,
         enableFavouriteIcon: true,
 
+        showDeleteIcon: false,
+        enableDeleteIcon: true,
+        deleted:false,
+
         onPressItem: () => null,
-        onPressFavourite: () => null
+        onPressFavourite: () => null,
+        onPressDelete: () => null
     };
 
 
@@ -44,6 +56,7 @@ export default class ListItem extends Component<Props> {
 
         this.onPress_Item = this.onPress_Item.bind(this);
         this.onPress_Heart = this.onPress_Heart.bind(this);
+        this.onPress_Delete = this.onPress_Delete.bind(this);
     }
 
 
@@ -64,6 +77,14 @@ export default class ListItem extends Component<Props> {
         }
     }
 
+    onPress_Delete() {
+        const { data1, deleted } = this.props;
+
+        if (this.props.onPressDelete) {
+            this.props.onPressDelete(data1, deleted);
+        }
+    }
+
 
 
     renderIcon_Heart() {
@@ -77,22 +98,6 @@ export default class ListItem extends Component<Props> {
             <TouchableOpacity
                 disabled={!enableFavouriteIcon}
                 onPress={this.onPress_Heart}
-
-            // onPress={
-            //     ((data) => {
-            //     this.setState({
-            //         propertyID: data.item.PropId
-            //     });
-
-            //     if (this.state.loggedUser) {
-            //         this.renderModal();
-            //     }
-            //     else {
-            //         this.pleaseLoginInAlert();
-            //     }
-
-
-            // }).bind(this, data)}
             >
 
                 <Meticon
@@ -101,6 +106,32 @@ export default class ListItem extends Component<Props> {
                     style={{ marginRight: 0 }}
                 />
             </TouchableOpacity>
+
+        );
+    }
+
+    renderIcon_Delete() {
+        const { data1, enableDeleteIcon, showDeleteIcon } = this.props;
+
+        if (!showDeleteIcon) {
+            return null;
+        }
+
+        return (
+            <TouchableOpacity
+                disabled={!enableDeleteIcon}
+                onPress={this.onPress_Delete}
+            >
+
+                <Meticon
+                    name="delete-outline"
+                    size={25}
+                    style={{ marginRight: 0 }}
+                />
+
+                {/* <Text style={{}}>delete</Text> */}
+            </TouchableOpacity>
+
         );
     }
 
@@ -111,7 +142,10 @@ export default class ListItem extends Component<Props> {
         return (
             <TouchableOpacity style={styles.listView} onPress={this.onPress_Item}>
 
-                <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>Luxury House in Colombo</Text>
+                {
+                    (this.props.data1.Title) ? <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>{this.props.data1.Title}</Text> :
+                        <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>Luxury House in Colombo</Text>
+                }
 
 
                 <View style={{ flexDirection: 'row' }}>
@@ -149,6 +183,8 @@ export default class ListItem extends Component<Props> {
                             <View style={styles.sideButtons}>
 
                                 {this.renderIcon_Heart()}
+                                {this.renderIcon_Delete()}
+                        
 
                             </View>
 
