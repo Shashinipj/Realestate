@@ -33,6 +33,7 @@ export default class SearchScreen extends Component {
             checked: true,
             propertiesBuy: [],
             propertiesRent: [],
+            featuredList: [],
             search: '',
             modalVisible: false,
             searchModalVisible: false,
@@ -64,6 +65,7 @@ export default class SearchScreen extends Component {
 
         let buyProperties = [];
         let rentProperties = [];
+        let featuredProps = [];
 
         PropRef.on('value', (snapshot) => {
             // console.log("VAL ", snapshot);
@@ -84,6 +86,9 @@ export default class SearchScreen extends Component {
                             rentProperties.push(propObj);
                             // console.log(rentProperties);
                         }
+                        if (propObj.isFeatured == true) {
+                            featuredProps.push(propObj);
+                        }
                     }
 
                 }
@@ -91,6 +96,7 @@ export default class SearchScreen extends Component {
                 this.setState({
                     propertiesBuy: buyProperties,
                     propertiesRent: rentProperties,
+                    featuredList: featuredProps,
                     loading: false
                 });
 
@@ -251,6 +257,27 @@ export default class SearchScreen extends Component {
             return (
 
                 <View style={{ flex: 1 }}>
+
+                    <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Featured Properties</Text>
+                    {(this.state.loading) ?
+                        <View style={styles.loader}>
+                            <ActivityIndicator
+                                size='small'
+                                color="#757575"
+                                style={styles.activityIndicator}
+                            />
+                        </View>
+                        :
+                        <FlatList
+                            data={this.state.featuredList}
+                            renderItem={item => this.renderItem(item)}
+                            keyExtractor={(item, index) => {
+                                return "" + index;
+                            }}
+                            horizontal={true}
+                        />
+                    }
+
                     <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties to Buy in Sri Lanka</Text>
                     {(this.state.loading) ?
                         <View style={styles.loader}>

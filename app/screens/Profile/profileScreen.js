@@ -72,8 +72,8 @@ export default class ProfileScreen extends Component<Props> {
     }
 
 
-    getMyProprties(user) {
-        if (useer) {
+    getMyProperties(user) {
+        if (user) {
             db.ref(`Users/${user.uid}/UserProperties`).once('value', (snapshot) => {
                 this.userProperties = snapshot.val();
                 console.log(this.userProperties);
@@ -103,12 +103,17 @@ export default class ProfileScreen extends Component<Props> {
                             }
                         }
                     }
+
+                    this.setState({
+                        myProperties: arrCont,
+                        // loading: false
+                    });
                 });
 
-                this.setState({
-                    myProperties: arrCont,
-                    // loading: false
-                });
+                // this.setState({
+                //     myProperties: arrCont,
+                //     // loading: false
+                // });
             });
 
         }
@@ -409,6 +414,7 @@ export default class ProfileScreen extends Component<Props> {
                 favouriteMarked={false}
                 showFavouriteIcon={false}
                 showDeleteIcon={true}
+                
                 onPressItem={(item) => {
                     this.props.navigation.navigate("ExpandedView", { PropertyData: item });
                 }}
