@@ -27,7 +27,7 @@ export default class SearchScreen extends Component {
     constructor(props) {
         super(props);
 
-        this.handleChange = this.handleChange.bind(this);
+        // this.handleChange = this.handleChange.bind(this);
 
         this.state = {
             checked: true,
@@ -36,7 +36,7 @@ export default class SearchScreen extends Component {
             featuredList: [],
             search: '',
             modalVisible: false,
-            searchModalVisible: false,
+            forgotPasswordModal: false,
 
             signUpVisible: false,
 
@@ -51,11 +51,10 @@ export default class SearchScreen extends Component {
             uid: ''
         };
 
-        this.forgotPassword_Alert = this.forgotPassword_Alert.bind(this);
+        // this.forgotPassword_Modal = this.forgotPassword_Modal.bind(this);
     }
 
     componentDidMount() {
-
 
         firebase.auth().onAuthStateChanged(user => {
             this.fetchUser(user);
@@ -128,9 +127,9 @@ export default class SearchScreen extends Component {
         this.setState({ modalVisible: visible });
     }
 
-    handleChange(checked) {
-        this.setState({ checked });
-    }
+    // handleChange(checked) {
+    //     this.setState({ checked });
+    // }
 
     onPress_Register() {
         this.setState({
@@ -142,21 +141,98 @@ export default class SearchScreen extends Component {
         });
     }
 
-    forgotPassword_Alert() {
-        Alert.alert(
-            'Forgot password',
-            'Open web browser to reset your password via our mobile website?',
-            [
-                {
-                    text: 'Cancel',
-                    onPress: () => console.log('Cancel Pressed'),
-                    style: 'cancel',
-                },
-                { text: 'OK', onPress: () => console.log('OK Pressed') },
-            ],
-            { cancelable: false },
-        );
+    forgotPassword_Modal(visible) {
+        // Alert.alert(
+        //     'Forgot password',
+        //     'Open web browser to reset your password via our mobile website?',
+        //     [
+        //         {
+        //             text: 'Cancel',
+        //             onPress: () => console.log('Cancel Pressed'),
+        //             style: 'cancel',
+        //         },
+        //         { text: 'OK', onPress: () => console.log('OK Pressed') },
+        //     ],
+        //     { cancelable: false },
+        // );
 
+
+        this.setState({ forgotPasswordModal: visible });
+
+    }
+
+    renderForgotPasswordModal() {
+        return (
+
+            <Modal
+                // animationType="slide"
+
+                transparent={true}
+                visible={this.state.forgotPasswordModal}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+
+                    <View style={{
+                        backgroundColor: '#ffffff', width: '90%', height: '25%', margin: 20, alignItems: 'center', justifyContent: 'center',
+                        borderRadius: 15
+                    }}>
+                        {/* <Text>Please enter your email</Text> */}
+                        <View style={{ borderBottomWidth: 1, width: '90%', backgroundColor: '#ffffff' }}>
+                            <TextInput
+                                label="Email"
+                                value={this.state.email}
+                                style={styles.textinput}
+                                secureTextEntry={false}
+                                onChangeText={email => this.setState({ email })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Please enter your email'
+                            />
+
+                        </View>
+                        <View style={{ flexDirection: 'row', padding: 10, marginTop: 20 }}>
+
+                            <View style={{ alignContent: 'flex-start', flex: 1, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => this.forgotPassword_Modal(false)} >
+                                    <Text style={{ fontSize: 17, fontWeight: '500' }}>Cancel</Text>
+                                </TouchableOpacity>
+
+                            </View>
+
+                            <View style={{ alignContent: 'flex-start', flex: 1, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => {
+                                    this.forgotPassword(this.state.email);
+                                }}>
+                                    <Text style={{ fontSize: 17, fontWeight: '500' }}>OK</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                        </View>
+
+                    </View>
+                </View>
+
+            </Modal>
+        );
+    }
+
+    forgotPassword(yourEmail) {
+        firebase.auth().sendPasswordResetEmail(yourEmail)
+            .then(() => {
+                alert('Please check your email...');
+                this.forgotPassword_Modal(false);
+            }).catch((e) => {
+                console.log(e);
+                console.log(e.code);
+                if (e.code == 'auth/user-not-found') {
+                    alert('You are not a registered user');
+                }
+                else if(e.code == 'auth/invalid-email'){
+                    alert('The email address is badly formatted');
+                }
+            })
     }
 
     onSignUPButtonPress() {
@@ -376,7 +452,11 @@ export default class SearchScreen extends Component {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}>
+                    <TouchableOpacity style={{ margin: 20 }} onPress={() => {
+                        this.forgotPassword_Modal(true);
+                        // this.setModalVisible(false);
+                    }
+                    }>
                         <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text>
                     </TouchableOpacity>
 
@@ -399,17 +479,17 @@ export default class SearchScreen extends Component {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}>
-                        {/* <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text> */}
+                    {/* <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}> */}
+                    {/* <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text> */}
 
-                        <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text>
-                            <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                                <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
-                            </TouchableOpacity>
-                        </View>
+                    <View style={{ flexDirection: 'row', margin: 20 }}>
+                        <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text>
+                        <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
+                            <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                    </TouchableOpacity>
+                    {/* </TouchableOpacity> */}
 
                 </View>
             );
@@ -514,6 +594,8 @@ export default class SearchScreen extends Component {
                     </View>
 
                 </View>
+                {this.renderForgotPasswordModal()}
+
 
             </Modal>
         );
@@ -622,6 +704,7 @@ export default class SearchScreen extends Component {
                 {this.renderAddNewProperty()}
 
                 {this.showJoinModal()}
+
 
             </View>
         );

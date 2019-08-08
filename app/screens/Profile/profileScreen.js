@@ -35,7 +35,8 @@ export default class ProfileScreen extends Component<Props> {
             receiveNotification: false,
             myProperties: [],
             uid: '',
-            propertyID: ''
+            propertyID: '',
+            visibleAd: false
         };
     }
 
@@ -74,41 +75,9 @@ export default class ProfileScreen extends Component<Props> {
 
     getMyProperties(user) {
         if (user) {
-            db.ref(`Users/${user.uid}/UserProperties`).once('value', (snapshot) => {
+            db.ref(`Users/${user.uid}/UserProperties`).on('value', (snapshot) => {
                 this.userProperties = snapshot.val();
                 console.log(this.userProperties);
-
-                db.ref('/PropertyType').on('value', (snapshot) => {
-                    const propTypes = snapshot.val();
-
-                    /**
-                     * @type {arrCont[]}
-                     */
-                    const arrCont = [];
-                    for (const i in this.userProperties) {
-                        for (const propTypeId in propTypes) {
-                            const propTypeObj = propTypes[propTypeId];
-
-                            if (propTypeObj.Property) {
-                                for (const propId in propTypeObj.Property) {
-                                    const propObj = propTypeObj.Property[propId];
-
-                                    if (propId == i) {
-                                        console.log("propObj", propObj);
-                                        arrCont.push(propObj);
-                                        console.log(arrCont);
-                                    }
-
-                                }
-                            }
-                        }
-                    }
-
-                    this.setState({
-                        myProperties: arrCont,
-                        // loading: false
-                    });
-                });
 
                 // this.setState({
                 //     myProperties: arrCont,
@@ -116,6 +85,51 @@ export default class ProfileScreen extends Component<Props> {
                 // });
             });
 
+            db.ref('/PropertyType').on('value', (snapshot) => {
+                const propTypes = snapshot.val();
+
+                /**
+                 * @type {arrCont[]}
+                 */
+                const arrCont = [];
+                let propVisible = ''
+                for (const i in this.userProperties) {
+                    for (const propTypeId in propTypes) {
+                        const propTypeObj = propTypes[propTypeId];
+
+                        if (propTypeObj.Property) {
+                            for (const propId in propTypeObj.Property) {
+                                const propObj = propTypeObj.Property[propId];
+                                propVisible = propObj.Visible;
+                                console.log('propObj.Visible',propObj.Visible);
+
+                                if (propId == i) {
+
+                                    // const propObjNew = {
+                                    //     ...propObj,
+
+                                    //     isVisible: false
+                                    // };
+                                    // propObjNew.isVisible = propObj.Visible;
+                                    console.log("propObj", propObj);
+                                    arrCont.push(propObj);
+                                    // console.log('propObjNew.isVisible',propObjNew.isVisible);
+                                    console.log('arrCont.',arrCont);
+
+                                    // this.setState({
+                                    //     visibleAd: propObj.Visible
+                                    // });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                this.setState({
+                    myProperties: arrCont,
+                    // loading: false
+                });
+            });
         }
 
     }
@@ -185,6 +199,48 @@ export default class ProfileScreen extends Component<Props> {
         );
     }
 
+    onPressPauseButton(PropId, PropAction){
+        Alert.alert(
+            'Pause',
+            'Do you really want to Pause this advertisement?',
+            [
+                {
+                    text: 'No',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => {
+                        this.pauseAdvertisement(PropId, PropAction);
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
+    }
+
+    onPressShowButton(PropId, PropAction){
+        Alert.alert(
+            'Show',
+            'Do you really want to Show this advertisement?',
+            [
+                {
+                    text: 'No',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => {
+                        this.showAdvertisement(PropId, PropAction);
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
+    }
+
     clearAsyncStorage = async () => {
         AsyncStorage.clear();
     }
@@ -214,6 +270,32 @@ export default class ProfileScreen extends Component<Props> {
                         console.log(error)
                     });
             });
+    }
+
+    pauseAdvertisement(propertyID, adType){
+        db.ref(`PropertyType/${adType}/Property/${propertyID}`)
+                        .update(
+                            {
+                                Visible: false
+                            }).then({
+
+                            }).catch((error) => {
+                                console.log(error)
+                            });
+
+    }
+
+    showAdvertisement(propertyID, adType){
+        db.ref(`PropertyType/${adType}/Property/${propertyID}`)
+                        .update(
+                            {
+                                Visible: true
+                            }).then({
+
+                            }).catch((error) => {
+                                console.log(error)
+                            });
+
     }
 
     renderProfileView() {
@@ -345,28 +427,35 @@ export default class ProfileScreen extends Component<Props> {
                                 </ScrollView>
 
                             </View>
-                            <View style={{}}>
-                                <TouchableOpacity onPress={() => {
-                                    this.props.navigation.navigate('AddPropertyScreen');
-                                }}>
 
-                                    <View style={{ height: 50, backgroundColor: '#f3d500', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-                                        <Ionicon name="md-add-circle" size={30} color='#49141E' />
-                                        <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add new property</Text>
+                            {
+                                (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
+                                    <View style={{}}>
+                                        <TouchableOpacity onPress={() => {
+                                            this.props.navigation.navigate('AddPropertyScreen');
+                                        }}>
+
+                                            <View style={{ height: 50, backgroundColor: '#f3d500', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                                                <Ionicon name="md-add-circle" size={30} color='#49141E' />
+                                                <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add new property</Text>
+                                            </View>
+                                        </TouchableOpacity>
+
+                                        <View style={{ flex: 1 }}>
+                                            <FlatList
+                                                data={this.state.myProperties}
+                                                // extraData={this.state}
+                                                renderItem={item => this.renderMyProperties(item)}
+                                                keyExtractor={(item, index) => {
+                                                    return "" + index;
+                                                }}
+                                            />
+                                        </View>
                                     </View>
-                                </TouchableOpacity>
+                                    :
+                                    null
+                            }
 
-                                <View style={{ flex: 1 }}>
-                                    <FlatList
-                                        data={this.state.myProperties}
-                                        // extraData={this.state}
-                                        renderItem={item => this.renderMyProperties(item)}
-                                        keyExtractor={(item, index) => {
-                                            return "" + index;
-                                        }}
-                                    />
-                                </View>
-                            </View>
                         </IndicatorViewPager>
                     </View>
 
@@ -386,25 +475,43 @@ export default class ProfileScreen extends Component<Props> {
     }
 
     renderTabIndicator() {
-        let tabs = [{
-            text: 'About',
-            // iconSource: require('../imgs/ic_tab_home_normal.png'),
-            // selectedIconSource: require('../imgs/ic_tab_home_click.png')
-        }, {
-            text: 'Settings',
-            // iconSource: require('../imgs/ic_tab_task_normal.png'),
-            // selectedIconSource: require('../imgs/ic_tab_task_click.png')
-        }, {
-            text: 'My Properties',
-            // iconSource: require('../imgs/ic_tab_my_normal.png'),
-            // selectedIconSource: require('../imgs/ic_tab_my_click.png')
-        }];
-        return <PagerTabIndicator tabs={tabs}
-            style={{ backgroundColor: '#49141E', borderTopWidth: 0 }}
-            textStyle={{ fontSize: 15, color: 'white', paddingBottom: 10 }}
-            selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
-        />;
+
+        if (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+            let tabs = [{
+                text: 'About',
+                // iconSource: require('../imgs/ic_tab_home_normal.png'),
+                // selectedIconSource: require('../imgs/ic_tab_home_click.png')
+            }, {
+                text: 'Settings',
+                // iconSource: require('../imgs/ic_tab_task_normal.png'),
+                // selectedIconSource: require('../imgs/ic_tab_task_click.png')
+            }, {
+                text: 'My Properties',
+                // iconSource: require('../imgs/ic_tab_my_normal.png'),
+                // selectedIconSource: require('../imgs/ic_tab_my_click.png')
+            }];
+            return <PagerTabIndicator tabs={tabs}
+                style={{ backgroundColor: '#49141E', borderTopWidth: 0 }}
+                textStyle={{ fontSize: 15, color: 'white', paddingBottom: 10 }}
+                selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
+            />;
+        }
+
+        else {
+            let tabs = [{
+                text: 'About',
+            }, {
+                text: 'Settings',
+            }];
+            return <PagerTabIndicator tabs={tabs}
+                style={{ backgroundColor: '#49141E', borderTopWidth: 0 }}
+                textStyle={{ fontSize: 15, color: 'white', paddingBottom: 10 }}
+                selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
+            />;
+        }
     }
+
+
 
     renderMyProperties({ item, index }) {
         return (
@@ -414,7 +521,9 @@ export default class ProfileScreen extends Component<Props> {
                 favouriteMarked={false}
                 showFavouriteIcon={false}
                 showDeleteIcon={true}
-                
+                showPauseIcon={true}
+                enablePauseIcon={item.Visible}
+
                 onPressItem={(item) => {
                     this.props.navigation.navigate("ExpandedView", { PropertyData: item });
                 }}
@@ -424,6 +533,21 @@ export default class ProfileScreen extends Component<Props> {
                     console.log(item.PropId);
                     this.onPressDeleteButton(item.PropId, item.PropAction);
 
+                }}
+
+                onPressPause={(item, isMarked) => {
+                    this.state.propertyID = item.propId;
+                    console.log(item.PropId);
+                    console.log(this.state.visibleAd);
+                    this.onPressPauseButton(item.PropId, item.PropAction);
+
+                }}
+
+                onPressShow={(item, isMarked) => {
+                    this.state.propertyID = item.propId;
+                    console.log(item.PropId);
+                    console.log(this.state.visibleAd);
+                    this.onPressShowButton(item.PropId, item.PropAction);
                 }}
             />
         );

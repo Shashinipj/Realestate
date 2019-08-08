@@ -53,7 +53,7 @@ export default class AddPropertyScreen extends Component<Props> {
 
             contactNumber: null,
             isFeatured: false,
-            // isVisible: false,
+            isVisible: false,
             houseCondition: '',
             landSize: 0,
             owner: '',
@@ -278,6 +278,13 @@ export default class AddPropertyScreen extends Component<Props> {
         });
     }
 
+    isVisibleEnable(value) {
+
+        this.setState({
+            isVisible: value
+        });
+    }
+
     addNewProperty() {
 
         db.ref(`PropertyType/${this.state.advertisementType}/Property`).push(
@@ -291,37 +298,40 @@ export default class AddPropertyScreen extends Component<Props> {
                 PropId: fbRef.key
             })
 
-            db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
-                .set(
-                    {
-                        Title: this.state.title,
-                        Address: this.state.location,
-                        Bathrooms: this.state.bathrooms,
-                        Bedrooms: this.state.bedrooms,
-                        CarPark: this.state.parkingSlots,
-                        Description: this.state.description,
-                        Features: this.state.keyWordsArr,
-                        LandSize: this.state.landSize,
-                        Owner: this.state.owner,
-                        ContactNumber: this.state.contactNumber,
-                        Price: this.state.price,
-                        PropAction: this.state.advertisementType,
-                        PropId: fbRef.key,
-                        PropTypeId: this.state.propertyType,
-                        isFeatured: this.state.isFeatured,
-                        Condition: this.state.houseCondition,
-                    }).then(() => {
-                        const user = firebase.auth().currentUser;
 
-                        db.ref(`Users/${user.uid}/UserProperties/${this.state.PropId}`).set(true)
-                            .then(() => {
-                                console.log('Inserted!');
-                                this.resetPropertyView();
-                                this.props.navigation.pop();
-                            }).catch((error) => {
-                                console.log(error)
-                            });
-                    });
+            const user = firebase.auth().currentUser;
+
+            db.ref(`Users/${user.uid}/UserProperties/${fbRef.key}`).set(true)
+                .then(() => {
+                    db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
+                        .set(
+                            {
+                                Title: this.state.title,
+                                Address: this.state.location,
+                                Bathrooms: this.state.bathrooms,
+                                Bedrooms: this.state.bedrooms,
+                                CarPark: this.state.parkingSlots,
+                                Description: this.state.description,
+                                Features: this.state.keyWordsArr,
+                                LandSize: this.state.landSize,
+                                Owner: this.state.owner,
+                                ContactNumber: this.state.contactNumber,
+                                Price: this.state.price,
+                                PropAction: this.state.advertisementType,
+                                PropId: fbRef.key,
+                                PropTypeId: this.state.propertyType,
+                                isFeatured: this.state.isFeatured,
+                                Condition: this.state.houseCondition,
+                                Visible: this.state.isVisible
+                            })
+                        .then(() => {
+                            console.log('Inserted!');
+                            this.resetPropertyView();
+                            this.props.navigation.pop();
+                        }).catch((error) => {
+                            console.log(error)
+                        });
+                });
 
         }).catch((error) => {
             console.log(error)
@@ -706,8 +716,20 @@ export default class AddPropertyScreen extends Component<Props> {
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>is Featured</Text>
                             <View style={{ flex: 1, alignItems: 'flex-end' }}>
                                 <Switch
-                                    value={this.state.isLocationEnable}
+                                    value={this.state.isFeatured}
                                     onSyncPress={() => { this.isFeaturedEnable(!this.state.isFeatured) }}
+                                    style={{}}
+                                />
+
+                            </View>
+                        </View>
+
+                        <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Display Property</Text>
+                            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                <Switch
+                                    value={this.state.isVisible}
+                                    onSyncPress={() => { this.isVisibleEnable(!this.state.isVisible) }}
                                     style={{}}
                                 />
 

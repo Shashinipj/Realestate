@@ -16,12 +16,18 @@ type Props = {
     enableDeleteIcon: boolean;
     deleted: boolean;
 
+    showPauseIcon: boolean;
+    enablePauseIcon: boolean;
+    paused: boolean;
+    show: boolean;
 
 
 
     onPressItem: (item: any) => void;
     onPressFavourite: (item: any, isMarked: boolean) => void;
     onPressDelete: (item: any, isMarked: boolean) => void;
+    onPressPause: (item: any, isMarked: boolean) => void;
+    onPressShow: (item: any, isMarked: boolean) => void;
 };
 
 export default class ListItem extends Component<Props> {
@@ -37,7 +43,12 @@ export default class ListItem extends Component<Props> {
 
         showDeleteIcon: false,
         enableDeleteIcon: true,
-        deleted:false,
+        deleted: false,
+
+        showPauseIcon: false,
+        enablePauseIcon: true,
+        paused: false,
+        show: false,
 
         onPressItem: () => null,
         onPressFavourite: () => null,
@@ -57,6 +68,8 @@ export default class ListItem extends Component<Props> {
         this.onPress_Item = this.onPress_Item.bind(this);
         this.onPress_Heart = this.onPress_Heart.bind(this);
         this.onPress_Delete = this.onPress_Delete.bind(this);
+        this.onPress_Pause = this.onPress_Pause.bind(this);
+        this.onPress_Show = this.onPress_Show.bind(this);
     }
 
 
@@ -85,29 +98,66 @@ export default class ListItem extends Component<Props> {
         }
     }
 
+    onPress_Pause() {
+        const { data1, paused } = this.props;
+
+        if (this.props.onPressPause) {
+            this.props.onPressPause(data1, paused);
+        }
+    }
+
+    onPress_Show() {
+        const { data1, show } = this.props;
+
+        if (this.props.onPressShow) {
+            this.props.onPressShow(data1, show);
+        }
+    }
+
 
 
     renderIcon_Heart() {
-        const { data1, showFavouriteIcon, enableFavouriteIcon } = this.props;
+        const { data1, showFavouriteIcon, enableFavouriteIcon, favouriteMarked } = this.props;
 
         if (!showFavouriteIcon) {
             return null;
         }
 
-        return (
-            <TouchableOpacity
-                disabled={!enableFavouriteIcon}
-                onPress={this.onPress_Heart}
-            >
+        if (!favouriteMarked) {
+            return (
+                <TouchableOpacity
+                    disabled={!enableFavouriteIcon}
+                    onPress={this.onPress_Heart}
+                >
 
-                <Meticon
-                    name="heart-outline"
-                    size={25}
-                    style={{ marginRight: 0 }}
-                />
-            </TouchableOpacity>
+                    <Meticon
+                        name="heart-outline"
+                        size={25}
+                        style={{ marginRight: 0 }}
+                    />
+                </TouchableOpacity>
 
-        );
+            );
+        }
+
+        else {
+            return (
+                <TouchableOpacity
+                    disabled={!enableFavouriteIcon}
+                    onPress={this.onPress_Heart}
+                >
+
+                    <Meticon
+                        name="heart"
+                        size={25}
+                        style={{ marginRight: 0 }}
+                    />
+                </TouchableOpacity>
+
+            );
+        }
+
+
     }
 
     renderIcon_Delete() {
@@ -126,13 +176,60 @@ export default class ListItem extends Component<Props> {
                 <Meticon
                     name="delete-outline"
                     size={25}
-                    style={{ marginRight: 0 }}
+                    style={{ marginRight: 0, paddingTop: 10 }}
                 />
 
                 {/* <Text style={{}}>delete</Text> */}
             </TouchableOpacity>
 
         );
+    }
+
+    renderIcon_Pause() {
+        const { data1, enablePauseIcon, showPauseIcon } = this.props;
+
+        if (!showPauseIcon) {
+            return null;
+        }
+
+        if (enablePauseIcon) {
+            return (
+                <TouchableOpacity
+                    disabled={!enablePauseIcon}
+                    onPress={this.onPress_Pause}
+                >
+
+                    <AntDesign
+                        name="pause"
+                        size={20}
+                        style={{ marginRight: 0 }}
+                    />
+
+                    {/* <Text style={{}}>pause</Text> */}
+                </TouchableOpacity>
+
+            );
+        }
+
+        else {
+            return (
+                <TouchableOpacity
+                    // disabled={!enablePauseIcon}
+                    onPress={this.onPress_Show}
+                >
+
+                    <AntDesign
+                        name="caretright"
+                        size={20}
+                        style={{ marginRight: 0 }}
+                    />
+
+                    {/* <Text style={{}}>Play</Text> */}
+                </TouchableOpacity>
+            );
+        }
+
+
     }
 
     render() {
@@ -184,7 +281,8 @@ export default class ListItem extends Component<Props> {
 
                                 {this.renderIcon_Heart()}
                                 {this.renderIcon_Delete()}
-                        
+                                {this.renderIcon_Pause()}
+
 
                             </View>
 

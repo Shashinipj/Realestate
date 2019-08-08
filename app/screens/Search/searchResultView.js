@@ -44,11 +44,40 @@ export default class SearchResultView extends Component<Props> {
             modalVisible: false,
             collectionName: '',
             collectionList: [],
+            // collectionListProperties:[],
+
             loggedUser: '',
-            loading: true
+            loading: true,
+
+            isFavourite: false
         };
 
         this.onValueCollection = this.onValueCollection.bind(this);
+    }
+
+    componentDidMount() {
+
+        const user = firebase.auth().currentUser;
+        if (user) {
+            this.getCollectionNames(user);
+            this.setState({
+                loggedUser: user
+            })
+
+            this.getSearchResults(user, null);
+        }
+        else {
+            this.getSearchResults(user, null);
+        }
+
+    }
+
+    componentWillUnmount() {
+        const user = firebase.auth().currentUser;
+
+        if (user) {
+            db.ref(`Users/${user.uid}/Collections`).off('value', this.onValueCollection);
+        }
     }
 
 
@@ -136,7 +165,8 @@ export default class SearchResultView extends Component<Props> {
         }
     }
 
-    componentDidMount() {
+
+    getSearchResults(user, collections) {
         let propData = this.props.navigation.state.params.data;
         console.log(propData);
 
@@ -155,6 +185,7 @@ export default class SearchResultView extends Component<Props> {
         // console.log(this.props.navigation.state.params.data);
 
         let filteredProperties = [];
+
 
         PropRef.on('value', (snapshot) => {
             console.log("VAL ", snapshot);
@@ -185,42 +216,58 @@ export default class SearchResultView extends Component<Props> {
 
                                                     if (priceRange == 0 || ((maxPrice >= propObj.Price) && (propObj.Price >= minPrice))) {
 
-                                                        let hasKeyword = false;
-                                                        if (featureKeywords != "") {
-                                                            const arrFeatureKeywords = featureKeywords.split(",");
+                                                        if (propObj.Visible == true) {
 
-                                                            // loopKeyword:
-                                                            for (let i = 0; i < arrFeatureKeywords.length; i++) {
-                                                                const keyWord = arrFeatureKeywords[i];
+                                                            let hasKeyword = false;
+                                                            if (featureKeywords != "") {
+                                                                const arrFeatureKeywords = featureKeywords.split(",");
 
-                                                                let keywordFound = false;
-                                                                if (propObj.Features) {
-                                                                    for (let j = 0; j < propObj.Features.length; j++) {
-                                                                        const featureName = propObj.Features[j];
+                                                                // loopKeyword:
+                                                                for (let i = 0; i < arrFeatureKeywords.length; i++) {
+                                                                    const keyWord = arrFeatureKeywords[i];
 
-                                                                        const reg = new RegExp(featureName, "gi");
-                                                                        if (reg.test(keyWord)) {
-                                                                            keywordFound = true;
-                                                                            break;
-                                                                            // break loopKeyword;
+                                                                    let keywordFound = false;
+                                                                    if (propObj.Features) {
+                                                                        for (let j = 0; j < propObj.Features.length; j++) {
+                                                                            const featureName = propObj.Features[j];
+
+                                                                            const reg = new RegExp(featureName, "gi");
+                                                                            if (reg.test(keyWord)) {
+                                                                                keywordFound = true;
+                                                                                break;
+                                                                                // break loopKeyword;
+                                                                            }
                                                                         }
                                                                     }
-                                                                }
 
-                                                                if (keywordFound) {
-                                                                    hasKeyword = true;
-                                                                } else {
-                                                                    hasKeyword = false;
-                                                                    break;
+                                                                    if (keywordFound) {
+                                                                        hasKeyword = true;
+                                                                    } else {
+                                                                        hasKeyword = false;
+                                                                        break;
+                                                                    }
                                                                 }
                                                             }
-                                                        }
 
-                                                        if (featureKeywords == "" || hasKeyword) {
+                                                            if (featureKeywords == "" || hasKeyword) {
 
-                                                            filteredProperties.push(propObj);
-                                                            // console.log(filteredProperties);
-                                                            // console.log(maxPrice >= (propObj.Price >= minPrice))
+                                                                const propObjNew = {
+                                                                    ...propObj,
+
+                                                                    isFavourite: false
+                                                                };
+
+                                                                if (user) {
+
+                                                                }
+
+                                                                // propObjNew.isFavourite = true;
+                                                                console.log(this.state.collectionList);
+
+                                                                filteredProperties.push(propObjNew);
+                                                                console.log('filteredProperties', filteredProperties);
+                                                                // console.log(maxPrice >= (propObj.Price >= minPrice))
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -264,28 +311,17 @@ export default class SearchResultView extends Component<Props> {
                 });
             }
 
+            // for(const i in this.state.collectionListProperties){
+            //     console.log('this.state.collectionListProperties', i);
+            // }
+
             this.setState({
                 propProperties: filteredProperties,
                 loading: false
             });
         });
-
-        const user = firebase.auth().currentUser;
-        if (user) {
-            this.getCollectionNames(user);
-            this.setState({
-                loggedUser: user
-            })
-        }
     }
 
-    componentWillUnmount() {
-        const user = firebase.auth().currentUser;
-
-        if (user) {
-            db.ref(`Users/${user.uid}/Collections`).off('value', this.onValueCollection);
-        }
-    }
 
     getCollectionNames(user) {
         db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection);
@@ -299,14 +335,24 @@ export default class SearchResultView extends Component<Props> {
         console.log(collections);
 
         const arrColl = [];
+        const arrCollPropList = []
         for (const collectionId in collections) {
-            console.log(collectionId);
+            console.log('collections[collectionId]', collections[collectionId]);
             arrColl.push(collectionId);
-            // console.log(this.state.collectionList);
+            // const temparr = collections[collectionId]
+
+            // arrCollPropList.push(temparr);
+            console.log('arrColl', arrColl);
+            console.log('collectionId', collectionId);
+
+            // for (const a in temparr){
+            //     console.log('temparr[a]',temparr[a]);
+            // }
         }
 
         this.setState({
-            collectionList: arrColl
+            collectionList: arrColl,
+            // collectionListProperties: arrCollPropList
         });
     }
 
@@ -330,11 +376,19 @@ export default class SearchResultView extends Component<Props> {
         db.ref(`Users/${user.uid}/Collections/${collectionName}/${this.state.propertyID}`).set(true)
             .then(() => {
                 console.log('Inserted!');
+                // this.changefavouriteIcon(true);
                 this.handleCreateNewCollectionCancel();
+                console.log(this.state.isFavourite);
             }).catch((error) => {
                 console.log(error)
             });
     }
+
+    // changefavouriteIcon(visible) {
+    //     this.setState({
+    //         isFavourite: visible
+    //     })
+    // }
 
     renderCreateNewCollectionDialog() {
 
@@ -351,7 +405,9 @@ export default class SearchResultView extends Component<Props> {
                     onChangeText={collectionName => this.setState({ collectionName })}
                 ></Dialog.Input>
                 <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
-                <Dialog.Button label="Cancel" onPress={() => { this.handleCreateNewCollectionCancel() }} />
+                <Dialog.Button label="Cancel" onPress={() => {
+                    this.handleCreateNewCollectionCancel();
+                }} />
             </Dialog.Container>
         );
     }
@@ -377,7 +433,7 @@ export default class SearchResultView extends Component<Props> {
         );
     }
 
-    getFavouritePropertyId(id){
+    getFavouritePropertyId(id) {
         console.log(id);
     }
 
@@ -388,7 +444,7 @@ export default class SearchResultView extends Component<Props> {
 
             <ListItem
                 data1={item}
-                favouriteMarked={false}
+                favouriteMarked={this.state.isFavourite}
                 showFavouriteIcon={true}
                 showDeleteIcon={false}
                 onPressItem={(item) => {
