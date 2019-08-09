@@ -7,6 +7,9 @@ PODS:
     - FirebaseAnalytics (= 6.0.1)
   - Firebase/CoreOnly (6.2.0):
     - FirebaseCore (= 6.0.2)
+  - Firebase/Storage (6.2.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 3.2.1)
   - FirebaseAnalytics (6.0.1):
     - FirebaseCore (~> 6.0)
     - FirebaseInstanceID (~> 4.1)
@@ -30,6 +33,10 @@ PODS:
     - FirebaseCore (~> 6.0)
     - GoogleUtilities/Environment (~> 6.0)
     - GoogleUtilities/UserDefaults (~> 6.0)
+  - FirebaseStorage (3.2.1):
+    - FirebaseAuthInterop (~> 1.0)
+    - FirebaseCore (~> 6.0)
+    - GTMSessionFetcher/Core (~> 1.1)
   - GoogleAppMeasurement (6.0.1):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
@@ -60,10 +67,20 @@ PODS:
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
+  - React (0.11.0):
+    - React/Core (= 0.11.0)
+  - react-native-fetch-blob (0.10.6):
+    - React/Core
+  - react-native-maps (0.24.2):
+    - React
+  - React/Core (0.11.0)
 
 DEPENDENCIES:
   - Firebase/Auth
   - Firebase/Core
+  - Firebase/Storage
+  - react-native-fetch-blob (from `../node_modules/react-native-fetch-blob`)
+  - react-native-maps (from `../node_modules/react-native-maps`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -73,10 +90,18 @@ SPEC REPOS:
     - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseInstanceID
+    - FirebaseStorage
     - GoogleAppMeasurement
     - GoogleUtilities
     - GTMSessionFetcher
     - nanopb
+    - React
+
+EXTERNAL SOURCES:
+  react-native-fetch-blob:
+    :path: "../node_modules/react-native-fetch-blob"
+  react-native-maps:
+    :path: "../node_modules/react-native-maps"
 
 SPEC CHECKSUMS:
   Firebase: 5965bac23e7fcb5fa6d926ed429c9ecef8a2014e
@@ -85,11 +110,15 @@ SPEC CHECKSUMS:
   FirebaseAuthInterop: 0ffa57668be100582bb7643d4fcb7615496c41fc
   FirebaseCore: b0f0262acebfa540e5f97b3832dbb13186980822
   FirebaseInstanceID: cdb3827746d53ece7ae87a5c51c25c3055443366
+  FirebaseStorage: 926d41552072b9fee67aa645760f05f87b7ce604
   GoogleAppMeasurement: 51d8d9ea48f0ca44484d29cfbdef976fbd4fc336
   GoogleUtilities: 996e0db07153674fd1b54b220fda3a3dc3547cba
   GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  React: ab1a2e21deb34965c38328d5ec40cc7d12c6050a
+  react-native-fetch-blob: 2bef9be702de8726f4d7bf58d2345579aaaee60d
+  react-native-maps: 0316ed017dbb64b33b227751fa810e2454fcfa39
 
-PODFILE CHECKSUM: 6b4e376b760f42fc4edd4e7d86a8eb4c634c82d4
+PODFILE CHECKSUM: 4a9e114b22d49978b4f3952c189b6020de70203f
 
 COCOAPODS: 1.7.2

@@ -9,11 +9,14 @@ target 'Realestate' do
 #  pod 'Firebase/Analytics'
   pod 'Firebase/Core'
   pod 'Firebase/Auth'
+  pod 'Firebase/Storage'
   
   target 'Realestate-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
     pod 'react-native-maps', :path => '../node_modules/react-native-maps'
+
+    pod 'react-native-fetch-blob', :path => '../node_modules/react-native-fetch-blob'
 
   end
 

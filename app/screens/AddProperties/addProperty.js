@@ -7,6 +7,7 @@ import { Icon, ListItem } from 'react-native-elements';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Switch from 'react-native-switch-pro'
 import firebase from 'react-native-firebase';
+import RNFetchBlob from 'react-native-fetch-blob'
 
 import { db } from '../../Database/db';
 let PropRef = db.ref('/PropertyType');
@@ -30,11 +31,13 @@ export default class AddPropertyScreen extends Component<Props> {
         title: 'Add Property'
     };
 
+
     constructor() {
         super();
         this.state = {
             image: null,
-            images: null,
+            images: [],
+            // imagesBase64: null,
             defaultImage: null,
             title: '',
             description: '',
@@ -60,6 +63,8 @@ export default class AddPropertyScreen extends Component<Props> {
             PropId: null
 
         };
+
+        this.imageTest = null;
     }
 
     // pickSingleWithCamera(cropping, mediaType = 'photo') {
@@ -78,21 +83,7 @@ export default class AddPropertyScreen extends Component<Props> {
     //     }).catch(e => console.log(e));
     // }
 
-    // pickSingleBase64(cropit) {
-    //     ImagePicker.openPicker({
-    //         width: 300,
-    //         height: 300,
-    //         cropping: cropit,
-    //         includeBase64: true,
-    //         includeExif: true,
-    //     }).then(image => {
-    //         console.log('received base64 image');
-    //         this.setState({
-    //             image: { uri: `data:${image.mime};base64,` + image.data, width: image.width, height: image.height },
-    //             images: null
-    //         });
-    //     }).catch(e => console.log(e));
-    // }
+
 
     cleanupImages() {
         ImagePicker.clean().then(() => {
@@ -134,27 +125,45 @@ export default class AddPropertyScreen extends Component<Props> {
     //     });
     // }
 
-    // pickSingle(cropit, circular = false, mediaType) {
+    pickSingle() {
+        ImagePicker.openPicker({
+            width: 500,
+            height: 500,
+            // cropping: cropit,
+            // cropperCircleOverlay: circular,
+            compressImageMaxWidth: 1000,
+            compressImageMaxHeight: 1000,
+            compressImageQuality: 1,
+            // compressVideoPreset: 'MediumQuality',
+            includeExif: true,
+        }).then(image => {
+            console.log('received image', image);
+            this.setState({
+                image: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
+                images: null
+            });
+
+            console.log('image', this.state.image.uri);
+        }).catch(e => {
+            console.log(e);
+            Alert.alert(e.message ? e.message : e);
+        });
+    }
+
+    // pickSingleBase64(cropit) {
     //     ImagePicker.openPicker({
-    //         width: 500,
-    //         height: 500,
+    //         width: 300,
+    //         height: 300,
     //         cropping: cropit,
-    //         cropperCircleOverlay: circular,
-    //         compressImageMaxWidth: 1000,
-    //         compressImageMaxHeight: 1000,
-    //         compressImageQuality: 1,
-    //         // compressVideoPreset: 'MediumQuality',
+    //         includeBase64: true,
     //         includeExif: true,
     //     }).then(image => {
-    //         console.log('received image', image);
+    //         console.log('received base64 image');
     //         this.setState({
-    //             image: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
+    //             image: { uri: `data:${image.mime};base64,` + image.data, width: image.width, height: image.height },
     //             images: null
     //         });
-    //     }).catch(e => {
-    //         console.log(e);
-    //         Alert.alert(e.message ? e.message : e);
-    //     });
+    //     }).catch(e => console.log(e));
     // }
 
     pickMultiple() {
@@ -165,6 +174,7 @@ export default class AddPropertyScreen extends Component<Props> {
             waitAnimationEnd: false,
             includeExif: true,
             forceJpg: true,
+            // includeBase64: true,
             maxFiles: 8 - (savedImages ? savedImages.length : 0)
         }).then(images => {
             this.setState({
@@ -174,11 +184,14 @@ export default class AddPropertyScreen extends Component<Props> {
                     ...(images.map(i => {
                         console.log('received image', i);
                         return { uri: i.path, width: i.width, height: i.height, mime: i.mime };
+                        // return { uri: `data:${images.mime};base64,`+images.data, width: images.width, height: images.height};
                     }))
                 ],
                 // defaultImage: this.state.images[1]
 
             });
+
+            console.log('this.state.images', this.state.images);
         }).catch(e => console.log(e));
 
     }
@@ -187,6 +200,49 @@ export default class AddPropertyScreen extends Component<Props> {
     //     return (oldH / oldW) * newW;
     // }
 
+
+    // uploadImages(imgarr){
+
+    // }
+
+    getSelectedImages(currentImage, uid, propID) {
+        console.log('currentImage', currentImage);
+
+        const image = currentImage.uri
+
+        const Blob = RNFetchBlob.polyfill.Blob
+        const fs = RNFetchBlob.fs
+        window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+        window.Blob = Blob
+
+
+        let uploadBlob = null
+        const imageRef = firebase.storage().ref(`PropImages/${uid}/${propID}`);
+        let mime = 'image/jpg'
+        fs.readFile(image, 'base64')
+            .then((data) => {
+                return Blob.build(data, { type: `${mime};BASE64` })
+            })
+            .then((blob) => {
+                uploadBlob = blob
+                // return imageRef.put(blob, { contentType: mime })
+                return imageRef.put(blob._ref, { contentType: mime });
+            })
+            .then(() => {
+                uploadBlob.close()
+                return imageRef.getDownloadURL()
+            })
+            .then((url) => {
+                // URL of the image uploaded on Firebase storage
+                console.log(url);
+
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+
+    }
+
     resetPropertyView() {
 
         return new Promise((resolve, reject) => {
@@ -194,6 +250,7 @@ export default class AddPropertyScreen extends Component<Props> {
             this.setState({
                 image: null,
                 images: null,
+                // imagesBase64: null,
                 defaultImage: null,
                 title: '',
                 description: '',
@@ -298,7 +355,6 @@ export default class AddPropertyScreen extends Component<Props> {
                 PropId: fbRef.key
             })
 
-
             const user = firebase.auth().currentUser;
 
             db.ref(`Users/${user.uid}/UserProperties/${fbRef.key}`).set(true)
@@ -326,7 +382,15 @@ export default class AddPropertyScreen extends Component<Props> {
                             })
                         .then(() => {
                             console.log('Inserted!');
+                            this.getSelectedImages(this.state.image, user.uid, fbRef.key);
+                            console.log('image1', this.state.image);
                             this.resetPropertyView();
+
+                            // if (this.state.images && this.state.images.length ) {
+
+                           
+                            // }
+
                             this.props.navigation.pop();
                         }).catch((error) => {
                             console.log(error)
@@ -336,6 +400,9 @@ export default class AddPropertyScreen extends Component<Props> {
         }).catch((error) => {
             console.log(error)
         });
+
+        // const user = firebase.auth().currentUser;
+        // this. getSelectedImages( this.state.images, user.uid, fbRef.key);
     }
 
     returnImageScrollView() {
@@ -346,7 +413,8 @@ export default class AddPropertyScreen extends Component<Props> {
         if (arrLength < 8) {
             return (
 
-                <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                <TouchableOpacity onPress={this.pickSingle.bind(this)}>
                     <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                         <Icon
                             name="add-a-photo"
@@ -407,7 +475,8 @@ export default class AddPropertyScreen extends Component<Props> {
                                 {arrLength == 0 ?
 
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                        {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)}> */}
+                                        <TouchableOpacity onPress={this.pickSingle.bind(this)}>
                                             <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                                                 <Icon
                                                     name="add-a-photo"
@@ -466,7 +535,8 @@ export default class AddPropertyScreen extends Component<Props> {
 
                                     (
                                         (arrLength < 8 ?
-                                            <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                            // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                            <TouchableOpacity onPress={this.pickSingle.bind(this)}>
                                                 <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                                                     <Icon
                                                         name="add-a-photo"
@@ -482,7 +552,11 @@ export default class AddPropertyScreen extends Component<Props> {
                                     // )
                                 }
 
-                                {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
+                                {/* {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
+                                    null
+                                } */}
+
+                                {this.state.image ? <View style={{}}>{this.renderImage(this.state.image)}</View> :
                                     null
                                 }
 
@@ -786,6 +860,7 @@ export default class AddPropertyScreen extends Component<Props> {
                             // });
                             console.log('Add button clicked');
                             this.addNewProperty();
+
                             // this.props.navigation.navigate('ProfileScreen');
                         }}
 

@@ -124,11 +124,11 @@ export default class ProfileScreen extends Component<Props> {
                         }
                     }
                 }
-
                 this.setState({
                     myProperties: arrCont,
                     // loading: false
                 });
+
             });
         }
 
