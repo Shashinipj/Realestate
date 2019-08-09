@@ -21,13 +21,16 @@ type Props = {
     paused: boolean;
     show: boolean;
 
-
+    showEditIcon: boolean;
+    enableEditIcon: boolean;
+    edited: boolean;
 
     onPressItem: (item: any) => void;
     onPressFavourite: (item: any, isMarked: boolean) => void;
     onPressDelete: (item: any, isMarked: boolean) => void;
     onPressPause: (item: any, isMarked: boolean) => void;
     onPressShow: (item: any, isMarked: boolean) => void;
+    onPressEdit: (item: any, isMarked: boolean) => void;
 };
 
 export default class ListItem extends Component<Props> {
@@ -50,9 +53,16 @@ export default class ListItem extends Component<Props> {
         paused: false,
         show: false,
 
+        showEditIcon: false,
+        enableEditIcon: true,
+        edited: false,
+
         onPressItem: () => null,
         onPressFavourite: () => null,
-        onPressDelete: () => null
+        onPressDelete: () => null,
+        onPressPause: () => null,
+        onPressShow: () => null,
+        onPressEdit: () => null
     };
 
 
@@ -70,6 +80,7 @@ export default class ListItem extends Component<Props> {
         this.onPress_Delete = this.onPress_Delete.bind(this);
         this.onPress_Pause = this.onPress_Pause.bind(this);
         this.onPress_Show = this.onPress_Show.bind(this);
+        this.onPress_Edit = this.onPress_Edit.bind(this);
     }
 
 
@@ -114,6 +125,13 @@ export default class ListItem extends Component<Props> {
         }
     }
 
+    onPress_Edit() {
+        const { data1, edit } = this.props;
+
+        if (this.props.onPressEdit) {
+            this.props.onPressEdit(data1, edit);
+        }
+    }
 
 
     renderIcon_Heart() {
@@ -129,14 +147,12 @@ export default class ListItem extends Component<Props> {
                     disabled={!enableFavouriteIcon}
                     onPress={this.onPress_Heart}
                 >
-
                     <Meticon
                         name="heart-outline"
                         size={25}
                         style={{ marginRight: 0 }}
                     />
                 </TouchableOpacity>
-
             );
         }
 
@@ -173,10 +189,10 @@ export default class ListItem extends Component<Props> {
                 onPress={this.onPress_Delete}
             >
 
-                <Meticon
-                    name="delete-outline"
-                    size={25}
-                    style={{ marginRight: 0, paddingTop: 10 }}
+                <AntDesign
+                    name="delete"
+                    size={20}
+                    style={{ marginRight: 0 }}
                 />
 
                 {/* <Text style={{}}>delete</Text> */}
@@ -202,7 +218,7 @@ export default class ListItem extends Component<Props> {
                     <AntDesign
                         name="pause"
                         size={20}
-                        style={{ marginRight: 0 }}
+                        style={{ marginRight: 10 }}
                     />
 
                     {/* <Text style={{}}>pause</Text> */}
@@ -221,15 +237,37 @@ export default class ListItem extends Component<Props> {
                     <AntDesign
                         name="caretright"
                         size={20}
-                        style={{ marginRight: 0 }}
+                        style={{ marginRight: 10 }}
                     />
 
                     {/* <Text style={{}}>Play</Text> */}
                 </TouchableOpacity>
             );
         }
+    }
 
+    renderIcon_Edit() {
+        const { data1, enableEditIcon, showEditIcon } = this.props;
 
+        if (!showEditIcon) {
+            return null;
+        }
+
+        return (
+            <TouchableOpacity
+                // disabled={!enableEditIcon}
+                onPress={this.onPress_Edit}
+            >
+                <AntDesign
+                    name="edit"
+                    size={20}
+                    style={{ marginRight: 10}}
+                />
+
+                {/* <Text style={{}}>Edit</Text> */}
+            </TouchableOpacity>
+
+        );
     }
 
     render() {
@@ -241,7 +279,7 @@ export default class ListItem extends Component<Props> {
 
                 {
                     (this.props.data1.Title) ? <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>{this.props.data1.Title}</Text> :
-                        <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>Luxury House in Colombo</Text>
+                        <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>Title</Text>
                 }
 
 
@@ -280,9 +318,9 @@ export default class ListItem extends Component<Props> {
                             <View style={styles.sideButtons}>
 
                                 {this.renderIcon_Heart()}
-                                {this.renderIcon_Delete()}
                                 {this.renderIcon_Pause()}
-
+                                {this.renderIcon_Edit()}
+                                {this.renderIcon_Delete()}
 
                             </View>
 

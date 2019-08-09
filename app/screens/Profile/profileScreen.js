@@ -523,6 +523,7 @@ export default class ProfileScreen extends Component<Props> {
                 showDeleteIcon={true}
                 showPauseIcon={true}
                 enablePauseIcon={item.Visible}
+                showEditIcon={true}
 
                 onPressItem={(item) => {
                     this.props.navigation.navigate("ExpandedView", { PropertyData: item });
@@ -548,6 +549,14 @@ export default class ProfileScreen extends Component<Props> {
                     console.log(item.PropId);
                     console.log(this.state.visibleAd);
                     this.onPressShowButton(item.PropId, item.PropAction);
+                }}
+
+                onPressEdit={(item, isMarked) => {
+                    // this.state.propertyID = item.propId;
+                    console.log(item.PropId);
+                    // console.log(this.state.visibleAd);
+                    // this.onPressShowButton(item.PropId, item.PropAction);
+                    this.props.navigation.navigate("EditPropertyScreen", { PropertyData: item });
                 }}
             />
         );

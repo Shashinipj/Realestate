@@ -53,10 +53,6 @@ export default class CollectionDetailScreen extends Component {
 
                 console.log("VAL ", snapshot);
 
-                // let filteredProperties = [];
-
-                // const propTypes = snapshot.val();
-
 
                 for (const propTypeId in this.userProperties) {
                     const propTypeObj = this.userProperties[propTypeId];
@@ -74,11 +70,11 @@ export default class CollectionDetailScreen extends Component {
                     }
                 }
 
-                this.setState({
-                    propProperties: filteredProperties
-                });
 
             }
+            this.setState({
+                propProperties: filteredProperties
+            });
         });
     }
 
@@ -95,12 +91,14 @@ export default class CollectionDetailScreen extends Component {
                 if (this.userProperties[propertyID] != undefined) {
                     delete this.userProperties[propertyID];
                 }
+
                 if (propIDs[propertyID] != undefined) {
                     delete propIDs[propertyID];
                 }
 
                 this.loadProps(propIDs);
 
+                // console.log(collection.name);
                 console.log('Deleted!!');
             }).catch((error) => {
                 console.log(error)
@@ -157,7 +155,11 @@ export default class CollectionDetailScreen extends Component {
 
     render() {
         return (
+
             <View style={{ flex: 1 }}>
+                {/* {(this.state.propProperties.length == -1) ?
+                    this.props.navigation.navigate("Collections")
+                    : */}
                 <FlatList
                     data={this.state.propProperties}
                     renderItem={item => this.renderItem(item)}
@@ -165,6 +167,8 @@ export default class CollectionDetailScreen extends Component {
                         return "" + index;
                     }}
                 />
+                {/* } */}
+
             </View>
         );
     }

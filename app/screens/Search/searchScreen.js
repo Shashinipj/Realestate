@@ -322,7 +322,7 @@ export default class SearchScreen extends Component {
                             this.setModalVisible(!this.state.modalVisible);
                         }}
                     >
-                        <Text style={{ textAlign: 'center', color: '#49141E', fontWeight: '600' }}>Join</Text>
+                        <Text style={{ textAlign: 'center', color: '#49141E', fontWeight: '600' }}>Login</Text>
 
                     </TouchableOpacity>
                 </View>
@@ -633,7 +633,7 @@ export default class SearchScreen extends Component {
 
                         <View style={styles.addNewPropertyView}>
                             <Ionicon name="md-add-circle" size={30} color='#49141E' />
-                            <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add property</Text>
+                            <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add Property</Text>
                         </View>
                     </TouchableOpacity>);
             }
@@ -647,7 +647,7 @@ export default class SearchScreen extends Component {
                         }}
                     >
                         <Ionicon name="md-add" size={20} color='#000000' />
-                        <Text style={{ marginLeft: 5 }}>Add</Text>
+                        <Text style={{ marginLeft: 5, fontWeight:'600' }}>Add</Text>
                     </TouchableOpacity>
                 );
             }
@@ -796,8 +796,10 @@ const styles = StyleSheet.create({
         textAlign: 'justify',
         fontSize: 13,
         alignSelf: 'center',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
         color: 'red',
+        padding: 10,
+        paddingHorizontal: 50
     },
     activityIndicator: {
         flex: 1,
@@ -816,7 +818,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#BDBDBD',
         position: 'absolute',
         height: 30,
         width: 70,

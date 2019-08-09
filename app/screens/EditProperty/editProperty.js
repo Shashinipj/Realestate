@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
+import { View, StyleSheet, Text, Alert, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -9,25 +9,17 @@ import Switch from 'react-native-switch-pro'
 import firebase from 'react-native-firebase';
 
 import { db } from '../../Database/db';
-let PropRef = db.ref('/PropertyType');
-
-const PropertyTypes = {
-    House: 1,
-    Apartment: 2,
-    Townhouse: 3,
-    Villa: 4,
-    All: -1
-}
 
 type Props = {
     navigation: NavigationScreenProp;
 };
 
-export default class AddPropertyScreen extends Component<Props> {
+export default class EditPropertyScreen extends Component<Props>  {
 
     static navigationOptions = {
         // header: null,
-        title: 'Add Property'
+        title: "Edit Property"
+
     };
 
     constructor() {
@@ -49,9 +41,9 @@ export default class AddPropertyScreen extends Component<Props> {
             location: '',
 
             keyWords: '',
-            keyWordsArr: [''],
+            keyWordsArr: [],
 
-            contactNumber: '',
+            contactNumber: null,
             isFeatured: false,
             isVisible: false,
             houseCondition: '',
@@ -61,101 +53,6 @@ export default class AddPropertyScreen extends Component<Props> {
 
         };
     }
-
-    // pickSingleWithCamera(cropping, mediaType = 'photo') {
-    //     ImagePicker.openCamera({
-    //         cropping: cropping,
-    //         width: 500,
-    //         height: 500,
-    //         includeExif: true,
-    //         mediaType,
-    //     }).then(image => {
-    //         console.log('received image', image);
-    //         this.setState({
-    //             image: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
-    //             images: null
-    //         });
-    //     }).catch(e => console.log(e));
-    // }
-
-    // pickSingleBase64(cropit) {
-    //     ImagePicker.openPicker({
-    //         width: 300,
-    //         height: 300,
-    //         cropping: cropit,
-    //         includeBase64: true,
-    //         includeExif: true,
-    //     }).then(image => {
-    //         console.log('received base64 image');
-    //         this.setState({
-    //             image: { uri: `data:${image.mime};base64,` + image.data, width: image.width, height: image.height },
-    //             images: null
-    //         });
-    //     }).catch(e => console.log(e));
-    // }
-
-    cleanupImages() {
-        ImagePicker.clean().then(() => {
-            console.log('removed tmp images from tmp directory');
-        }).catch(e => {
-            console.log(e);
-        });
-    }
-
-    // cleanupSingleImage() {
-    //     let image = this.state.image || (this.state.images && this.state.images.length ? this.state.images[0] : null);
-    //     console.log('will cleanup image', image);
-
-    //     ImagePicker.cleanSingle(image ? image.uri : null).then(() => {
-    //         console.log(`removed tmp image ${image.uri} from tmp directory`);
-    //     }).catch(e => {
-    //         console.log(e);
-    //     })
-    // }
-
-    // cropLast() {
-    //     if (!this.state.image) {
-    //         return Alert.alert('No image', 'Before open cropping only, please select image');
-    //     }
-
-    //     ImagePicker.openCropper({
-    //         path: this.state.image.uri,
-    //         width: 200,
-    //         height: 200
-    //     }).then(image => {
-    //         console.log('received cropped image', image);
-    //         this.setState({
-    //             image: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
-    //             images: null
-    //         });
-    //     }).catch(e => {
-    //         console.log(e);
-    //         Alert.alert(e.message ? e.message : e);
-    //     });
-    // }
-
-    // pickSingle(cropit, circular = false, mediaType) {
-    //     ImagePicker.openPicker({
-    //         width: 500,
-    //         height: 500,
-    //         cropping: cropit,
-    //         cropperCircleOverlay: circular,
-    //         compressImageMaxWidth: 1000,
-    //         compressImageMaxHeight: 1000,
-    //         compressImageQuality: 1,
-    //         // compressVideoPreset: 'MediumQuality',
-    //         includeExif: true,
-    //     }).then(image => {
-    //         console.log('received image', image);
-    //         this.setState({
-    //             image: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
-    //             images: null
-    //         });
-    //     }).catch(e => {
-    //         console.log(e);
-    //         Alert.alert(e.message ? e.message : e);
-    //     });
-    // }
 
     pickMultiple() {
         const { images: savedImages } = this.state;
@@ -176,16 +73,11 @@ export default class AddPropertyScreen extends Component<Props> {
                         return { uri: i.path, width: i.width, height: i.height, mime: i.mime };
                     }))
                 ],
-                // defaultImage: this.state.images[1]
 
             });
         }).catch(e => console.log(e));
 
     }
-
-    // scaledHeight(oldW, oldH, newW) {
-    //     return (oldH / oldW) * newW;
-    // }
 
     resetPropertyView() {
 
@@ -202,9 +94,9 @@ export default class AddPropertyScreen extends Component<Props> {
                 advertisementType: 1,
                 propertyType: 1,
 
-                bedrooms: null,
-                bathrooms: null,
-                parkingSlots: null,
+                bedrooms: 0,
+                bathrooms: 0,
+                parkingSlots: 0,
                 location: '',
 
                 keyWords: '',
@@ -221,6 +113,39 @@ export default class AddPropertyScreen extends Component<Props> {
                 resolve();
             });
         });
+    }
+
+    componentDidMount() {
+        this.fetchData();
+    }
+
+    fetchData() {
+
+        const { navigation } = this.props;
+        const property = navigation.getParam('PropertyData');
+
+        this.setState({
+
+            title: property.Title,
+            location: property.Address,
+            bathrooms: property.Bathrooms,
+            bedrooms: property.Bedrooms,
+            parkingSlots: property.CarPark,
+            description: property.Description,
+            keyWordsArr: property.Features,
+            landSize: property.LandSize,
+            owner: property.Owner,
+            contactNumber: property.ContactNumber,
+            price: property.Price,
+            advertisementType: property.PropAction,
+            PropId: property.PropId,
+            propertyType: property.PropTypeId,
+            isFeatured: property.isFeatured,
+            houseCondition: property.Condition,
+            isVisible: property.Visible,
+
+        });
+
     }
 
     renderImage(image) {
@@ -248,7 +173,6 @@ export default class AddPropertyScreen extends Component<Props> {
         this.setState({
             images: arr
         });
-
     }
 
     renderInitialImage(i) {
@@ -285,57 +209,103 @@ export default class AddPropertyScreen extends Component<Props> {
         });
     }
 
-    addNewProperty() {
 
-        db.ref(`PropertyType/${this.state.advertisementType}/Property`).push(
-            {
+    onPressSaveButton() {
 
-            }
-        ).then((fbRef) => {
-            console.log('Inserted!', fbRef.key)
+        Alert.alert(
+            'Update',
+            'Do you really want to Update this property details?',
+            [
+                {
+                    text: 'No',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => {
+                        this.updateProperty();
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
+    }
 
-            this.setState({
-                PropId: fbRef.key
-            })
+    updateProperty() {
 
+        // const user = firebase.auth().currentUser;
 
-            const user = firebase.auth().currentUser;
+        const { navigation } = this.props;
+        const property = navigation.getParam('PropertyData');
 
-            db.ref(`Users/${user.uid}/UserProperties/${fbRef.key}`).set(true)
+        if (property.PropAction != this.state.advertisementType) {
+            db.ref(`PropertyType/${property.PropAction}/Property/${this.state.PropId}`).remove();
+
+            db.ref(`PropertyType/${this.state.advertisementType}/Property/${this.state.PropId}`)
+                .set(
+                    {
+                        Title: this.state.title,
+                        Address: this.state.location,
+                        Bathrooms: this.state.bathrooms,
+                        Bedrooms: this.state.bedrooms,
+                        CarPark: this.state.parkingSlots,
+                        Description: this.state.description,
+                        Features: this.state.keyWordsArr,
+                        LandSize: this.state.landSize,
+                        Owner: this.state.owner,
+                        ContactNumber: this.state.contactNumber,
+                        Price: this.state.price,
+                        PropAction: this.state.advertisementType,
+                        PropId: this.state.PropId,
+                        PropTypeId: this.state.propertyType,
+                        isFeatured: this.state.isFeatured,
+                        Condition: this.state.houseCondition,
+                        Visible: this.state.isVisible
+                    })
                 .then(() => {
-                    db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
-                        .set(
-                            {
-                                Title: this.state.title,
-                                Address: this.state.location,
-                                Bathrooms: this.state.bathrooms,
-                                Bedrooms: this.state.bedrooms,
-                                CarPark: this.state.parkingSlots,
-                                Description: this.state.description,
-                                Features: this.state.keyWordsArr,
-                                LandSize: this.state.landSize,
-                                Owner: this.state.owner,
-                                ContactNumber: this.state.contactNumber,
-                                Price: this.state.price,
-                                PropAction: this.state.advertisementType,
-                                PropId: fbRef.key,
-                                PropTypeId: this.state.propertyType,
-                                isFeatured: this.state.isFeatured,
-                                Condition: this.state.houseCondition,
-                                Visible: this.state.isVisible
-                            })
-                        .then(() => {
-                            console.log('Inserted!');
-                            this.resetPropertyView();
-                            this.props.navigation.pop();
-                        }).catch((error) => {
-                            console.log(error)
-                        });
+                    console.log('Inserted!');
+                    this.resetPropertyView();
+                    this.props.navigation.pop();
+                }).catch((error) => {
+                    console.log(error)
                 });
 
-        }).catch((error) => {
-            console.log(error)
-        });
+        }
+        else {
+            db.ref(`PropertyType/${this.state.advertisementType}/Property/${this.state.PropId}`)
+                .update(
+                    {
+                        Title: this.state.title,
+                        Address: this.state.location,
+                        Bathrooms: this.state.bathrooms,
+                        Bedrooms: this.state.bedrooms,
+                        CarPark: this.state.parkingSlots,
+                        Description: this.state.description,
+                        Features: this.state.keyWordsArr,
+                        LandSize: this.state.landSize,
+                        Owner: this.state.owner,
+                        ContactNumber: this.state.contactNumber,
+                        Price: this.state.price,
+                        PropAction: this.state.advertisementType,
+                        PropId: this.state.PropId,
+                        PropTypeId: this.state.propertyType,
+                        isFeatured: this.state.isFeatured,
+                        Condition: this.state.houseCondition,
+                        Visible: this.state.isVisible
+                    })
+                .then(() => {
+                    console.log('Inserted!');
+                    this.resetPropertyView();
+                    this.props.navigation.pop();
+                }).catch((error) => {
+                    console.log(error)
+                });
+        }
+
+
+
+
     }
 
     returnImageScrollView() {
@@ -370,13 +340,15 @@ export default class AddPropertyScreen extends Component<Props> {
             keyWords: text,
             keyWordsArr: text.split(",")
         });
-        // console.log(this.state.keyWordsArr)
     }
 
     render() {
 
         const { images: savedImages } = this.state;
         arrLength = savedImages ? savedImages.length : 0
+
+        // const { navigation } = this.props;
+        // const property = navigation.getParam('PropertyData');
 
         return (
 
@@ -397,13 +369,6 @@ export default class AddPropertyScreen extends Component<Props> {
                             <ScrollView horizontal={true}
                                 style={{ marginTop: 10, flex: 1 }}
                             >
-
-                                {/* {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
-                                    null
-                                } */}
-
-                                {/* {this.returnImageScrollView.bind(this)} */}
-
                                 {arrLength == 0 ?
 
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -418,51 +383,9 @@ export default class AddPropertyScreen extends Component<Props> {
 
                                         </TouchableOpacity>
 
-
-                                        {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                            <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                                
-                                            </View>
-
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                            <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                              
-                                            </View>
-
-                                        </TouchableOpacity> */}
-
                                     </View>
 
                                     :
-
-                                    // (arrLength == 1 ?
-                                    //     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                    //         <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                    //             <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                    //                 <Icon
-                                    //                     name="add-a-photo"
-                                    //                     type='MaterialIcons'
-                                    //                     size={30}
-                                    //                 />
-                                    //             </View>
-
-                                    //         </TouchableOpacity>
-
-                                    //         <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                    //             <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                    //                 {/* <Icon
-                                    //                 name="add-a-photo"
-                                    //                 type='MaterialIcons'
-                                    //                 size={30}
-                                    //             /> */}
-                                    //             </View>
-
-                                    //         </TouchableOpacity>
-
-                                    //     </View>
-
-                                    //     :
 
                                     (
                                         (arrLength < 8 ?
@@ -478,8 +401,6 @@ export default class AddPropertyScreen extends Component<Props> {
                                             </TouchableOpacity>
 
                                             : null))
-
-                                    // )
                                 }
 
                                 {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
@@ -735,41 +656,6 @@ export default class AddPropertyScreen extends Component<Props> {
                             </View>
                         </View>
 
-
-                        {/* <View> */}
-
-                        {/* <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} style={styles.button}>
-                        <Text style={styles.text}>Select Single Image With Camera</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.pickSingleWithCamera(true)} style={styles.button}>
-                        <Text style={styles.text}>Select Single With Camera With Cropping</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.pickSingle(false)} style={styles.button}>
-                                <Text style={styles.text}>Select Single</Text>
-                            </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.cropLast()} style={styles.button}>
-                        <Text style={styles.text}>Crop Last Selected Image</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.pickSingleBase64(false)} style={styles.button}>
-                        <Text style={styles.text}>Select Single Returning Base64</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.pickSingle(true)} style={styles.button}>
-                        <Text style={styles.text}>Select Single With Cropping</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.pickSingle(true, true)} style={styles.button}>
-                        <Text style={styles.text}>Select Single With Circular Cropping</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)} style={styles.button}>
-                        <Text style={styles.text}>*Select Multiple*</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={this.cleanupImages.bind(this)} style={styles.button}>
-                        <Text style={styles.text}>Cleanup All Images</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={this.cleanupSingleImage.bind(this)} style={styles.button}>
-                        <Text style={styles.text}>Cleanup Single Image</Text>
-                    </TouchableOpacity> */}
-                        {/* </View> */}
-
                     </View>
 
                 </ScrollView>
@@ -778,15 +664,8 @@ export default class AddPropertyScreen extends Component<Props> {
                 <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
                     <TouchableOpacity
                         onPress={() => {
-                            // this.setFilterModalVisible();
-                            // this.props.navigation.navigate('SearchResultView', {
-                            //     data: {
-                            //         ...this.state
-                            //     }
-                            // });
                             console.log('Add button clicked');
-                            this.addNewProperty();
-                            // this.props.navigation.navigate('ProfileScreen');
+                            this.onPressSaveButton();
                         }}
 
                     >
@@ -794,13 +673,8 @@ export default class AddPropertyScreen extends Component<Props> {
                             backgroundColor: '#49141E', marginVertical: 7, flex: 1, marginHorizontal: 10, width: 300,
                             borderRadius: 7, alignItems: 'center', justifyContent: 'center'
                         }}>
-                            {/* <Icon
-                                name="search"
-                                type='MaterialIcons'
-                                size={30}
-                                color='white'
-                            /> */}
-                            <Text style={{ color: 'white', fontWeight: '600' }}>Add</Text>
+
+                            <Text style={{ color: 'white', fontWeight: '600' }}>Save</Text>
                         </View>
                     </TouchableOpacity>
 

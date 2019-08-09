@@ -10,6 +10,7 @@ import SearchResultView from '../screens/Search/searchResultView';
 import ExpandedView from '../screens/Search/expandedView';
 import CollectionDetailScreen from '../screens/Collection/collectionDetailScreen';
 import AddPropertyScreen from '../screens/AddProperties/addProperty';
+import EditPropertyScreen from '../screens/EditProperty/editProperty';
 
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Icon } from 'react-native-elements';
@@ -55,6 +56,9 @@ const profileStack = createStackNavigator({
     },
     AddPropertyScreen: {
         screen: AddPropertyScreen
+    },
+    EditPropertyScreen:{
+        screen: EditPropertyScreen
     }
 },{
     mode:'modal'
