@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TouchableWithoutFeedback, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput, Modal } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { Icon, ListItem } from 'react-native-elements';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Switch from 'react-native-switch-pro'
+import Switch from 'react-native-switch-pro';
 import firebase from 'react-native-firebase';
-import RNFetchBlob from 'react-native-fetch-blob'
+import RNFetchBlob from 'react-native-fetch-blob';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import { db } from '../../Database/db';
+import { placeholder } from '@babel/types';
 let PropRef = db.ref('/PropertyType');
 
 const PropertyTypes = {
@@ -60,7 +62,9 @@ export default class AddPropertyScreen extends Component<Props> {
             houseCondition: '',
             landSize: 0,
             owner: '',
-            PropId: null
+            PropId: null,
+            search: '',
+            locationModal: false
 
         };
 
@@ -201,46 +205,225 @@ export default class AddPropertyScreen extends Component<Props> {
     // }
 
 
-    // uploadImages(imgarr){
+    uploadImages(imgarr, index, userUID, propID, callback) {
+        if (index >= imgarr.length) {
+            if (callback) {
+                callback();
+            }
+        } else {
+            const currentImage = imgarr[index];
 
-    // }
+            this.getSelectedImages(currentImage, userUID, propID)
+                .then(() => {
+                    this.uploadImages(imgarr, index + 1, userUID, propID, callback);
+                });
+        }
+    }
 
     getSelectedImages(currentImage, uid, propID) {
-        console.log('currentImage', currentImage);
 
-        const image = currentImage.uri
+        return new Promise((resolve, reject) => {
 
-        const Blob = RNFetchBlob.polyfill.Blob
-        const fs = RNFetchBlob.fs
-        window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-        window.Blob = Blob
+            console.log('currentImage', currentImage);
+
+            const image = currentImage.uri
+
+            const Blob = RNFetchBlob.polyfill.Blob
+            const fs = RNFetchBlob.fs
+            window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+            window.Blob = Blob
 
 
-        let uploadBlob = null
-        const imageRef = firebase.storage().ref(`PropImages/${uid}/${propID}`);
-        let mime = 'image/jpg'
-        fs.readFile(image, 'base64')
-            .then((data) => {
-                return Blob.build(data, { type: `${mime};BASE64` })
-            })
-            .then((blob) => {
-                uploadBlob = blob
-                // return imageRef.put(blob, { contentType: mime })
-                return imageRef.put(blob._ref, { contentType: mime });
-            })
-            .then(() => {
-                uploadBlob.close()
-                return imageRef.getDownloadURL()
-            })
-            .then((url) => {
-                // URL of the image uploaded on Firebase storage
-                console.log(url);
+            let uploadBlob = null
+            const imageRef = firebase.storage().ref(`PropImages/${uid}/${propID}/${(new Date().getTime())}`);
+            let mime = 'image/jpg'
+            fs.readFile(image, 'base64')
+                .then((data) => {
+                    return Blob.build(data, { type: `${mime};BASE64` })
+                })
+                .then((blob) => {
+                    uploadBlob = blob
+                    // return imageRef.put(blob, { contentType: mime })
+                    return imageRef.put(blob._ref, { contentType: mime });
+                })
+                .then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                })
+                .then((url) => {
+                    // URL of the image uploaded on Firebase storage
+                    console.log(url);
 
-            })
-            .catch((error) => {
-                console.log(error);
-            })
+                    resolve(true);
+                })
+                .catch((error) => {
+                    console.log(error);
 
+                    reject(error);
+                });
+
+        });
+
+        // let photo = currentImage.map(img => img.image);
+        // photo.forEach((image, i) => {
+        //     const sessionId = new Date().getTime();
+        //     const Blob = RNFetchBlob.polyfill.Blob;
+        //     const fs = RNFetchBlob.fs;
+        //     window.XMLHttpRequest =
+        //         RNFetchBlob.polyfill.XMLHttpRequest;
+        //     window.Blob = Blob;
+        //     let uploadBlob = null;
+        //     let mime = 'image/jpg';
+        //     // const imageRef = this.image.child(`${sessionId}${i}`);
+        //     const imageRef = firebase.storage().ref(`PropImages/${uid}/${propID}/${sessionId}${i}`);
+        //     fs.readFile(image, 'base64')
+        //         //     .then((data) => {
+        //         //         return Blob.build(data, { type: `${mime};BASE64` })
+        //         //     })
+        //         //     .then((blob) => {
+        //         //         uploadBlob = blob;
+        //         //         return imageRef.put(blob, { contentType: mime })
+        //         //     })
+        //         //     .then(() => {
+        //         //         uploadBlob.close();
+        //         //         return imageRef.getDownloadURL()
+        //         //     })
+        //         //     .then((url) => {
+        //         //     console.log(url)                                        
+        //         //    })
+        //         //     .catch((error) => {
+
+        //         //     });
+
+        //         .then((data) => {
+        //             return Blob.build(data, { type: `${mime};BASE64` })
+        //         })
+        //         .then((blob) => {
+        //             uploadBlob = blob
+        //             // return imageRef.put(blob, { contentType: mime })
+        //             return imageRef.put(blob._ref, { contentType: mime });
+        //         })
+        //         .then(() => {
+        //             uploadBlob.close()
+        //             return imageRef.getDownloadURL()
+        //         })
+        //         .then((url) => {
+        //             // URL of the image uploaded on Firebase storage
+        //             console.log(url);
+
+        //         })
+        //         .catch((error) => {
+        //             console.log(error);
+        //         })
+
+        // })
+
+    }
+
+    locationModalVisible(visible) {
+        this.setState({
+            locationModal: visible
+        });
+    }
+
+    renderLocationModal() {
+
+        return (
+            <Modal
+                // animationType="slide"
+
+                transparent={false}
+                visible={this.state.locationModal}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                    {/* <View style={{ width: '90%',backgroundColor:'gray' }}> */}
+
+                    <GooglePlacesAutocomplete
+                        placeholder='enter the property location'
+                        minLength={2} // minimum length of text to search
+                        autoFocus={true}
+                        value={this.state.location}
+                        returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
+                        listViewDisplayed={true}   // true/false/undefined
+                        fetchDetails={true}
+                        // renderDescription={row => row.description} // custom description render
+                        renderDescription={row => row.description || row.formatted_address || row.name}
+                        // renderDescription={row =>  row.formatted_address}
+                        onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+                            console.log(data, details);
+                            console.log(data.description);
+                            // this.setFilterModalVisible();
+                            this.setState({
+                                location: data.description
+                            });
+                            this.locationModalVisible(false);
+                            // this.setValue(data);
+                        }}
+
+                        getDefaultValue={() => ''}
+
+                        query={{
+                            // available options: https://developers.google.com/places/web-service/autocomplete
+                            key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
+                            language: 'en', // language of the results
+                            types: '(cities)', // default: 'geocode'
+                            region: "LK",
+                            components: 'country:lk'
+                        }}
+
+                        styles={{
+                            textInputContainer: {
+                                width: '100%',
+                                backgroundColor: '#bdbdbd',
+                                borderTopWidth: 0,
+                                // borderBottomWidth: 1,
+                                // borderBottomColor: "#000",
+                                marginTop: 20
+                            },
+                            description: {
+                                fontWeight: 'bold',
+                            },
+                            predefinedPlacesDescription: {
+                                color: '#757575'
+                            },
+
+
+                        }}
+
+                        currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
+                        currentLocationLabel="Current location"
+                        nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+                        GoogleReverseGeocodingQuery={{
+                            // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+                        }}
+                        GooglePlacesSearchQuery={{
+                            // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
+                            rankby: 'distance'
+                        }}
+
+                        filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+                        // predefinedPlaces={[homePlace, workPlace]}
+                        // predefinedPlaces={this.state.recentSearchList}
+
+                        debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
+                        // renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
+                        renderRightButton={() => <View style={{ alignSelf: 'center', marginRight: 10 }}>
+                            <TouchableOpacity onPress={() => {
+                                this.locationModalVisible(false);
+                                // this.props.navigation.navigate('Search');
+                            }}>
+                                <Text >cancel</Text>
+                            </TouchableOpacity>
+                        </View>}
+                    />
+                </View>
+
+                {/* </View> */}
+
+            </Modal>
+        );
     }
 
     resetPropertyView() {
@@ -382,13 +565,16 @@ export default class AddPropertyScreen extends Component<Props> {
                             })
                         .then(() => {
                             console.log('Inserted!');
-                            this.getSelectedImages(this.state.image, user.uid, fbRef.key);
-                            console.log('image1', this.state.image);
+                            console.log('image1', this.state.images);
+                            // this.getSelectedImages(this.state.images, user.uid, fbRef.key);
+                            this.uploadImages(this.state.images, 0, user.uid, fbRef.key, () => {
+                                console.log('Upload DONE: ');
+                            });
                             this.resetPropertyView();
 
                             // if (this.state.images && this.state.images.length ) {
 
-                           
+
                             // }
 
                             this.props.navigation.pop();
@@ -414,7 +600,7 @@ export default class AddPropertyScreen extends Component<Props> {
             return (
 
                 // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                <TouchableOpacity onPress={this.pickSingle.bind(this)}>
+                <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
                     <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                         <Icon
                             name="add-a-photo"
@@ -476,7 +662,7 @@ export default class AddPropertyScreen extends Component<Props> {
 
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                         {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)}> */}
-                                        <TouchableOpacity onPress={this.pickSingle.bind(this)}>
+                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
                                             <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                                                 <Icon
                                                     name="add-a-photo"
@@ -536,7 +722,7 @@ export default class AddPropertyScreen extends Component<Props> {
                                     (
                                         (arrLength < 8 ?
                                             // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                            <TouchableOpacity onPress={this.pickSingle.bind(this)}>
+                                            <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
                                                 <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                                                     <Icon
                                                         name="add-a-photo"
@@ -552,13 +738,13 @@ export default class AddPropertyScreen extends Component<Props> {
                                     // )
                                 }
 
-                                {/* {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
-                                    null
-                                } */}
-
-                                {this.state.image ? <View style={{}}>{this.renderImage(this.state.image)}</View> :
+                                {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
                                     null
                                 }
+
+                                {/* {this.state.image ? <View style={{}}>{this.renderImage(this.state.image)}</View> :
+                                    null
+                                } */}
 
                             </ScrollView>
                         </View>
@@ -723,12 +909,23 @@ export default class AddPropertyScreen extends Component<Props> {
                         </View>
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Location</Text>
-                            <TextInput
+                            {/* <TextInput
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                // multiline={true}
                                 onChangeText={(location) => this.setState({ location })}
                                 value={this.state.location}
-                            />
+                            /> */}
+
+                            <TouchableWithoutFeedback onPress={() => {
+                                this.locationModalVisible(true);
+                            }}>
+
+                                <View style={{ height: 20, borderBottomWidth: 1 }}>
+                                    <Text>{this.state.location}</Text>
+                                </View>
+
+                            </TouchableWithoutFeedback>
+
+
                         </View>
 
                         <View style={{ margin: 10, width: '90%' }}>
@@ -744,7 +941,7 @@ export default class AddPropertyScreen extends Component<Props> {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, paddingBottom: 5 }}
                                 multiline={true}
                                 placeholder='e.g Pool, garage'
                                 onChangeText={
@@ -881,7 +1078,7 @@ export default class AddPropertyScreen extends Component<Props> {
 
                 </View>
 
-
+                {this.renderLocationModal()}
 
             </View>
 

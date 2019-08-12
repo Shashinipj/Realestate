@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Alert, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
+import { View, StyleSheet, Text, Alert, TouchableWithoutFeedback, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput, Modal } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -7,6 +7,7 @@ import { Icon, ListItem } from 'react-native-elements';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Switch from 'react-native-switch-pro'
 import firebase from 'react-native-firebase';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import { db } from '../../Database/db';
 
@@ -49,7 +50,8 @@ export default class EditPropertyScreen extends Component<Props>  {
             houseCondition: '',
             landSize: 0,
             owner: '',
-            PropId: null
+            PropId: null,
+            locationModal: false
 
         };
     }
@@ -77,6 +79,12 @@ export default class EditPropertyScreen extends Component<Props>  {
             });
         }).catch(e => console.log(e));
 
+    }
+
+    locationModalVisible(visible) {
+        this.setState({
+            locationModal: visible
+        });
     }
 
     resetPropertyView() {
@@ -207,6 +215,106 @@ export default class EditPropertyScreen extends Component<Props>  {
         this.setState({
             isVisible: value
         });
+    }
+
+    renderLocationModal() {
+
+        return (
+            <Modal
+                // animationType="slide"
+
+                transparent={false}
+                visible={this.state.locationModal}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                    {/* <View style={{ width: '90%',backgroundColor:'gray' }}> */}
+
+                    <GooglePlacesAutocomplete
+                        placeholder='enter the property location'
+                        minLength={2} // minimum length of text to search
+                        autoFocus={true}
+                        value={this.state.location}
+                        returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
+                        listViewDisplayed='true'    // true/false/undefined
+                        fetchDetails={true}
+                        // renderDescription={row => row.description} // custom description render
+                        renderDescription={row => row.description || row.formatted_address || row.name}
+                        // renderDescription={row =>  row.formatted_address}
+                        onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+                            console.log(data, details);
+                            console.log(data.description);
+                            // this.setFilterModalVisible();
+                            this.setState({
+                                location: data.description
+                            });
+                            this.locationModalVisible(false);
+                            // this.setValue(data);
+                        }}
+
+                        getDefaultValue={() => ''}
+
+                        query={{
+                            // available options: https://developers.google.com/places/web-service/autocomplete
+                            key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
+                            language: 'en', // language of the results
+                            types: '(cities)', // default: 'geocode'
+                            region: "LK",
+                            components: 'country:lk'
+                        }}
+
+                        styles={{
+                            textInputContainer: {
+                                width: '100%',
+                                backgroundColor: '#bdbdbd',
+                                borderTopWidth: 0,
+                                // borderBottomWidth: 1,
+                                // borderBottomColor: "#000",
+                                marginTop: 20
+                            },
+                            description: {
+                                fontWeight: 'bold',
+                            },
+                            predefinedPlacesDescription: {
+                                color: '#757575'
+                            },
+
+
+                        }}
+
+                        currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
+                        currentLocationLabel="Current location"
+                        nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+                        GoogleReverseGeocodingQuery={{
+                            // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+                        }}
+                        GooglePlacesSearchQuery={{
+                            // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
+                            rankby: 'distance'
+                        }}
+
+                        filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+                        // predefinedPlaces={[homePlace, workPlace]}
+                        // predefinedPlaces={this.state.recentSearchList}
+
+                        debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
+                        // renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
+                        renderRightButton={() => <View style={{ alignSelf: 'center', marginRight: 10 }}>
+                            <TouchableOpacity onPress={() => {
+                                this.locationModalVisible(false);
+                                // this.props.navigation.navigate('Search');
+                            }}>
+                                <Text >cancel</Text>
+                            </TouchableOpacity>
+                        </View>}
+                    />
+                </View>
+
+                {/* </View> */}
+
+            </Modal>
+        );
     }
 
 
@@ -570,12 +678,22 @@ export default class EditPropertyScreen extends Component<Props>  {
                         </View>
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Location</Text>
-                            <TextInput
+                            {/* <TextInput
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
                                 // multiline={true}
                                 onChangeText={(location) => this.setState({ location })}
                                 value={this.state.location}
-                            />
+                            /> */}
+
+                            <TouchableWithoutFeedback onPress={() => {
+                                this.locationModalVisible(true);
+                            }}>
+
+                                <View style={{ height: 20, borderBottomWidth: 1 }}>
+                                    <Text>{this.state.location}</Text>
+                                </View>
+
+                            </TouchableWithoutFeedback>
                         </View>
 
                         <View style={{ margin: 10, width: '90%' }}>
@@ -680,7 +798,7 @@ export default class EditPropertyScreen extends Component<Props>  {
 
                 </View>
 
-
+                {this.renderLocationModal()}
 
             </View>
 

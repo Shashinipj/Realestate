@@ -146,6 +146,7 @@ export default class ListItem extends Component<Props> {
                 <TouchableOpacity
                     disabled={!enableFavouriteIcon}
                     onPress={this.onPress_Heart}
+                    style={{ padding: 5}}
                 >
                     <Meticon
                         name="heart-outline"
@@ -187,6 +188,7 @@ export default class ListItem extends Component<Props> {
             <TouchableOpacity
                 disabled={!enableDeleteIcon}
                 onPress={this.onPress_Delete}
+                style={{ padding: 5}}
             >
 
                 <AntDesign

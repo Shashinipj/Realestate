@@ -61,6 +61,10 @@
 		D8F17784A97D4C6C977EE7E3 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 548CE126C4494E4E809D1EB0 /* MaterialCommunityIcons.ttf */; };
 		E834120122FD83E000E8AB3D /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E83411FA22FD839C00E8AB3D /* libRNFetchBlob.a */; };
 		E834124522FDBCE200E8AB3D /* libRNRangeSlider.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8A2040B22CC967B0049D3D7 /* libRNRangeSlider.a */; };
+		E86513DC2301142000087326 /* RSKImageCropper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E86513DB2301142000087326 /* RSKImageCropper.framework */; };
+		E86513DD2301142000087326 /* RSKImageCropper.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E86513DB2301142000087326 /* RSKImageCropper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E865140E2301190200087326 /* QBImagePicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E865140D2301190200087326 /* QBImagePicker.framework */; };
+		E865140F2301190200087326 /* QBImagePicker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E865140D2301190200087326 /* QBImagePicker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E876168222D311AA002FAC2A /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E876165622D3118B002FAC2A /* libAirMaps.a */; };
 		E88E341222CA0ADB008B9041 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E88E341122CA0ADA008B9041 /* GoogleService-Info.plist */; };
 		E88E341322CA0ADB008B9041 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E88E341122CA0ADA008B9041 /* GoogleService-Info.plist */; };
@@ -412,6 +416,21 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		E865140C2301142100087326 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E86513DD2301142000087326 /* RSKImageCropper.framework in Embed Frameworks */,
+				E865140F2301190200087326 /* QBImagePicker.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTActionSheet.xcodeproj; path = "../node_modules/react-native/Libraries/ActionSheetIOS/RCTActionSheet.xcodeproj"; sourceTree = "<group>"; };
@@ -471,6 +490,8 @@
 		E3E73FAAD2C0BE0112E38E4D /* Pods-Realestate-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Realestate-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Realestate-tvOSTests/Pods-Realestate-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		E4A00703C6AA4194BFD0F03A /* libRNVectorIcons-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNVectorIcons-tvOS.a"; sourceTree = "<group>"; };
 		E83411CE22FD839B00E8AB3D /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/react-native-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
+		E86513DB2301142000087326 /* RSKImageCropper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RSKImageCropper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E865140D2301190200087326 /* QBImagePicker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = QBImagePicker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E876165122D3118A002FAC2A /* AirMaps.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AirMaps.xcodeproj; path = "../node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; };
 		E88E341122CA0ADA008B9041 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E8AAEE5622F19E6600BD62EF /* imageCropPicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = imageCropPicker.xcodeproj; path = "../node_modules/react-native-image-crop-picker/ios/imageCropPicker.xcodeproj"; sourceTree = "<group>"; };
@@ -511,11 +532,13 @@
 				139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */,
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
+				E865140E2301190200087326 /* QBImagePicker.framework in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				313692D4D5CA4379957C336C /* libRNGestureHandler.a in Frameworks */,
 				B1DAD1B13B8946F989DB532A /* libRNVectorIcons.a in Frameworks */,
 				8C4DBD316C344402A77F245F /* Pods_Realestate.framework in Frameworks */,
 				4ED11F1CE2F34E4F9B699654 /* libRNFirebase.a in Frameworks */,
+				E86513DC2301142000087326 /* RSKImageCropper.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -748,6 +771,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				E865140D2301190200087326 /* QBImagePicker.framework */,
+				E86513DB2301142000087326 /* RSKImageCropper.framework */,
 				13B07FAE1A68108700A75B9A /* Realestate */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* RealestateTests */,
@@ -907,6 +932,7 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				5868879FBE9B75BE3D725303 /* [CP] Embed Pods Frameworks */,
+				E865140C2301142100087326 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

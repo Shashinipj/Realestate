@@ -101,7 +101,7 @@ export default class ProfileScreen extends Component<Props> {
                             for (const propId in propTypeObj.Property) {
                                 const propObj = propTypeObj.Property[propId];
                                 propVisible = propObj.Visible;
-                                console.log('propObj.Visible',propObj.Visible);
+                                // console.log('propObj.Visible',propObj.Visible);
 
                                 if (propId == i) {
 
@@ -589,7 +589,8 @@ const styles = StyleSheet.create({
         width: '100%',
         alignSelf: 'center',
         height: 50,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        
     },
     buttonContainer: {
         flex: 1,

@@ -27,8 +27,6 @@ export default class SearchScreen extends Component {
     constructor(props) {
         super(props);
 
-        // this.handleChange = this.handleChange.bind(this);
-
         this.state = {
             checked: true,
             propertiesBuy: [],

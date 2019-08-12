@@ -141,12 +141,12 @@ export default class SearchBarScreen extends Component {
                 }
             }
 
-            if (arr.length > 4) {
+            // if (arr.length > 4) {
                 // this.state.recentSearchList.splice(0, 1);
                 // arr.splice(arr.length - 1, 1);
                 arr.splice(arr.length - 1, 1);
                 console.log(arr.length);
-            }
+            // }
 
             arr = [
                 location,
@@ -1204,9 +1204,11 @@ export default class SearchBarScreen extends Component {
                 autoFocus={true}
                 value={search}
                 returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
-                listViewDisplayed='auto'    // true/false/undefined
+                listViewDisplayed='true'    // true/false/undefined
                 fetchDetails={true}
-                renderDescription={row => row.description} // custom description render
+                // renderDescription={row => row.description} // custom description render
+                renderDescription={row => row.description || row.formatted_address || row.name}
+                // renderDescription={row =>  row.formatted_address}
                 onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
                     console.log(data, details);
                     console.log(data.description);

@@ -157,8 +157,10 @@ export default class CollectionDetailScreen extends Component {
         return (
 
             <View style={{ flex: 1 }}>
-                {/* {(this.state.propProperties.length == -1) ?
-                    this.props.navigation.navigate("Collections")
+                {/* {(this.state.propProperties.length == 0) ?
+                    // this.props.navigation.navigate("Collections")
+                    <View style={{backgroundColor:'red'}}>
+                        </View>
                     : */}
                 <FlatList
                     data={this.state.propProperties}

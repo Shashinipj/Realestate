@@ -159,21 +159,27 @@ export default class CollectionScreen extends Component {
                 <View style={{ flex: 1 }}>
                     {(this.state.loading) ?
                         <View style={styles.loader}>
-                            <ActivityIndicator 
-                            size='large' 
-                            color="#757575" 
-                            style={styles.activityIndicator}
+                            <ActivityIndicator
+                                size='large'
+                                color="#757575"
+                                style={styles.activityIndicator}
                             />
                         </View>
-                        :
-                        <FlatList
-                            data={this.state.collectionList}
-                            extraData={this.state}
-                            renderItem={item => this.renderItem(item)}
-                            keyExtractor={(item, index) => {
-                                return "" + index;
-                            }}
-                        />
+                        : (this.state.collectionList.length == 0 ?
+                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                <Text style={{ textAlign: 'center', fontSize: 17, fontWeight: '600' }}>No saved collections</Text>
+                            </View>
+                            :
+                            <FlatList
+                                data={this.state.collectionList}
+                                extraData={this.state}
+                                renderItem={item => this.renderItem(item)}
+                                keyExtractor={(item, index) => {
+                                    return "" + index;
+                                }}
+                            />
+                        )
+
                     }
 
                 </View>
