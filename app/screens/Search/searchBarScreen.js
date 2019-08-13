@@ -142,10 +142,10 @@ export default class SearchBarScreen extends Component {
             }
 
             // if (arr.length > 4) {
-                // this.state.recentSearchList.splice(0, 1);
-                // arr.splice(arr.length - 1, 1);
-                arr.splice(arr.length - 1, 1);
-                console.log(arr.length);
+            // this.state.recentSearchList.splice(0, 1);
+            // arr.splice(arr.length - 1, 1);
+            arr.splice(arr.length - 1, 1);
+            console.log(arr.length);
             // }
 
             arr = [
@@ -158,7 +158,7 @@ export default class SearchBarScreen extends Component {
             await AsyncStorage.setItem('@LocationList', JSON.stringify(arr));
 
             // }
-            
+
 
         } catch (e) {
             console.log(e);
@@ -444,7 +444,10 @@ export default class SearchBarScreen extends Component {
     showFilterModal() {
 
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{
+                flex: 1,
+                // backgroundColor: 'red'
+            }}>
                 <Modal
                     animationType="slide"
                     transparent={false}
@@ -594,7 +597,7 @@ export default class SearchBarScreen extends Component {
     showFilters() {
 
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, paddingTop: 20 }}>
                 <View style={[styles.searchBarView, { flexDirection: 'row', width: "100%" }]}>
 
                     <TouchableWithoutFeedback style={{ padding: 5, flex: 1 }} onPress={() => {
@@ -626,7 +629,7 @@ export default class SearchBarScreen extends Component {
 
                 <View style={{
                     position: "absolute",
-                    top: 10,
+                    top: 30,
                     left: 0,
                     zIndex: 2,
                     width: "100%",
@@ -1096,7 +1099,7 @@ export default class SearchBarScreen extends Component {
                             value={this.state.landSize + ''}
                             onChangeText={landSize => this.setState({ landSize })}
                             keyboardType='numeric'
-                            
+
                         // onChangeText={(text) => this.setState({ text })}
                         // value={this.state.text}
                         />
@@ -1275,7 +1278,7 @@ export default class SearchBarScreen extends Component {
 
     render() {
         return (
-            <View style={{ flex: 1, paddingTop: 20 }}>
+            <View style={{ flex: 1, paddingTop: 40 }}>
                 {this.GooglePlacesInput()}
                 {this.showFilterModal()}
             </View>
@@ -1286,6 +1289,8 @@ export default class SearchBarScreen extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        // backgroundColor:'red',
+        // paddingTop: 100
     },
     searchBarView: {
         marginTop: 15,

@@ -525,7 +525,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Title</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 // maxLength={300}
                                 onChangeText={(title) => this.setState({ title })}
                                 value={this.state.title}
@@ -535,7 +535,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Description</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 multiline={true}
                                 onChangeText={(description) => this.setState({ description })}
                                 value={this.state.description}
@@ -545,7 +545,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Price</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 onChangeText={(price) => this.setState({ price })}
                                 value={this.state.price}
                                 keyboardType='numeric'
@@ -650,7 +650,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bedrooms</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 onChangeText={(bedrooms) => this.setState({ bedrooms })}
                                 value={this.state.bedrooms}
                                 keyboardType='numeric'
@@ -660,7 +660,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bathrooms</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 onChangeText={(bathrooms) => this.setState({ bathrooms })}
                                 value={this.state.bathrooms}
                                 keyboardType='numeric'
@@ -670,7 +670,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Parking Slots</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 onChangeText={(parkingSlots) => this.setState({ parkingSlots })}
                                 value={this.state.parkingSlots}
                                 keyboardType='numeric'
@@ -689,7 +689,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                                 this.locationModalVisible(true);
                             }}>
 
-                                <View style={{ height: 20, borderBottomWidth: 1 }}>
+                                <View style={{ height: 30, borderBottomWidth: 1 }}>
                                     <Text>{this.state.location}</Text>
                                 </View>
 
@@ -699,7 +699,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 onChangeText={(landSize) => this.setState({ landSize })}
                                 value={this.state.landSize}
                                 keyboardType='numeric'
@@ -709,7 +709,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30, paddingBottom: 5  }}
                                 multiline={true}
                                 placeholder='e.g Pool, garage'
                                 onChangeText={
@@ -722,7 +722,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Condition of the House</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 onChangeText={(houseCondition) => this.setState({ houseCondition })}
                                 value={this.state.houseCondition}
                             />
@@ -731,7 +731,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Owner</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 // maxLength={300}
                                 onChangeText={(owner) => this.setState({ owner })}
                                 value={this.state.owner}
@@ -741,7 +741,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Contact Number</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 onChangeText={(contactNumber) => this.setState({ contactNumber })}
                                 value={this.state.contactNumber}
                                 keyboardType='numeric'

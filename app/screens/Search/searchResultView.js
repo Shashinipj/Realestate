@@ -10,7 +10,8 @@ import Dialog from "react-native-dialog";
 import firebase from 'react-native-firebase';
 import ModalSelector from 'react-native-modal-selector';
 import ImageSlider from 'react-native-image-slider';
-import ListItem from '../../component/listItemComponent'
+import ListItem from '../../component/listItemComponent';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -199,6 +200,7 @@ export default class SearchResultView extends Component<Props> {
                     for (const propId in propTypeObj.Property) {
                         const propObj = propTypeObj.Property[propId];
 
+
                         if (location == '' || propObj.Address == location) {
 
                             if (actionType == null || propObj.PropAction == actionType) {
@@ -267,6 +269,8 @@ export default class SearchResultView extends Component<Props> {
                                                                 filteredProperties.push(propObjNew);
                                                                 console.log('filteredProperties', filteredProperties);
                                                                 // console.log(maxPrice >= (propObj.Price >= minPrice))
+                                                                console.log("propId:", propObjNew.PropId);
+                                                                // this.getPropImages(propObjNew.PropId);
                                                             }
                                                         }
                                                     }
@@ -277,6 +281,9 @@ export default class SearchResultView extends Component<Props> {
                                 }
                             }
                         }
+
+                        
+                        // this.getPropImages(propId);
                     }
                 }
             }
@@ -322,6 +329,17 @@ export default class SearchResultView extends Component<Props> {
         });
     }
 
+    // getPropImages(propId) {
+    //     const imageRef = firebase.storage().ref(`PropImages/${propId}`);
+
+    //     console.log("imageRef:",imageRef)
+    //     // const sampleImage = imageRef.getDownloadURL().then(
+    //     //     result => console.log('result', result)
+    //     // );
+
+    //     const sampleImage = imageRef.getDownloadURL()
+    //     console.log("sampleImage:",sampleImage)
+    // }
 
     getCollectionNames(user) {
         db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection);

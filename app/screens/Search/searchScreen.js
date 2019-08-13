@@ -713,6 +713,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // backgroundColor: '#E0E0E0',
+        paddingTop: 10
     },
     imageTop: {
         width: '100%',

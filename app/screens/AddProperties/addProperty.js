@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableWithoutFeedback, NativeModules, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput, Modal } from 'react-native';
+import {
+    View, StyleSheet, Text, TouchableWithoutFeedback, NativeModules, ScrollView, TouchableOpacity,
+    Image, ImageBackground, TextInput, Modal, ActivityIndicator
+} from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -64,7 +67,10 @@ export default class AddPropertyScreen extends Component<Props> {
             owner: '',
             PropId: null,
             search: '',
-            locationModal: false
+            locationModal: false,
+
+            imgUrlArr: [],
+            loading: false
 
         };
 
@@ -96,38 +102,6 @@ export default class AddPropertyScreen extends Component<Props> {
             console.log(e);
         });
     }
-
-    // cleanupSingleImage() {
-    //     let image = this.state.image || (this.state.images && this.state.images.length ? this.state.images[0] : null);
-    //     console.log('will cleanup image', image);
-
-    //     ImagePicker.cleanSingle(image ? image.uri : null).then(() => {
-    //         console.log(`removed tmp image ${image.uri} from tmp directory`);
-    //     }).catch(e => {
-    //         console.log(e);
-    //     })
-    // }
-
-    // cropLast() {
-    //     if (!this.state.image) {
-    //         return Alert.alert('No image', 'Before open cropping only, please select image');
-    //     }
-
-    //     ImagePicker.openCropper({
-    //         path: this.state.image.uri,
-    //         width: 200,
-    //         height: 200
-    //     }).then(image => {
-    //         console.log('received cropped image', image);
-    //         this.setState({
-    //             image: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
-    //             images: null
-    //         });
-    //     }).catch(e => {
-    //         console.log(e);
-    //         Alert.alert(e.message ? e.message : e);
-    //     });
-    // }
 
     pickSingle() {
         ImagePicker.openPicker({
@@ -234,26 +208,41 @@ export default class AddPropertyScreen extends Component<Props> {
             window.Blob = Blob
 
 
+            let imageUrl = [];
             let uploadBlob = null
-            const imageRef = firebase.storage().ref(`PropImages/${uid}/${propID}/${(new Date().getTime())}`);
+            const imgName = new Date().getTime();
+
+
+            console.log('imgName', imgName);
+            const imageRef = firebase.storage().ref(`PropImages/${propID}/${imgName}`);
             let mime = 'image/jpg'
             fs.readFile(image, 'base64')
                 .then((data) => {
+                    // this.state.imgUrlArr.push(imgName);
+                    // this.setState({
+                    //     imgUrlArr: imageUrl
+                    // });
+                    // console.log('imgUrlArr', this.state.imgUrlArr);
+
                     return Blob.build(data, { type: `${mime};BASE64` })
                 })
                 .then((blob) => {
                     uploadBlob = blob
                     // return imageRef.put(blob, { contentType: mime })
+
                     return imageRef.put(blob._ref, { contentType: mime });
                 })
                 .then(() => {
                     uploadBlob.close()
+
+
                     return imageRef.getDownloadURL()
                 })
                 .then((url) => {
                     // URL of the image uploaded on Firebase storage
                     console.log(url);
-
+                    this.state.imgUrlArr.push(url);
+                    console.log('imgUrlArr', this.state.imgUrlArr);
                     resolve(true);
                 })
                 .catch((error) => {
@@ -263,6 +252,7 @@ export default class AddPropertyScreen extends Component<Props> {
                 });
 
         });
+
 
         // let photo = currentImage.map(img => img.image);
         // photo.forEach((image, i) => {
@@ -527,61 +517,27 @@ export default class AddPropertyScreen extends Component<Props> {
 
     addNewProperty() {
 
+        this.setState({
+            loading: true
+        });
+
         db.ref(`PropertyType/${this.state.advertisementType}/Property`).push(
             {
 
             }
         ).then((fbRef) => {
-            console.log('Inserted!', fbRef.key)
+
+            const user = firebase.auth().currentUser;
 
             this.setState({
                 PropId: fbRef.key
             })
+            this.uploadImages(this.state.images, 0, user.uid, fbRef.key, () => {
+                console.log('Upload DONE: ');
+                this.addToFirebaseDB(fbRef)
+            });
 
-            const user = firebase.auth().currentUser;
-
-            db.ref(`Users/${user.uid}/UserProperties/${fbRef.key}`).set(true)
-                .then(() => {
-                    db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
-                        .set(
-                            {
-                                Title: this.state.title,
-                                Address: this.state.location,
-                                Bathrooms: this.state.bathrooms,
-                                Bedrooms: this.state.bedrooms,
-                                CarPark: this.state.parkingSlots,
-                                Description: this.state.description,
-                                Features: this.state.keyWordsArr,
-                                LandSize: this.state.landSize,
-                                Owner: this.state.owner,
-                                ContactNumber: this.state.contactNumber,
-                                Price: this.state.price,
-                                PropAction: this.state.advertisementType,
-                                PropId: fbRef.key,
-                                PropTypeId: this.state.propertyType,
-                                isFeatured: this.state.isFeatured,
-                                Condition: this.state.houseCondition,
-                                Visible: this.state.isVisible
-                            })
-                        .then(() => {
-                            console.log('Inserted!');
-                            console.log('image1', this.state.images);
-                            // this.getSelectedImages(this.state.images, user.uid, fbRef.key);
-                            this.uploadImages(this.state.images, 0, user.uid, fbRef.key, () => {
-                                console.log('Upload DONE: ');
-                            });
-                            this.resetPropertyView();
-
-                            // if (this.state.images && this.state.images.length ) {
-
-
-                            // }
-
-                            this.props.navigation.pop();
-                        }).catch((error) => {
-                            console.log(error)
-                        });
-                });
+            console.log('Inserted!', fbRef.key)
 
         }).catch((error) => {
             console.log(error)
@@ -589,6 +545,54 @@ export default class AddPropertyScreen extends Component<Props> {
 
         // const user = firebase.auth().currentUser;
         // this. getSelectedImages( this.state.images, user.uid, fbRef.key);
+    }
+
+    addToFirebaseDB(fbRef) {
+
+        const user = firebase.auth().currentUser;
+
+
+        db.ref(`Users/${user.uid}/UserProperties/${fbRef.key}`).set(true)
+            .then(() => {
+
+                db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
+                    .set(
+                        {
+                            Title: this.state.title,
+                            Address: this.state.location,
+                            Bathrooms: this.state.bathrooms,
+                            Bedrooms: this.state.bedrooms,
+                            CarPark: this.state.parkingSlots,
+                            Description: this.state.description,
+                            Features: this.state.keyWordsArr,
+                            LandSize: this.state.landSize,
+                            Owner: this.state.owner,
+                            ContactNumber: this.state.contactNumber,
+                            Price: this.state.price,
+                            PropAction: this.state.advertisementType,
+                            PropId: fbRef.key,
+                            PropTypeId: this.state.propertyType,
+                            isFeatured: this.state.isFeatured,
+                            Condition: this.state.houseCondition,
+                            Visible: this.state.isVisible,
+                            images: this.state.imgUrlArr,
+                        })
+                    .then(() => {
+                        console.log('Inserted!!!');
+                        // console.log('image1', this.state.images);
+                        this.setState({
+                            loading: false
+                        });
+
+                        this.resetPropertyView();
+
+                        this.props.navigation.pop();
+                    }).catch((error) => {
+                        console.log(error)
+                    });
+
+
+            });
     }
 
     returnImageScrollView() {
@@ -635,93 +639,39 @@ export default class AddPropertyScreen extends Component<Props> {
         return (
 
             <View style={styles.container}>
-                <ScrollView style={{}}>
-                    <View style={{ alignItems: 'center' }}>
-
-                        <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
-
-                            {this.state.defaultImage ? <Image source={this.state.defaultImage} style={{ width: 300, height: 200, alignItems: 'center' }} />
-                                : <Text style={{ fontWeight: '600', color: 'white' }}>Select a default image</Text>
-                            }
-
-                        </View>
-
-                        <View style={{ height: 130 }}>
-
-                            <ScrollView horizontal={true}
-                                style={{ marginTop: 10, flex: 1 }}
-                            >
-
-                                {/* {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
-                                    null
-                                } */}
-
-                                {/* {this.returnImageScrollView.bind(this)} */}
-
-                                {arrLength == 0 ?
-
-                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                        {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)}> */}
-                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                            <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                                <Icon
-                                                    name="add-a-photo"
-                                                    type='MaterialIcons'
-                                                    size={30}
-                                                />
-                                            </View>
-
-                                        </TouchableOpacity>
+                {(this.state.loading) ?
+                    <View style={{flex:1}}>
+                        <ActivityIndicator
+                            size='small'
+                            color="#757575"
+                            style={styles.activityIndicator}
+                        />
+                    </View>
 
 
-                                        {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                            <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                                
-                                            </View>
+                    :
 
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                            <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                              
-                                            </View>
+                    <ScrollView style={{}}>
+                        <View style={{ alignItems: 'center' }}>
 
-                                        </TouchableOpacity> */}
+                            <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
 
-                                    </View>
+                                {this.state.defaultImage ? <Image source={this.state.defaultImage} style={{ width: 300, height: 200, alignItems: 'center' }} />
+                                    : <Text style={{ fontWeight: '600', color: 'white' }}>Select a default image</Text>
+                                }
 
-                                    :
+                            </View>
 
-                                    // (arrLength == 1 ?
-                                    //     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                    //         <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                    //             <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                    //                 <Icon
-                                    //                     name="add-a-photo"
-                                    //                     type='MaterialIcons'
-                                    //                     size={30}
-                                    //                 />
-                                    //             </View>
+                            <View style={{ height: 130 }}>
 
-                                    //         </TouchableOpacity>
+                                <ScrollView horizontal={true}
+                                    style={{ marginTop: 10, flex: 1 }}
+                                >
 
-                                    //         <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                    //             <View style={{ backgroundColor: '#e0e0e0', width: 90, height: 90, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                    //                 {/* <Icon
-                                    //                 name="add-a-photo"
-                                    //                 type='MaterialIcons'
-                                    //                 size={30}
-                                    //             /> */}
-                                    //             </View>
+                                    {arrLength == 0 ?
 
-                                    //         </TouchableOpacity>
-
-                                    //     </View>
-
-                                    //     :
-
-                                    (
-                                        (arrLength < 8 ?
-                                            // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                            {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)}> */}
                                             <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
                                                 <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                                                     <Icon
@@ -733,317 +683,302 @@ export default class AddPropertyScreen extends Component<Props> {
 
                                             </TouchableOpacity>
 
-                                            : null))
+                                        </View>
 
-                                    // )
-                                }
+                                        :
 
-                                {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
-                                    null
-                                }
+                                        (
+                                            (arrLength < 8 ?
+                                                // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                                <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                                    <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                                        <Icon
+                                                            name="add-a-photo"
+                                                            type='MaterialIcons'
+                                                            size={30}
+                                                        />
+                                                    </View>
 
-                                {/* {this.state.image ? <View style={{}}>{this.renderImage(this.state.image)}</View> :
+                                                </TouchableOpacity>
+
+                                                : null))
+
+                                        // )
+                                    }
+
+                                    {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
+                                        null
+                                    }
+
+                                    {/* {this.state.image ? <View style={{}}>{this.renderImage(this.state.image)}</View> :
                                     null
                                 } */}
 
-                            </ScrollView>
-                        </View>
-
-                    </View>
-
-
-                    <View style={{ alignItems: 'flex-start', margin: 10, backgroundColor: '#ffffff' }}>
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Title</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                // maxLength={300}
-                                onChangeText={(title) => this.setState({ title })}
-                                value={this.state.title}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Description</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                multiline={true}
-                                onChangeText={(description) => this.setState({ description })}
-                                value={this.state.description}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Price</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                onChangeText={(price) => this.setState({ price })}
-                                value={this.state.price}
-                                keyboardType='numeric'
-                            />
-                        </View>
-
-                        <View style={{ margin: 10 }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Type of Advertisement</Text>
-                            <View style={styles.buttonSetView}>
-                                <TouchableOpacity
-                                    style={
-                                        this.state.advertisementType == 1
-                                            ? { flex: 1, backgroundColor: '#424242', borderTopLeftRadius: 5, borderBottomLeftRadius: 5 } : { flex: 1 }
-                                    }
-                                    onPress={() => this.isAdvertisementTypeButtonPress(1)}
-                                >
-                                    <View style={[styles.subButtonView, { borderRightWidth: 1, height: 30 }]}>
-                                        <Text style={
-                                            this.state.advertisementType == 1 ?
-                                                [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO SELL</Text>
-                                    </View>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={
-                                        this.state.advertisementType == 2
-                                            ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
-                                    }
-
-                                    onPress={() => this.isAdvertisementTypeButtonPress(2)}
-                                >
-                                    <View style={styles.subButtonView}>
-                                        <Text style={
-                                            this.state.advertisementType == 2 ?
-                                                [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO RENT</Text>
-                                    </View>
-                                </TouchableOpacity>
-
+                                </ScrollView>
                             </View>
+
                         </View>
 
-                        <View style={{ margin: 10, height: 150 }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Type</Text>
-                            <ScrollView horizontal={true} >
 
-                                <View style={styles.propertyTypeView}>
-                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(1)}>
-                                        <View style={
-                                            this.state.propertyType == 1 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
-                                                : styles.propertTypeButtons
-                                        }>
+                        <View style={{ alignItems: 'flex-start', margin: 10, backgroundColor: '#ffffff' }}>
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Title</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    // maxLength={300}
+                                    onChangeText={(title) => this.setState({ title })}
+                                    value={this.state.title}
+                                />
+                            </View>
 
-                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 1 ? 'white' : 'gray'} />
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Description</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    multiline={true}
+                                    onChangeText={(description) => this.setState({ description })}
+                                    value={this.state.description}
+                                />
+                            </View>
 
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Price</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(price) => this.setState({ price })}
+                                    value={this.state.price}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10 }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Type of Advertisement</Text>
+                                <View style={styles.buttonSetView}>
+                                    <TouchableOpacity
+                                        style={
+                                            this.state.advertisementType == 1
+                                                ? { flex: 1, backgroundColor: '#424242', borderTopLeftRadius: 5, borderBottomLeftRadius: 5 } : { flex: 1 }
+                                        }
+                                        onPress={() => this.isAdvertisementTypeButtonPress(1)}
+                                    >
+                                        <View style={[styles.subButtonView, { borderRightWidth: 1, height: 30 }]}>
+                                            <Text style={
+                                                this.state.advertisementType == 1 ?
+                                                    [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO SELL</Text>
                                         </View>
                                     </TouchableOpacity>
-                                    <Text>House</Text>
-                                </View>
 
-                                <View style={styles.propertyTypeView}>
-                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(2)}>
-                                        <View style={
-                                            this.state.propertyType == 2 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
-                                                : styles.propertTypeButtons
-                                        }>
-                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 2 ? 'white' : 'gray'} />
+                                    <TouchableOpacity
+                                        style={
+                                            this.state.advertisementType == 2
+                                                ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                        }
 
+                                        onPress={() => this.isAdvertisementTypeButtonPress(2)}
+                                    >
+                                        <View style={styles.subButtonView}>
+                                            <Text style={
+                                                this.state.advertisementType == 2 ?
+                                                    [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO RENT</Text>
                                         </View>
                                     </TouchableOpacity>
-                                    <Text style={{ textAlign: 'center' }}>Apartment{"\n&"} house </Text>
+
                                 </View>
+                            </View>
 
-                                <View style={styles.propertyTypeView}>
-                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(3)}>
-                                        <View style={
-                                            this.state.propertyType == 3 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
-                                                : styles.propertTypeButtons
-                                        }>
+                            <View style={{ margin: 10, height: 150 }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Type</Text>
+                                <ScrollView horizontal={true} >
 
-                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 3 ? 'white' : 'gray'} />
+                                    <View style={styles.propertyTypeView}>
+                                        <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(1)}>
+                                            <View style={
+                                                this.state.propertyType == 1 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                    : styles.propertTypeButtons
+                                            }>
 
-                                        </View>
-                                    </TouchableOpacity>
-                                    <Text>Townhouse</Text>
-                                </View>
+                                                <Meticon name='home-outline' size={30} color={this.state.propertyType == 1 ? 'white' : 'gray'} />
 
-                                <View style={styles.propertyTypeView}>
-                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(4)}>
-                                        <View style={
-                                            this.state.propertyType == 4 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
-                                                : styles.propertTypeButtons
-                                        }>
-                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 4 ? 'white' : 'gray'} />
+                                            </View>
+                                        </TouchableOpacity>
+                                        <Text>House</Text>
+                                    </View>
 
-                                        </View>
-                                    </TouchableOpacity>
-                                    <Text>Villa</Text>
-                                </View>
-                            </ScrollView>
-                        </View>
+                                    <View style={styles.propertyTypeView}>
+                                        <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(2)}>
+                                            <View style={
+                                                this.state.propertyType == 2 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                    : styles.propertTypeButtons
+                                            }>
+                                                <Meticon name='home-outline' size={30} color={this.state.propertyType == 2 ? 'white' : 'gray'} />
 
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bedrooms</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                onChangeText={(bedrooms) => this.setState({ bedrooms })}
-                                value={this.state.bedrooms}
-                                keyboardType='numeric'
-                            />
-                        </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                        <Text style={{ textAlign: 'center' }}>Apartment{"\n&"} house </Text>
+                                    </View>
 
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bathrooms</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                onChangeText={(bathrooms) => this.setState({ bathrooms })}
-                                value={this.state.bathrooms}
-                                keyboardType='numeric'
-                            />
-                        </View>
+                                    <View style={styles.propertyTypeView}>
+                                        <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(3)}>
+                                            <View style={
+                                                this.state.propertyType == 3 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                    : styles.propertTypeButtons
+                                            }>
 
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Parking Slots</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                onChangeText={(parkingSlots) => this.setState({ parkingSlots })}
-                                value={this.state.parkingSlots}
-                                keyboardType='numeric'
-                            />
-                        </View>
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Location</Text>
-                            {/* <TextInput
+                                                <Meticon name='home-outline' size={30} color={this.state.propertyType == 3 ? 'white' : 'gray'} />
+
+                                            </View>
+                                        </TouchableOpacity>
+                                        <Text>Townhouse</Text>
+                                    </View>
+
+                                    <View style={styles.propertyTypeView}>
+                                        <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(4)}>
+                                            <View style={
+                                                this.state.propertyType == 4 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                    : styles.propertTypeButtons
+                                            }>
+                                                <Meticon name='home-outline' size={30} color={this.state.propertyType == 4 ? 'white' : 'gray'} />
+
+                                            </View>
+                                        </TouchableOpacity>
+                                        <Text>Villa</Text>
+                                    </View>
+                                </ScrollView>
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bedrooms</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(bedrooms) => this.setState({ bedrooms })}
+                                    value={this.state.bedrooms}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bathrooms</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(bathrooms) => this.setState({ bathrooms })}
+                                    value={this.state.bathrooms}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Parking Slots</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(parkingSlots) => this.setState({ parkingSlots })}
+                                    value={this.state.parkingSlots}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Location</Text>
+                                {/* <TextInput
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
                                 onChangeText={(location) => this.setState({ location })}
                                 value={this.state.location}
                             /> */}
 
-                            <TouchableWithoutFeedback onPress={() => {
-                                this.locationModalVisible(true);
-                            }}>
+                                <TouchableWithoutFeedback onPress={() => {
+                                    this.locationModalVisible(true);
+                                }}>
 
-                                <View style={{ height: 20, borderBottomWidth: 1 }}>
-                                    <Text>{this.state.location}</Text>
+                                    <View style={{ height: 30, borderBottomWidth: 1 }}>
+                                        <Text>{this.state.location}</Text>
+                                    </View>
+
+                                </TouchableWithoutFeedback>
+
+
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(landSize) => this.setState({ landSize })}
+                                    value={this.state.landSize}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, paddingBottom: 5, height: 30 }}
+                                    multiline={true}
+                                    placeholder='e.g Pool, garage'
+                                    onChangeText={
+                                        (keyWords) => this.getKeyWords(keyWords)
+                                    }
+                                    value={this.state.keyWords}
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Condition of the House</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(houseCondition) => this.setState({ houseCondition })}
+                                    value={this.state.houseCondition}
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Owner</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    // maxLength={300}
+                                    onChangeText={(owner) => this.setState({ owner })}
+                                    value={this.state.owner}
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Contact Number</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(contactNumber) => this.setState({ contactNumber })}
+                                    value={this.state.contactNumber}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+
+
+                            <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>is Featured</Text>
+                                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                    <Switch
+                                        value={this.state.isFeatured}
+                                        onSyncPress={() => { this.isFeaturedEnable(!this.state.isFeatured) }}
+                                        style={{}}
+                                    />
+
                                 </View>
-
-                            </TouchableWithoutFeedback>
-
-
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                onChangeText={(landSize) => this.setState({ landSize })}
-                                value={this.state.landSize}
-                                keyboardType='numeric'
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, paddingBottom: 5 }}
-                                multiline={true}
-                                placeholder='e.g Pool, garage'
-                                onChangeText={
-                                    (keyWords) => this.getKeyWords(keyWords)
-                                }
-                                value={this.state.keyWords}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Condition of the House</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                onChangeText={(houseCondition) => this.setState({ houseCondition })}
-                                value={this.state.houseCondition}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Owner</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                // maxLength={300}
-                                onChangeText={(owner) => this.setState({ owner })}
-                                value={this.state.owner}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Contact Number</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
-                                onChangeText={(contactNumber) => this.setState({ contactNumber })}
-                                value={this.state.contactNumber}
-                                keyboardType='numeric'
-                            />
-                        </View>
-
-
-
-                        <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>is Featured</Text>
-                            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                                <Switch
-                                    value={this.state.isFeatured}
-                                    onSyncPress={() => { this.isFeaturedEnable(!this.state.isFeatured) }}
-                                    style={{}}
-                                />
-
                             </View>
-                        </View>
 
-                        <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Display Property</Text>
-                            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                                <Switch
-                                    value={this.state.isVisible}
-                                    onSyncPress={() => { this.isVisibleEnable(!this.state.isVisible) }}
-                                    style={{}}
-                                />
+                            <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Display Property</Text>
+                                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                    <Switch
+                                        value={this.state.isVisible}
+                                        onSyncPress={() => { this.isVisibleEnable(!this.state.isVisible) }}
+                                        style={{}}
+                                    />
 
+                                </View>
                             </View>
+
                         </View>
 
+                    </ScrollView>
 
-                        {/* <View> */}
-
-                        {/* <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} style={styles.button}>
-                        <Text style={styles.text}>Select Single Image With Camera</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.pickSingleWithCamera(true)} style={styles.button}>
-                        <Text style={styles.text}>Select Single With Camera With Cropping</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.pickSingle(false)} style={styles.button}>
-                                <Text style={styles.text}>Select Single</Text>
-                            </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.cropLast()} style={styles.button}>
-                        <Text style={styles.text}>Crop Last Selected Image</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.pickSingleBase64(false)} style={styles.button}>
-                        <Text style={styles.text}>Select Single Returning Base64</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={() => this.pickSingle(true)} style={styles.button}>
-                        <Text style={styles.text}>Select Single With Cropping</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.pickSingle(true, true)} style={styles.button}>
-                        <Text style={styles.text}>Select Single With Circular Cropping</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)} style={styles.button}>
-                        <Text style={styles.text}>*Select Multiple*</Text>
-                    </TouchableOpacity> */}
-                        {/* <TouchableOpacity onPress={this.cleanupImages.bind(this)} style={styles.button}>
-                        <Text style={styles.text}>Cleanup All Images</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={this.cleanupSingleImage.bind(this)} style={styles.button}>
-                        <Text style={styles.text}>Cleanup Single Image</Text>
-                    </TouchableOpacity> */}
-                        {/* </View> */}
-
-                    </View>
-
-                </ScrollView>
+                }
 
 
                 <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
@@ -1134,5 +1069,9 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    activityIndicator: {
+        flex: 1,
+        height: 120
     },
 });

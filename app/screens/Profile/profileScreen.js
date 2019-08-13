@@ -301,8 +301,8 @@ export default class ProfileScreen extends Component<Props> {
     renderProfileView() {
         if (!this.state.loggedIn) {
             return (
-                <View style={[styles.buttonContainer, { justifyContent: 'center' }]}>
-                    <Text style={{ textAlign: 'center', fontWeight: '400', fontSize: 15, color: 'white' }}>
+                <View style={[styles.buttonContainer, { justifyContent: 'center', backgroundColor:'#ffffff' }]}>
+                    <Text style={{ textAlign: 'center', fontWeight: '400', fontSize: 15, color: '#000000' }}>
                         Please Login to see user details
                         </Text>
 
@@ -310,8 +310,8 @@ export default class ProfileScreen extends Component<Props> {
                         <TouchableOpacity onPress={() => {
                             this.props.navigation.navigate('Search');
                         }}>
-                            <View style={styles.buttons}>
-                                <Text style={styles.buttonText}>
+                            <View style={[styles.buttons, {width: '25%', height: 30, alignContent:'center',  backgroundColor: '#f3d500',}]}>
+                                <Text style={[styles.buttonText, {fontSize: 15}]}>
                                     Home
                                 </Text>
                             </View>
@@ -343,7 +343,7 @@ export default class ProfileScreen extends Component<Props> {
                             style={{ flex: 1, backgroundColor: '#ffffff', flexDirection: 'column-reverse' }}
                             indicator={this.renderTabIndicator()}
                         >
-                            <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', padding: 100 }}>
+                            <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', alignContent:'center', paddingLeft: 30}}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
                                         <Meticon name="email-outline" size={25} style={{ color: '#49141E' }} />
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         width: '100%',
         alignSelf: 'center',
-        height: 50,
+        height: 40,
         justifyContent: 'center',
         
     },

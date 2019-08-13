@@ -49,7 +49,13 @@ export default class FeaturedListItem extends Component<Props> {
                 <TouchableOpacity onPress={this.onPress_Item}>
 
                     <View style={{ borderRadius: 4, margin: 5, width: 100, height: 120 }}>
-                        <Image source={require('../assets/images/house.jpg')} style={{ height: 70, width: 100, borderRadius: 4, marginBottom: 5 }} />
+                    {
+                        (!propertyData.images) ?
+                        <Image source={require('../assets/images/house.jpg')} style={{ height: 70, width: 100, borderRadius: 4, marginBottom: 5 }} /> :
+
+                            <Image source={propertyData.images} style={{ height: 70, width: 100, borderRadius: 4, marginBottom: 5 }} />
+                    }
+                       
                         {
                             (propertyData.Title) ? <Text style={{ fontSize: 11, fontWeight: '600' }}>{propertyData.Title}</Text> :
                                 <Text style={{ fontSize: 11, fontWeight: '600' }}>Property Title </Text>

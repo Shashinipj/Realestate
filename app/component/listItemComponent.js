@@ -146,7 +146,7 @@ export default class ListItem extends Component<Props> {
                 <TouchableOpacity
                     disabled={!enableFavouriteIcon}
                     onPress={this.onPress_Heart}
-                    style={{ padding: 5}}
+                    style={{ padding: 3 }}
                 >
                     <Meticon
                         name="heart-outline"
@@ -188,7 +188,7 @@ export default class ListItem extends Component<Props> {
             <TouchableOpacity
                 disabled={!enableDeleteIcon}
                 onPress={this.onPress_Delete}
-                style={{ padding: 5}}
+                style={{ padding: 3 }}
             >
 
                 <AntDesign
@@ -215,6 +215,7 @@ export default class ListItem extends Component<Props> {
                 <TouchableOpacity
                     disabled={!enablePauseIcon}
                     onPress={this.onPress_Pause}
+                    style={{ padding: 3 }}
                 >
 
                     <AntDesign
@@ -234,6 +235,7 @@ export default class ListItem extends Component<Props> {
                 <TouchableOpacity
                     // disabled={!enablePauseIcon}
                     onPress={this.onPress_Show}
+                    style={{ padding: 3 }}
                 >
 
                     <AntDesign
@@ -259,11 +261,12 @@ export default class ListItem extends Component<Props> {
             <TouchableOpacity
                 // disabled={!enableEditIcon}
                 onPress={this.onPress_Edit}
+                style={{ padding: 3 }}
             >
                 <AntDesign
                     name="edit"
                     size={20}
-                    style={{ marginRight: 10}}
+                    style={{ marginRight: 10 }}
                 />
 
                 {/* <Text style={{}}>Edit</Text> */}
@@ -286,7 +289,13 @@ export default class ListItem extends Component<Props> {
 
 
                 <View style={{ flexDirection: 'row' }}>
-                    <Image source={require('../assets/images/house.jpg')} style={[styles.imageTop, { marginRight: 10 }]} />
+                    {/* <Image source={require('../assets/images/house.jpg')} style={[styles.imageTop, { marginRight: 10 }]} /> */}
+                    {
+                        (!this.props.data1.images) ?
+                            <Image source={require('../assets/images/house.jpg')} style={[styles.imageTop, { marginRight: 10 }]} /> :
+
+                            <Image source={this.props.data1.images} style={[styles.imageTop, { marginRight: 10 }]} />
+                    }
 
                     <View style={{ flex: 1 }}>
 
