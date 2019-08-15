@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Modal } from 'react-native';
+import { View, StyleSheet, Text, Image, TouchableOpacity, Modal, SafeAreaView } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -63,74 +63,77 @@ export default class ExpandedView extends Component {
                         Alert.alert('Modal has been closed.');
                     }}>
 
-                    <View style={{ marginTop: 10, backgroundColor: 'white', justifyContent: 'center' }}>
+                    <SafeAreaView>
 
-                        <TouchableOpacity
-                            style={{
-                                // backgroundColor: "red",
-                                alignSelf: "flex-start",
-                                padding: 10
-                            }}
-                            onPress={() => {
-                                this.setModalVisible(!this.state.mapModalVisible);
-                                // this.onLoginSuccess.bind(this);
-                            }}>
+                        <View style={{ marginTop: 10, backgroundColor: 'white', justifyContent: 'center' }}>
 
-                            <Icon
-                                name="close"
-                                type='MaterialIcons'
-                                size={20}
-                            />
-
-                        </TouchableOpacity>
-                    </View>
-
-                    <View>
-                        <MapView
-                            style={styles.mapViewExpand}
-                            initialRegion={{
-                                latitude: property.lat,
-                                longitude: property.lon,
-                                latitudeDelta: 0.0922,
-                                longitudeDelta: 0.0421,
-                            }}
-                            onMapReady={() => {
-                                if (this.refMarker) {
-                                    this.refMarker.showCallout();
-                                }
-                            }}
-                        >
-
-                            <MapView.Marker
-                                ref={(ref) => {
-                                    this.refMarker = ref;
+                            <TouchableOpacity
+                                style={{
+                                    // backgroundColor: "red",
+                                    alignSelf: "flex-start",
+                                    padding: 10
                                 }}
-                                coordinate={{
-                                    latitude: property.lat,
-                                    longitude: property.lon
-                                }}
-                                title={property.Owner}
-                                description={property.PropType}
+                                onPress={() => {
+                                    this.setModalVisible(!this.state.mapModalVisible);
+                                    // this.onLoginSuccess.bind(this);
+                                }}>
 
-                            />
-                        </MapView>
+                                <Icon
+                                    name="close"
+                                    type='MaterialIcons'
+                                    size={20}
+                                />
 
-                        <View style={{ flexDirection: 'row', padding: 10, backgroundColor: 'white', justifyContent: 'center', position: 'absolute', zIndex: 2, bottom: 50 }}>
-
-                            <TouchableOpacity style={{ flex: 1, }}>
-                                <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
-                                    <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Street View</Text>
-                                </View>
                             </TouchableOpacity>
-                            <TouchableOpacity style={{ flex: 1, }}>
-                                <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
-                                    <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Get Directions</Text>
-                                </View>
-                            </TouchableOpacity>
-
                         </View>
 
-                    </View>
+                        <View>
+                            <MapView
+                                style={styles.mapViewExpand}
+                                initialRegion={{
+                                    latitude: property.lat,
+                                    longitude: property.lon,
+                                    latitudeDelta: 0.0922,
+                                    longitudeDelta: 0.0421,
+                                }}
+                                onMapReady={() => {
+                                    if (this.refMarker) {
+                                        this.refMarker.showCallout();
+                                    }
+                                }}
+                            >
+
+                                <MapView.Marker
+                                    ref={(ref) => {
+                                        this.refMarker = ref;
+                                    }}
+                                    coordinate={{
+                                        latitude: property.lat,
+                                        longitude: property.lon
+                                    }}
+                                    title={property.Owner}
+                                    description={property.PropType}
+
+                                />
+                            </MapView>
+
+                            {/* <View style={{ flexDirection: 'row', padding: 10, backgroundColor: 'white', justifyContent: 'center', position: 'absolute', zIndex: 2, bottom: 50 }}>
+
+                                <TouchableOpacity style={{ flex: 1, }}>
+                                    <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
+                                        <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Street View</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ flex: 1, }}>
+                                    <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
+                                        <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Get Directions</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                            </View> */}
+
+                        </View>
+                    </SafeAreaView>
 
                 </Modal>
 
@@ -139,11 +142,11 @@ export default class ExpandedView extends Component {
         );
     }
 
-    handleTextReady(){
+    handleTextReady() {
         console.log('ready!');
     }
 
-    renderTruncatedFooter(handlePress){
+    renderTruncatedFooter(handlePress) {
         return (
             <View style={{ backgroundColor: '#EEEEEE', borderRadius: 4, flex: 1, alignContent: 'center', justifyContent: 'center', margin: 10 }}>
                 <Text style={{ alignSelf: 'center', margin: 5, fontSize: 13, fontWeight: '500' }} onPress={handlePress}>
@@ -171,7 +174,7 @@ export default class ExpandedView extends Component {
         const { navigation } = this.props;
         const property = navigation.getParam('PropertyData');
         return (
-            <View style={{ flex: 1, backgroundColor: '#EEEEEE' }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: '#EEEEEE' }}>
 
                 <ScrollView style={{ flex: 1, paddingBottom: 60 }}>
 
@@ -180,7 +183,8 @@ export default class ExpandedView extends Component {
                             <Text style={styles.ownerName}> {property.Owner}</Text>
                             <View style={styles.userProfileView}>
 
-                                <Image source={require('../../assets/images/owner.jpg')} style={{ width: 40, height: 40, borderRadius: 20 }} />
+                                {/* <Image source={require('../../assets/images/owner2.jpg')} style={{ width: 40, height: 40, borderRadius: 20 }} /> */}
+                                <Image source={require('../../assets/images/owner2.png')} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor:'#ffffff' }} />
                             </View>
                         </View>
                         {/* <ImageBackground style={styles.imageBackground}> */}
@@ -196,8 +200,8 @@ export default class ExpandedView extends Component {
                             //     { uri: 'https://firebasestorage.googleapis.com/v0/b/realestate-be70e.appspot.com/o/house4.jpg?alt=media&token=850bf1ef-a0d3-42bd-8e76-745cbbcc7055' },
                             // ]} 
                             images={property.images}
-                            
-                            />
+
+                        />
 
                         {/* </ImageBackground> */}
 
@@ -358,7 +362,7 @@ export default class ExpandedView extends Component {
 
                     </TouchableOpacity>
                 </View>
-            </View >
+            </SafeAreaView >
         );
     }
 }
@@ -437,6 +441,7 @@ const styles = StyleSheet.create({
     },
     mapViewExpand: {
         width: '100%',
-        height: '100%'
+        height: '100%',
+        // marginTop: 50
     }
 })

@@ -203,7 +203,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#f3d500'
     },
     buttons: {
-        backgroundColor: '#f3d500',
+        // backgroundColor: '#f3d500',
+        backgroundColor: '#212121',
         borderRadius: 4,
         paddingVertical: 7,
         margin: 10,
@@ -217,7 +218,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     buttonText: {
-        color: '#49141E',
+        // color: '#49141E',
+        color: '#ffffff',
         fontWeight: '500',
         textAlign: 'center'
     },

@@ -1090,7 +1090,7 @@ export default class SearchBarScreen extends Component {
                     <View style={styles.separatorView}></View>
 
                     <View style={styles.mainCategoryView}>
-                        <Text style={styles.mainCategoryText}>Land size</Text>
+                        <Text style={styles.mainCategoryText}>Land size (Square Feet)</Text>
                     </View>
                     <View style={{ justifyContent: 'center', flexDirection: 'row', marginVertical: 20 }}>
                         <Text style={{ fontSize: 15 }}>At leaset </Text>
@@ -1099,9 +1099,6 @@ export default class SearchBarScreen extends Component {
                             value={this.state.landSize + ''}
                             onChangeText={landSize => this.setState({ landSize })}
                             keyboardType='numeric'
-
-                        // onChangeText={(text) => this.setState({ text })}
-                        // value={this.state.text}
                         />
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={{ fontSize: 15 }}>m</Text>
@@ -1109,30 +1106,6 @@ export default class SearchBarScreen extends Component {
                         </View>
 
                     </View>
-
-                    {/* <View style={[styles.buttonSetView, { marginHorizontal: 80 }]}>
-                        <TouchableOpacity style={{ flex: 1 }}>
-                            <View style={[styles.subButtonView, { borderRightWidth: 1, height: 20 }]}>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={{ fontSize: 12 }}>Metres</Text>
-                                    <Text style={{ fontSize: 9, lineHeight: 12 }}>2</Text>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={{ flex: 1 }}>
-                            <View style={styles.subButtonView}>
-                                <Text style={styles.propertyTypeText}>Acres</Text>
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={{ flex: 1 }}>
-                            <View style={[styles.subButtonView, { borderLeftWidth: 1 }]}>
-                                <Text style={styles.propertyTypeText}>Hectares</Text>
-                            </View>
-                        </TouchableOpacity>
-
-                    </View> */}
 
                     <View style={styles.separatorView}></View>
 
@@ -1159,10 +1132,6 @@ export default class SearchBarScreen extends Component {
                     {this.RenderSortOrder()}
 
                     <View style={styles.separatorView}></View>
-
-                    {/* <Text> Exclude under contract/offer</Text>
-
-                    <View style={styles.separatorView}></View> */}
 
                 </ScrollView>
                 <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
@@ -1213,7 +1182,10 @@ export default class SearchBarScreen extends Component {
                 renderDescription={row => row.description || row.formatted_address || row.name}
                 // renderDescription={row =>  row.formatted_address}
                 onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                    console.log(data, details);
+                    console.log('data', data);
+                    // console.log('details', details.geometry.location.lat);
+                    // console.log('details', details.geometry.location.lng);
+                    console.log('details', details.geometry);
                     console.log(data.description);
                     this.setFilterModalVisible();
                     this.setState({
@@ -1230,8 +1202,8 @@ export default class SearchBarScreen extends Component {
                     key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
                     language: 'en', // language of the results
                     types: '(cities)', // default: 'geocode'
-                    region: "LK",
-                    components: 'country:lk'
+                    region: "Canada",
+                    components: 'country:ca'
                 }}
 
                 styles={{

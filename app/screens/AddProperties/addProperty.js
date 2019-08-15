@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     View, StyleSheet, Text, TouchableWithoutFeedback, NativeModules, ScrollView, TouchableOpacity,
-    Image, ImageBackground, TextInput, Modal, ActivityIndicator
+    Image, ImageBackground, TextInput, Modal, ActivityIndicator, KeyboardAvoidingView
 } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -47,6 +47,8 @@ export default class AddPropertyScreen extends Component<Props> {
             title: '',
             description: '',
             price: '',
+            lat: '',
+            lon: '',
 
             advertisementType: 1,
             propertyType: 1,
@@ -218,12 +220,6 @@ export default class AddPropertyScreen extends Component<Props> {
             let mime = 'image/jpg'
             fs.readFile(image, 'base64')
                 .then((data) => {
-                    // this.state.imgUrlArr.push(imgName);
-                    // this.setState({
-                    //     imgUrlArr: imageUrl
-                    // });
-                    // console.log('imgUrlArr', this.state.imgUrlArr);
-
                     return Blob.build(data, { type: `${mime};BASE64` })
                 })
                 .then((blob) => {
@@ -234,8 +230,6 @@ export default class AddPropertyScreen extends Component<Props> {
                 })
                 .then(() => {
                     uploadBlob.close()
-
-
                     return imageRef.getDownloadURL()
                 })
                 .then((url) => {
@@ -250,63 +244,7 @@ export default class AddPropertyScreen extends Component<Props> {
 
                     reject(error);
                 });
-
         });
-
-
-        // let photo = currentImage.map(img => img.image);
-        // photo.forEach((image, i) => {
-        //     const sessionId = new Date().getTime();
-        //     const Blob = RNFetchBlob.polyfill.Blob;
-        //     const fs = RNFetchBlob.fs;
-        //     window.XMLHttpRequest =
-        //         RNFetchBlob.polyfill.XMLHttpRequest;
-        //     window.Blob = Blob;
-        //     let uploadBlob = null;
-        //     let mime = 'image/jpg';
-        //     // const imageRef = this.image.child(`${sessionId}${i}`);
-        //     const imageRef = firebase.storage().ref(`PropImages/${uid}/${propID}/${sessionId}${i}`);
-        //     fs.readFile(image, 'base64')
-        //         //     .then((data) => {
-        //         //         return Blob.build(data, { type: `${mime};BASE64` })
-        //         //     })
-        //         //     .then((blob) => {
-        //         //         uploadBlob = blob;
-        //         //         return imageRef.put(blob, { contentType: mime })
-        //         //     })
-        //         //     .then(() => {
-        //         //         uploadBlob.close();
-        //         //         return imageRef.getDownloadURL()
-        //         //     })
-        //         //     .then((url) => {
-        //         //     console.log(url)                                        
-        //         //    })
-        //         //     .catch((error) => {
-
-        //         //     });
-
-        //         .then((data) => {
-        //             return Blob.build(data, { type: `${mime};BASE64` })
-        //         })
-        //         .then((blob) => {
-        //             uploadBlob = blob
-        //             // return imageRef.put(blob, { contentType: mime })
-        //             return imageRef.put(blob._ref, { contentType: mime });
-        //         })
-        //         .then(() => {
-        //             uploadBlob.close()
-        //             return imageRef.getDownloadURL()
-        //         })
-        //         .then((url) => {
-        //             // URL of the image uploaded on Firebase storage
-        //             console.log(url);
-
-        //         })
-        //         .catch((error) => {
-        //             console.log(error);
-        //         })
-
-        // })
 
     }
 
@@ -320,15 +258,12 @@ export default class AddPropertyScreen extends Component<Props> {
 
         return (
             <Modal
-                // animationType="slide"
-
                 transparent={false}
                 visible={this.state.locationModal}
                 onRequestClose={() => {
                     Alert.alert('Modal has been closed.');
                 }}>
-                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                    {/* <View style={{ width: '90%',backgroundColor:'gray' }}> */}
+                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, paddingTop: 30 }}>
 
                     <GooglePlacesAutocomplete
                         placeholder='enter the property location'
@@ -344,9 +279,13 @@ export default class AddPropertyScreen extends Component<Props> {
                         onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
                             console.log(data, details);
                             console.log(data.description);
+                            console.log('details', details.geometry.location.lat);
+                            console.log('details', details.geometry.location.lng);
                             // this.setFilterModalVisible();
                             this.setState({
-                                location: data.description
+                                location: data.description,
+                                lat: details.geometry.location.lat,
+                                lon: details.geometry.location.lng
                             });
                             this.locationModalVisible(false);
                             // this.setValue(data);
@@ -359,8 +298,8 @@ export default class AddPropertyScreen extends Component<Props> {
                             key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
                             language: 'en', // language of the results
                             types: '(cities)', // default: 'geocode'
-                            region: "LK",
-                            components: 'country:lk'
+                            region: "Canada",
+                            components: 'country:ca'
                         }}
 
                         styles={{
@@ -409,8 +348,6 @@ export default class AddPropertyScreen extends Component<Props> {
                         </View>}
                     />
                 </View>
-
-                {/* </View> */}
 
             </Modal>
         );
@@ -542,15 +479,12 @@ export default class AddPropertyScreen extends Component<Props> {
         }).catch((error) => {
             console.log(error)
         });
-
-        // const user = firebase.auth().currentUser;
-        // this. getSelectedImages( this.state.images, user.uid, fbRef.key);
     }
+
 
     addToFirebaseDB(fbRef) {
 
         const user = firebase.auth().currentUser;
-
 
         db.ref(`Users/${user.uid}/UserProperties/${fbRef.key}`).set(true)
             .then(() => {
@@ -576,6 +510,8 @@ export default class AddPropertyScreen extends Component<Props> {
                             Condition: this.state.houseCondition,
                             Visible: this.state.isVisible,
                             images: this.state.imgUrlArr,
+                            lat: this.state.lat,
+                            lon: this.state.lon
                         })
                     .then(() => {
                         console.log('Inserted!!!');
@@ -590,8 +526,6 @@ export default class AddPropertyScreen extends Component<Props> {
                     }).catch((error) => {
                         console.log(error)
                     });
-
-
             });
     }
 
@@ -631,6 +565,41 @@ export default class AddPropertyScreen extends Component<Props> {
         // console.log(this.state.keyWordsArr)
     }
 
+    checkEmptyFields() {
+        const { title, description, price, owner, location, images, contactNumber } = this.state
+
+        if (images.length > 0) {
+            if (title != '') {
+                if (description != '') {
+                    if (price != '') {
+                        if (location != '') {
+                            if (owner != '') {
+                                if (contactNumber != '') {
+                                    // alert('success');
+                                    this.addNewProperty();
+                                } else {
+                                    alert('Please enter contact number');
+                                }
+                            } else {
+                                alert('Please enter the owner');
+                            }
+                        } else {
+                            alert('Please enter the location for the property');
+                        }
+                    } else {
+                        alert('Please enter price for the property');
+                    }
+                } else {
+                    alert('Please enter a description for the property');
+                }
+            } else {
+                alert('Please enter a title for the property');
+            }
+        } else {
+            alert('Please upload images of the property');
+        }
+    }
+
     render() {
 
         const { images: savedImages } = this.state;
@@ -638,16 +607,15 @@ export default class AddPropertyScreen extends Component<Props> {
 
         return (
 
-            <View style={styles.container}>
+            <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
                 {(this.state.loading) ?
-                    <View style={{flex:1}}>
+                    <View style={{ flex: 1 }}>
                         <ActivityIndicator
                             size='small'
                             color="#757575"
                             style={styles.activityIndicator}
                         />
                     </View>
-
 
                     :
 
@@ -710,15 +678,10 @@ export default class AddPropertyScreen extends Component<Props> {
                                         null
                                     }
 
-                                    {/* {this.state.image ? <View style={{}}>{this.renderImage(this.state.image)}</View> :
-                                    null
-                                } */}
-
                                 </ScrollView>
                             </View>
 
                         </View>
-
 
                         <View style={{ alignItems: 'flex-start', margin: 10, backgroundColor: '#ffffff' }}>
                             <View style={{ margin: 10, width: '90%' }}>
@@ -897,7 +860,7 @@ export default class AddPropertyScreen extends Component<Props> {
                             </View>
 
                             <View style={{ margin: 10, width: '90%' }}>
-                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size</Text>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size (Square Feet)</Text>
                                 <TextInput
                                     style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                     onChangeText={(landSize) => this.setState({ landSize })}
@@ -948,8 +911,6 @@ export default class AddPropertyScreen extends Component<Props> {
                                 />
                             </View>
 
-
-
                             <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
                                 <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>is Featured</Text>
                                 <View style={{ flex: 1, alignItems: 'flex-end' }}>
@@ -977,23 +938,14 @@ export default class AddPropertyScreen extends Component<Props> {
                         </View>
 
                     </ScrollView>
-
                 }
-
 
                 <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
                     <TouchableOpacity
                         onPress={() => {
-                            // this.setFilterModalVisible();
-                            // this.props.navigation.navigate('SearchResultView', {
-                            //     data: {
-                            //         ...this.state
-                            //     }
-                            // });
                             console.log('Add button clicked');
-                            this.addNewProperty();
-
-                            // this.props.navigation.navigate('ProfileScreen');
+                            // this.addNewProperty();
+                            this.checkEmptyFields();
                         }}
 
                     >
@@ -1001,12 +953,6 @@ export default class AddPropertyScreen extends Component<Props> {
                             backgroundColor: '#49141E', marginVertical: 7, flex: 1, marginHorizontal: 10, width: 300,
                             borderRadius: 7, alignItems: 'center', justifyContent: 'center'
                         }}>
-                            {/* <Icon
-                                name="search"
-                                type='MaterialIcons'
-                                size={30}
-                                color='white'
-                            /> */}
                             <Text style={{ color: 'white', fontWeight: '600' }}>Add</Text>
                         </View>
                     </TouchableOpacity>
@@ -1015,7 +961,7 @@ export default class AddPropertyScreen extends Component<Props> {
 
                 {this.renderLocationModal()}
 
-            </View>
+            </KeyboardAvoidingView>
 
         );
     }

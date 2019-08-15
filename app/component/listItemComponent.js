@@ -221,7 +221,7 @@ export default class ListItem extends Component<Props> {
                     <AntDesign
                         name="pause"
                         size={20}
-                        style={{ marginRight: 10 }}
+                        style={{ marginRight: 0 }}
                     />
 
                     {/* <Text style={{}}>pause</Text> */}
@@ -241,7 +241,7 @@ export default class ListItem extends Component<Props> {
                     <AntDesign
                         name="caretright"
                         size={20}
-                        style={{ marginRight: 10 }}
+                        style={{ marginRight: 0 }}
                     />
 
                     {/* <Text style={{}}>Play</Text> */}
@@ -266,7 +266,7 @@ export default class ListItem extends Component<Props> {
                 <AntDesign
                     name="edit"
                     size={20}
-                    style={{ marginRight: 10 }}
+                    style={{ marginRight: 0 }}
                 />
 
                 {/* <Text style={{}}>Edit</Text> */}
@@ -339,6 +339,7 @@ export default class ListItem extends Component<Props> {
                     </View>
 
                 </View>
+                <View style={{ borderBottomColor: '#757575', borderBottomWidth: 1, width: '100%', marginTop: 15}}></View>
 
             </TouchableOpacity>
         );
@@ -362,8 +363,8 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         position: 'absolute',
         right: -5,
-        top: 15,
-        flexDirection: 'row',
+        // top: 15,
+        // flexDirection: 'row',
         flex: 1,
         // backgroundColor:'blue'
     },

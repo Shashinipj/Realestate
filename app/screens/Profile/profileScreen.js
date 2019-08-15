@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage, Image, ScrollView, FlatList } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage, Image, ScrollView, FlatList, ImageBackground } from 'react-native';
 import { NavigationProp, NavigationEvents } from 'react-navigation';
 import firebase from 'react-native-firebase';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -114,7 +114,7 @@ export default class ProfileScreen extends Component<Props> {
                                     console.log("propObj", propObj);
                                     arrCont.push(propObj);
                                     // console.log('propObjNew.isVisible',propObjNew.isVisible);
-                                    console.log('arrCont.',arrCont);
+                                    console.log('arrCont.', arrCont);
 
                                     // this.setState({
                                     //     visibleAd: propObj.Visible
@@ -199,7 +199,7 @@ export default class ProfileScreen extends Component<Props> {
         );
     }
 
-    onPressPauseButton(PropId, PropAction){
+    onPressPauseButton(PropId, PropAction) {
         Alert.alert(
             'Pause',
             'Do you really want to Pause this advertisement?',
@@ -220,7 +220,7 @@ export default class ProfileScreen extends Component<Props> {
         );
     }
 
-    onPressShowButton(PropId, PropAction){
+    onPressShowButton(PropId, PropAction) {
         Alert.alert(
             'Show',
             'Do you really want to Show this advertisement?',
@@ -272,36 +272,36 @@ export default class ProfileScreen extends Component<Props> {
             });
     }
 
-    pauseAdvertisement(propertyID, adType){
+    pauseAdvertisement(propertyID, adType) {
         db.ref(`PropertyType/${adType}/Property/${propertyID}`)
-                        .update(
-                            {
-                                Visible: false
-                            }).then({
+            .update(
+                {
+                    Visible: false
+                }).then({
 
-                            }).catch((error) => {
-                                console.log(error)
-                            });
+                }).catch((error) => {
+                    console.log(error)
+                });
 
     }
 
-    showAdvertisement(propertyID, adType){
+    showAdvertisement(propertyID, adType) {
         db.ref(`PropertyType/${adType}/Property/${propertyID}`)
-                        .update(
-                            {
-                                Visible: true
-                            }).then({
+            .update(
+                {
+                    Visible: true
+                }).then({
 
-                            }).catch((error) => {
-                                console.log(error)
-                            });
+                }).catch((error) => {
+                    console.log(error)
+                });
 
     }
 
     renderProfileView() {
         if (!this.state.loggedIn) {
             return (
-                <View style={[styles.buttonContainer, { justifyContent: 'center', backgroundColor:'#ffffff' }]}>
+                <View style={[styles.buttonContainer, { justifyContent: 'center', backgroundColor: '#ffffff' }]}>
                     <Text style={{ textAlign: 'center', fontWeight: '400', fontSize: 15, color: '#000000' }}>
                         Please Login to see user details
                         </Text>
@@ -310,8 +310,9 @@ export default class ProfileScreen extends Component<Props> {
                         <TouchableOpacity onPress={() => {
                             this.props.navigation.navigate('Search');
                         }}>
-                            <View style={[styles.buttons, {width: '25%', height: 30, alignContent:'center',  backgroundColor: '#f3d500',}]}>
-                                <Text style={[styles.buttonText, {fontSize: 15}]}>
+                            {/* <View style={[styles.buttons, {width: '25%', height: 30, alignContent:'center',  backgroundColor: '#f3d500',}]}> */}
+                            <View style={[styles.buttons, { width: '25%', height: 30, alignContent: 'center', backgroundColor: '#212121', }]}>
+                                <Text style={[styles.buttonText, { fontSize: 15 }]}>
                                     Home
                                 </Text>
                             </View>
@@ -327,14 +328,19 @@ export default class ProfileScreen extends Component<Props> {
 
             return (
                 <View style={styles.buttonContainer}>
-                    <View style={{ justifyContent: 'flex-start', backgroundColor: '#49141E' }}>
-                        <View style={{ width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
-                            <Image source={require('../../assets/images/owner.jpg')} style={{ width: 120, height: 120, borderRadius: 60, borderColor: '#ffffff', borderWidth: 2, }} />
+                    {/* <View style={{ justifyContent: 'flex-start', backgroundColor: '#49141E' }}> */}
+                    <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{  }}>
+                        <View style={{ justifyContent: 'flex-start' }}>
+                            <View style={{ width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20, 
+                        backgroundColor:'#ffffff', padding: 0}}>
+                                <Image source={require('../../assets/images/owner2.png')} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
+                            </View>
+
+                            {/* <Text style={{ color: '#ffffff', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>Robin Peiterson</Text> */}
+                            <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>Theepan Muthulingam</Text>
+
                         </View>
-
-                        <Text style={{ color: '#ffffff', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>Robin Peiterson</Text>
-
-                    </View>
+                    </ImageBackground>
 
 
                     <View style={{ backgroundColor: '#ffffff', flex: 1, justifyContent: 'center' }}>
@@ -343,10 +349,11 @@ export default class ProfileScreen extends Component<Props> {
                             style={{ flex: 1, backgroundColor: '#ffffff', flexDirection: 'column-reverse' }}
                             indicator={this.renderTabIndicator()}
                         >
-                            <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', alignContent:'center', paddingLeft: 30}}>
+                            <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', alignContent: 'center', paddingLeft: 30 }}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        <Meticon name="email-outline" size={25} style={{ color: '#49141E' }} />
+                                        {/* <Meticon name="email-outline" size={25} style={{ color: '#49141E' }} /> */}
+                                        <Meticon name="email-outline" size={25} style={{ color: '#212121' }} />
                                     </View>
                                     <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text>
                                     {/* <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>robinpeiter@gmail.com</Text> */}
@@ -355,7 +362,8 @@ export default class ProfileScreen extends Component<Props> {
 
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        <Meticon name="phone" size={25} style={{ color: '#49141E' }} />
+                                        {/* <Meticon name="phone" size={25} style={{ color: '#49141E' }} /> */}
+                                        <Meticon name="phone" size={25} style={{ color: '#212121' }} />
                                     </View>
                                     <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>+94 77 1111111</Text>
 
@@ -363,7 +371,8 @@ export default class ProfileScreen extends Component<Props> {
 
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        <Octicons name="location" size={25} style={{ color: '#49141E' }} />
+                                        {/* <Octicons name="location" size={25} style={{ color: '#49141E' }} /> */}
+                                        <Octicons name="location" size={25} style={{ color: '#212121' }} />
                                     </View>
                                     <Text style={{ fontSize: 15, fontWeight: '400', justifyContent: 'center', color: 'grey', alignSelf: 'center' }}>Colombo</Text>
 
@@ -435,9 +444,12 @@ export default class ProfileScreen extends Component<Props> {
                                             this.props.navigation.navigate('AddPropertyScreen');
                                         }}>
 
-                                            <View style={{ height: 50, backgroundColor: '#f3d500', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-                                                <Ionicon name="md-add-circle" size={30} color='#49141E' />
-                                                <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add new property</Text>
+                                            {/* <View style={{ height: 50, backgroundColor: '#f3d500', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}> */}
+                                            <View style={{ height: 50, backgroundColor: '#bdbdbd', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                                                {/* <Ionicon name="md-add-circle" size={30} color='#49141E' /> */}
+                                                <Ionicon name="md-add-circle" size={30} color='#212121' />
+                                                {/* <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add new property</Text> */}
+                                                <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#212121' }}>Add new property</Text>
                                             </View>
                                         </TouchableOpacity>
 
@@ -463,8 +475,8 @@ export default class ProfileScreen extends Component<Props> {
                     <TouchableOpacity style={{ backgroundColor: '#ffffff' }} onPress={() => {
                         this.onPressSignOutButton();
                     }}>
-                        <View style={styles.buttons}>
-                            <Text style={styles.buttonText}>
+                        <View style={[styles.buttons, { backgroundColor: '#bdbdbd' }]}>
+                            <Text style={[styles.buttonText, { color: '#212121' }]}>
                                 Sign Out
                                 </Text>
                         </View>
@@ -491,9 +503,11 @@ export default class ProfileScreen extends Component<Props> {
                 // selectedIconSource: require('../imgs/ic_tab_my_click.png')
             }];
             return <PagerTabIndicator tabs={tabs}
-                style={{ backgroundColor: '#49141E', borderTopWidth: 0 }}
-                textStyle={{ fontSize: 15, color: 'white', paddingBottom: 10 }}
-                selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
+                // style={{ backgroundColor: '#49141E', borderTopWidth: 0 }}
+                style={{ backgroundColor: '#212121', borderTopWidth: 0 }}
+                textStyle={{ fontSize: 15, color: '#9e9e9e', paddingBottom: 10 }}
+                // selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
+                selectedTextStyle={{ fontSize: 15, color: '#ffffff' }}
             />;
         }
 
@@ -504,9 +518,10 @@ export default class ProfileScreen extends Component<Props> {
                 text: 'Settings',
             }];
             return <PagerTabIndicator tabs={tabs}
-                style={{ backgroundColor: '#49141E', borderTopWidth: 0 }}
-                textStyle={{ fontSize: 15, color: 'white', paddingBottom: 10 }}
-                selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
+                style={{ backgroundColor: '#212121', borderTopWidth: 0 }}
+                textStyle={{ fontSize: 15, color: '#9e9e9e', paddingBottom: 10 }}
+                // selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
+                selectedTextStyle={{ fontSize: 15, color: '#ffffff' }}
             />;
         }
     }
@@ -590,17 +605,18 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         height: 40,
         justifyContent: 'center',
-        
+
     },
     buttonContainer: {
         flex: 1,
         alignContent: 'center',
-        backgroundColor: '#49141E',
+        // backgroundColor: '#e0e0e0',
         // justifyContent: 'center',
         // backgroundColor:'green'
     },
     buttonText: {
-        color: '#49141E',
+        // color: '#49141E',
+        color: '#ffffff',
         fontWeight: '500',
         textAlign: 'center',
         fontSize: 17

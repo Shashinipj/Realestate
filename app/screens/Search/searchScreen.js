@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
     View, StyleSheet, TextInput, Image, Text, TouchableOpacity,
-    Dimensions, Animated, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator
+    Dimensions, Animated, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator, SafeAreaView,
+    RefreshControl, NativeSyntheticEvent, NativeScrollEvent, ImageBackground
 } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
@@ -46,7 +47,9 @@ export default class SearchScreen extends Component {
 
             loading: true,
             scroll: false,
-            uid: ''
+            uid: '',
+
+            refreshing: false
         };
 
         // this.forgotPassword_Modal = this.forgotPassword_Modal.bind(this);
@@ -60,34 +63,41 @@ export default class SearchScreen extends Component {
 
         });
 
-        let buyProperties = [];
-        let rentProperties = [];
-        let featuredProps = [];
+        this.loadData();
+    }
 
-        PropRef.on('value', (snapshot) => {
-            // console.log("VAL ", snapshot);
+    loadData() {
 
-            const propTypes = snapshot.val();
+        return new Promise((resolve, reject) => {
+            let buyProperties = [];
+            let rentProperties = [];
+            let featuredProps = [];
 
-            for (const propTypeId in propTypes) {
-                const propTypeObj = propTypes[propTypeId];
+            PropRef.once('value', (snapshot) => {
+                // console.log("VAL ", snapshot);
 
-                if (propTypeObj.Property) {
-                    for (const propId in propTypeObj.Property) {
-                        const propObj = propTypeObj.Property[propId];
-                        if (propObj.PropAction == 1) {
-                            buyProperties.push(propObj);
-                            // console.log(buyProperties);
+                const propTypes = snapshot.val();
+
+                for (const propTypeId in propTypes) {
+                    const propTypeObj = propTypes[propTypeId];
+
+                    if (propTypeObj.Property) {
+                        for (const propId in propTypeObj.Property) {
+                            const propObj = propTypeObj.Property[propId];
+                            if (propObj.PropAction == 1) {
+                                buyProperties.push(propObj);
+                                // console.log(buyProperties);
+                            }
+                            if (propObj.PropAction == 2) {
+                                rentProperties.push(propObj);
+                                // console.log(rentProperties);
+                            }
+                            if (propObj.isFeatured == true) {
+                                featuredProps.push(propObj);
+                            }
                         }
-                        if (propObj.PropAction == 2) {
-                            rentProperties.push(propObj);
-                            // console.log(rentProperties);
-                        }
-                        if (propObj.isFeatured == true) {
-                            featuredProps.push(propObj);
-                        }
+
                     }
-
                 }
 
                 this.setState({
@@ -95,11 +105,14 @@ export default class SearchScreen extends Component {
                     propertiesRent: rentProperties,
                     featuredList: featuredProps,
                     loading: false
+                }, () => {
+                    resolve();
                 });
 
-            }
-
+            });
         });
+
+
     }
 
     fetchUser(user) {
@@ -227,7 +240,7 @@ export default class SearchScreen extends Component {
                 if (e.code == 'auth/user-not-found') {
                     alert('You are not a registered user');
                 }
-                else if(e.code == 'auth/invalid-email'){
+                else if (e.code == 'auth/invalid-email') {
                     alert('The email address is badly formatted');
                 }
             })
@@ -320,7 +333,8 @@ export default class SearchScreen extends Component {
                             this.setModalVisible(!this.state.modalVisible);
                         }}
                     >
-                        <Text style={{ textAlign: 'center', color: '#49141E', fontWeight: '600' }}>Login</Text>
+                        {/* <Text style={{ textAlign: 'center', color: '#49141E', fontWeight: '600' }}>Login</Text> */}
+                        <Text style={{ textAlign: 'center', color: '#ffffff', fontWeight: '600' }}>Login</Text>
 
                     </TouchableOpacity>
                 </View>
@@ -432,15 +446,30 @@ export default class SearchScreen extends Component {
                     </View>
                 );
             }
-
         }
+    }
+
+    onRefresh() {
+        this.setState({
+            refreshing: true,
+            // loading: false
+        });
+        this.loadData()
+            .then(() => {
+                this.setState({
+                    refreshing: false,
+                    // loading: false
+                });
+            });
+
+
     }
 
     renderSignUpSignInView() {
         if (!this.state.signUpVisible) {
 
             return (
-                <View style={{ alignItems: "center" }} >
+                <View style={{ alignItems: "center", }} >
                     <View style={{ width: '100%' }}>
                         <TouchableOpacity style={styles.loginButton}
                             onPress={this.onSignInButtonPress.bind(this)}
@@ -450,20 +479,27 @@ export default class SearchScreen extends Component {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity style={{ margin: 20 }} onPress={() => {
-                        this.forgotPassword_Modal(true);
-                        // this.setModalVisible(false);
-                    }
-                    }>
-                        <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text>
-                    </TouchableOpacity>
 
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ color: '#616161', fontSize: 12 }}>Don't have an account? {' '}</Text>
-                        <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                            <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Register</Text>
+                    <View style={{}}>
+                        <TouchableOpacity style={{ margin: 20 }} onPress={() => {
+                            this.forgotPassword_Modal(true);
+                            // this.setModalVisible(false);
+                        }
+                        }>
+                            {/* <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text> */}
+                            <Text style={{ color: '#212121', fontSize: 12, fontWeight: '600' }}>Forgot your password?</Text>
                         </TouchableOpacity>
+
+                        <View style={{ flexDirection: 'row' }}>
+                            {/* <Text style={{ color: '#616161', fontSize: 12 }}>Don't have an account? {' '}</Text> */}
+                            <Text style={{ color: '#eeeeee', fontSize: 12, fontWeight: '700' }}>Don't have an account? {' '}</Text>
+                            <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
+                                {/* <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Register</Text> */}
+                                <Text style={{ color: '#212121', fontSize: 12, fontWeight: '600' }}>Register</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
+
                 </View>
             );
         }
@@ -481,9 +517,11 @@ export default class SearchScreen extends Component {
                     {/* <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text> */}
 
                     <View style={{ flexDirection: 'row', margin: 20 }}>
-                        <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text>
+                        {/* <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text> */}
+                        <Text style={{ color: '#eeeeee', fontSize: 12, fontWeight: '700'  }}>Already have an account? {' '}</Text>
                         <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                            <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
+                            {/* <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Sign in</Text> */}
+                            <Text style={{ color: '#212121', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -505,138 +543,199 @@ export default class SearchScreen extends Component {
                 onRequestClose={() => {
                     Alert.alert('Modal has been closed.');
                 }}>
-                <View style={{ marginTop: 22, backgroundColor: '#f3d500' }}>
+                {/* <View style={{ marginTop: 22, backgroundColor: '#f3d500' }}> */}
 
-                    <TouchableOpacity
-                        style={{
-                            // backgroundColor: "red",
-                            alignSelf: "flex-start",
-                            padding: 10
-                        }}
-                        onPress={() => {
-                            this.setModalVisible(!this.state.modalVisible);
-                            // this.onLoginSuccess.bind(this);
-                            this.loginReset.bind(this)();
-                        }}>
+                {/* <ImageBackground source={require('../../assets/images/skycraper.jpg')} style={{height:'100%', width:'100%'}}> */}
+                <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{ height: '100%', width: '100%' }}>
 
-                        <Icon
-                            name="close"
-                            type='MaterialIcons'
-                            size={20}
-                        />
+                    <View style={{ marginTop: 22 }}>
 
-                    </TouchableOpacity>
-                </View>
-
-                <View style={styles.modalContainer}>
-                    <Image source={require('../../assets/images/rtcl.png')} style={styles.image} />
-                    {/* <View style={{backgroundColor:'yellow', marginVertical: 5}}> */}
-                    <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
-                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
-                            <Icon
-                                name="email"
-                                type='MaterialIcons'
-                                size={20}
-                                color='gray'
-                            />
-                            <TextInput
-                                label="Email"
-                                value={this.state.email}
-                                style={styles.textinput}
-                                secureTextEntry={false}
-                                onChangeText={email => this.setState({ email })}
-                                editable={true}
-                                maxLength={40}
-                                placeholder='Email address' />
-                        </View>
-
-                        <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
-
-                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                        <TouchableOpacity
+                            style={{
+                                // backgroundColor: "red",
+                                alignSelf: "flex-start",
+                                padding: 10
+                            }}
+                            onPress={() => {
+                                this.setModalVisible(!this.state.modalVisible);
+                                // this.onLoginSuccess.bind(this);
+                                this.loginReset.bind(this)();
+                            }}>
 
                             <Icon
-                                name="lock"
+                                name="close"
                                 type='MaterialIcons'
                                 size={20}
-                                color='gray'
                             />
-                            <TextInput
-                                label="Password"
-                                value={this.state.password}
-                                style={styles.textinput}
-                                onChangeText={password => this.setState({ password })}
-                                editable={true}
-                                maxLength={40}
-                                placeholder='Password'
-                                secureTextEntry={true} />
 
-                        </View>
-                    </View>
-
-                    <View style={{ width: "70%" }}>
-                        {this.renderSignUpSignInView()}
-                    </View>
-
-                    <Text style={styles.errorTextStyle} >
-                        {this.state.error}
-                    </Text>
-
-                    <Text style={styles.errorTextStyle} >
-                        {this.state.success}
-                    </Text>
-
-                    <View style={styles.footerView}>
-                        <TouchableOpacity>
-                            <Text style={{ fontSize: 12, color: '#616161' }}> Personal information collection statement</Text>
                         </TouchableOpacity>
                     </View>
 
-                </View>
-                {this.renderForgotPasswordModal()}
+                    <View style={styles.modalContainer}>
+                        <Image source={require('../../assets/images/muthu.png')} style={styles.image} />
+                        {/* <View style={{backgroundColor:'yellow', marginVertical: 5}}> */}
+                        <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
+                            <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                                <Icon
+                                    name="email"
+                                    type='MaterialIcons'
+                                    size={20}
+                                    color='gray'
+                                />
+                                <TextInput
+                                    label="Email"
+                                    value={this.state.email}
+                                    style={styles.textinput}
+                                    secureTextEntry={false}
+                                    onChangeText={email => this.setState({ email })}
+                                    editable={true}
+                                    maxLength={40}
+                                    placeholder='Email address' />
+                            </View>
 
+                            <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
 
+                            <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+
+                                <Icon
+                                    name="lock"
+                                    type='MaterialIcons'
+                                    size={20}
+                                    color='gray'
+                                />
+                                <TextInput
+                                    label="Password"
+                                    value={this.state.password}
+                                    style={styles.textinput}
+                                    onChangeText={password => this.setState({ password })}
+                                    editable={true}
+                                    maxLength={40}
+                                    placeholder='Password'
+                                    secureTextEntry={true} />
+
+                            </View>
+                        </View>
+
+                        <View style={{ width: "70%" }}>
+                            {this.renderSignUpSignInView()}
+                        </View>
+
+                        <Text style={styles.errorTextStyle} >
+                            {this.state.error}
+                        </Text>
+
+                        <Text style={styles.errorTextStyle} >
+                            {this.state.success}
+                        </Text>
+
+                        <View style={styles.footerView}>
+                            <TouchableOpacity>
+                                <Text style={{ fontSize: 12, color: '#616161' }}> Personal information collection statement</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+                    {this.renderForgotPasswordModal()}
+
+                </ImageBackground>
             </Modal>
         );
     }
 
+    /**
+     * 
+     * @param {NativeSyntheticEvent<NativeScrollEvent>} event 
+     */
     onScroll(event) {
 
         if (event && event.nativeEvent) {
             const offset = event.nativeEvent.contentOffset;
 
-            if (offset.y <= 0) {
+            console.log(offset);
+
+            // if (offset.y <= 10) {
+            //     if (this.state.scroll) {
+            //         this.setState({
+            //             scroll: false
+            //         });
+            //     }
+            // }
+            // else if (offset.y > 0) {
+            //     if (!this.state.scroll) {
+            //         this.setState({
+            //             scroll: true
+            //         });
+            //     }
+            // }
+
+
+            if (offset.y > 10) {
+                if (!this.state.scroll) {
+                    this.setState({
+                        scroll: true
+                    });
+                }
+            }
+            else {
                 this.setState({
                     scroll: false
-                });
-            }
-            else if (offset.y > 0) {
-
-                this.setState({
-                    scroll: true
                 });
             }
         }
     }
 
     renderAddNewProperty() {
+        if (this.state.refreshing) {
+            return null;
+        }
+
         if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
 
-            if (!this.state.scroll) {
-                return (
-                    <TouchableOpacity
-                        style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 60 }}
-                        onPress={() => {
-                            this.props.navigation.navigate('AddPropertyScreen');
-                        }}>
+            // if (!this.state.scroll) {
+            return (
+                <TouchableOpacity
+                    // style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 105 }}
+                    style={{ backgroundColor: 'green', flex: 1, width: '100%' }}
+                    onPress={() => {
+                        this.props.navigation.navigate('AddPropertyScreen');
+                    }}>
 
-                        <View style={styles.addNewPropertyView}>
-                            <Ionicon name="md-add-circle" size={30} color='#49141E' />
-                            <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add Property</Text>
-                        </View>
-                    </TouchableOpacity>);
-            }
+                    <View style={styles.addNewPropertyView}>
+                        {/* <Ionicon name="md-add-circle" size={30} color='#49141E' /> */}
+                        <Ionicon name="md-add-circle" size={30} color='#ffffff' />
+                        {/* <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add Property</Text> */}
+                        <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#ffffff' }}>Add Property</Text>
+                    </View>
+                </TouchableOpacity>);
+            // }
 
-            else {
+            // else {
+            //     return (
+            //         <TouchableOpacity
+            //             style={styles.addNewSubButton}
+            //             onPress={() => {
+            //                 this.props.navigation.navigate('AddPropertyScreen');
+            //             }}
+            //         >
+            //             <Ionicon name="md-add" size={20} color='#000000' />
+            //             <Text style={{ marginLeft: 5, fontWeight: '600' }}>Add</Text>
+            //         </TouchableOpacity>
+            //     );
+            // }
+
+        }
+
+        return null;
+    }
+
+    renderAddNewProperty2() {
+        if (this.state.refreshing) {
+            return null;
+        }
+
+        if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+
+            if (this.state.scroll) {
                 return (
                     <TouchableOpacity
                         style={styles.addNewSubButton}
@@ -645,27 +744,24 @@ export default class SearchScreen extends Component {
                         }}
                     >
                         <Ionicon name="md-add" size={20} color='#000000' />
-                        <Text style={{ marginLeft: 5, fontWeight:'600' }}>Add</Text>
+                        <Text style={{ marginLeft: 5, fontWeight: '600' }}>Add</Text>
                     </TouchableOpacity>
                 );
             }
 
         }
 
-        else {
-            return null;
-        }
-
+        return null;
     }
 
     render() {
 
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
 
                 {/* <ScrollView> */}
 
-                <View style={{ paddingTop: 20 }}>
+                <View style={{}}>
                     <View style={styles.searchBarView}>
 
                         <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
@@ -686,8 +782,18 @@ export default class SearchScreen extends Component {
                     </View>
                 </View>
 
-                <ScrollView onScroll={this.onScroll.bind(this)} style={{}}>
+                <ScrollView onScroll={this.onScroll.bind(this)} style={{}}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                this.onRefresh();
+                            }}
+                        />
+                    }
+                >
 
+                    {this.renderAddNewProperty()}
                     {this.loginScreenImage()}
 
                     <View style={styles.bottomContainer}>
@@ -699,12 +805,12 @@ export default class SearchScreen extends Component {
                 </ScrollView>
 
 
-                {this.renderAddNewProperty()}
+                {this.renderAddNewProperty2()}
 
                 {this.showJoinModal()}
 
 
-            </View>
+            </SafeAreaView>
         );
     }
 }
@@ -713,7 +819,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // backgroundColor: '#E0E0E0',
-        paddingTop: 10
+        // paddingTop: 30
     },
     imageTop: {
         width: '100%',
@@ -732,7 +838,8 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     joinButton: {
-        backgroundColor: '#f3d500',
+        // backgroundColor: '#f3d500',
+        backgroundColor: '#212121',
         width: '40%',
         height: 30,
         borderRadius: 4,
@@ -755,15 +862,17 @@ const styles = StyleSheet.create({
 
     //modal styles
     modalContainer: {
-        backgroundColor: '#f3d500',
+        // backgroundColor: '#f3d500',
+        // backgroundColor: '#757575',
         flex: 1,
         alignItems: 'center',
-        paddingTop: 100
+        paddingTop: 50
     },
     image: {
         width: 200,
         height: 100,
         resizeMode: 'contain',
+        marginBottom: 50
 
     },
     textinput: {
@@ -773,7 +882,8 @@ const styles = StyleSheet.create({
     },
     loginButton: {
         // backgroundColor: '#C62828',
-        backgroundColor: '#49141E',
+        // backgroundColor: '#49141E',
+        backgroundColor: '#212121',
         width: '100%',
         height: 30,
         borderRadius: 4,
@@ -806,7 +916,8 @@ const styles = StyleSheet.create({
     },
     addNewPropertyView: {
         height: 50,
-        backgroundColor: '#f3d500',
+        // backgroundColor: '#f3d500',
+        backgroundColor: '#757575',
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
@@ -823,7 +934,7 @@ const styles = StyleSheet.create({
         width: 70,
         borderRadius: 15,
         right: 15,
-        top: 100,
+        top: 130,
         zIndex: 5,
     }
 

@@ -697,7 +697,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         </View>
 
                         <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size</Text>
+                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size(Square Feet)</Text>
                             <TextInput
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
                                 onChangeText={(landSize) => this.setState({ landSize })}
