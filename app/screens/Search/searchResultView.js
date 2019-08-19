@@ -316,6 +316,7 @@ export default class SearchResultView extends Component<Props> {
 
                     return 0;
                 });
+
             }
 
             // for(const i in this.state.collectionListProperties){

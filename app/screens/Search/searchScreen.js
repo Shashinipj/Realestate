@@ -366,7 +366,7 @@ export default class SearchScreen extends Component {
                         />
                     }
 
-                    <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties to Buy in Sri Lanka</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties for Sale </Text>
                     {(this.state.loading) ?
                         <View style={styles.loader}>
                             <ActivityIndicator
@@ -387,7 +387,7 @@ export default class SearchScreen extends Component {
                     }
 
 
-                    <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties for Rent in Sri Lanka</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties for Rent </Text>
 
                     {(this.state.loading) ?
                         <View style={styles.loader}>
@@ -434,7 +434,7 @@ export default class SearchScreen extends Component {
         else {
             if (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
                 return (
-                    <View style={{ paddingTop: 50 }}>
+                    <View style={{ }}>
                         <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
                     </View>
                 );
@@ -518,7 +518,7 @@ export default class SearchScreen extends Component {
 
                     <View style={{ flexDirection: 'row', margin: 20 }}>
                         {/* <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text> */}
-                        <Text style={{ color: '#eeeeee', fontSize: 12, fontWeight: '700'  }}>Already have an account? {' '}</Text>
+                        <Text style={{ color: '#eeeeee', fontSize: 12, fontWeight: '700' }}>Already have an account? {' '}</Text>
                         <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
                             {/* <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Sign in</Text> */}
                             <Text style={{ color: '#212121', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
@@ -696,11 +696,12 @@ export default class SearchScreen extends Component {
                 <TouchableOpacity
                     // style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 105 }}
                     style={{ backgroundColor: 'green', flex: 1, width: '100%' }}
+                    // style={styles.addNewPropertyView}
                     onPress={() => {
                         this.props.navigation.navigate('AddPropertyScreen');
+                        console.log("touchableOpacity test add new");
                     }}>
-
-                    <View style={styles.addNewPropertyView}>
+                    <View style={[styles.addNewPropertyView, {}]}>
                         {/* <Ionicon name="md-add-circle" size={30} color='#49141E' /> */}
                         <Ionicon name="md-add-circle" size={30} color='#ffffff' />
                         {/* <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add Property</Text> */}
@@ -748,7 +749,6 @@ export default class SearchScreen extends Component {
                     </TouchableOpacity>
                 );
             }
-
         }
 
         return null;
@@ -921,7 +921,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-        position: 'absolute',
+        // position: 'absolute',
         width: '100%'
     },
     addNewSubButton: {
