@@ -519,7 +519,7 @@ export default class AddPropertyScreen extends Component<Props> {
                         this.setState({
                             loading: false
                         });
-
+                        alert("Succefully Added!");
                         this.resetPropertyView();
 
                         this.props.navigation.pop();

@@ -7,7 +7,7 @@ import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 import Switch from 'react-native-switch-pro'
 import Ionicon from 'react-native-vector-icons/Ionicons';
-import { db } from '../../Database/db';
+import { db, fbStorage } from '../../Database/db';
 import ListItem from '../../component/listItemComponent'
 
 let PropRef = db.ref('/PropertyType');
@@ -83,53 +83,46 @@ export default class ProfileScreen extends Component<Props> {
                 //     myProperties: arrCont,
                 //     // loading: false
                 // });
-            });
 
-            db.ref('/PropertyType').on('value', (snapshot) => {
-                const propTypes = snapshot.val();
+                db.ref('/PropertyType').on('value', (snapshot) => {
+                    const propTypes = snapshot.val();
 
-                /**
-                 * @type {arrCont[]}
-                 */
-                const arrCont = [];
-                let propVisible = ''
-                for (const i in this.userProperties) {
-                    for (const propTypeId in propTypes) {
-                        const propTypeObj = propTypes[propTypeId];
+                    /**
+                     * @type {arrCont[]}
+                     */
+                    const arrCont = [];
+                    let propVisible = ''
+                    for (const i in this.userProperties) {
+                        for (const propTypeId in propTypes) {
+                            const propTypeObj = propTypes[propTypeId];
 
-                        if (propTypeObj.Property) {
-                            for (const propId in propTypeObj.Property) {
-                                const propObj = propTypeObj.Property[propId];
-                                propVisible = propObj.Visible;
-                                // console.log('propObj.Visible',propObj.Visible);
+                            if (propTypeObj.Property) {
+                                for (const propId in propTypeObj.Property) {
+                                    const propObj = propTypeObj.Property[propId];
+                                    propVisible = propObj.Visible;
+                                    // console.log('propObj.Visible',propObj.Visible);
 
-                                if (propId == i) {
+                                    if (propId == i) {
+                                        console.log("propObj", propObj);
+                                        arrCont.push(propObj);
+                                        // console.log('propObjNew.isVisible',propObjNew.isVisible);
+                                        console.log('arrCont.', arrCont);
 
-                                    // const propObjNew = {
-                                    //     ...propObj,
-
-                                    //     isVisible: false
-                                    // };
-                                    // propObjNew.isVisible = propObj.Visible;
-                                    console.log("propObj", propObj);
-                                    arrCont.push(propObj);
-                                    // console.log('propObjNew.isVisible',propObjNew.isVisible);
-                                    console.log('arrCont.', arrCont);
-
-                                    // this.setState({
-                                    //     visibleAd: propObj.Visible
-                                    // });
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                this.setState({
-                    myProperties: arrCont,
-                    // loading: false
+                    this.setState({
+                        myProperties: arrCont,
+                        // loading: false
+                    });
+
                 });
 
             });
+
+
         }
 
     }
@@ -260,12 +253,37 @@ export default class ProfileScreen extends Component<Props> {
 
                 const user = firebase.auth().currentUser;
 
+                // firebase.storage().ref(`PropImages/${propertyID}`).delete().then(() => {
+
                 db.ref(`Users/${user.uid}/UserProperties/${propertyID}`).remove()
                     .then(() => {
                         if (this.userProperties[propertyID] != undefined) {
                             delete this.userProperties[propertyID];
                         }
-                        console.log('Deleted!!');
+
+                        let imagePathArr = [];
+
+                        fbStorage.ref(`PropImages/${propertyID}`).listAll()
+                            .then((list) => {
+                                console.log(list);
+                                imagePathArr = list.items;
+                                for (const i in imagePathArr) {
+                                    console.log(imagePathArr[i].fullPath);
+
+                                    fbStorage.ref(imagePathArr[i].fullPath)
+                                        .delete()
+                                        .then((tt) => {
+                                            // deleted
+                                            console.log('Deleted!!', tt);
+                                            alert('successfully removed!');
+                                        })
+                                        .catch((deleteError) => {
+                                            // deletion error
+                                            console.log('deletion error', deleteError);
+                                        });
+                                }
+                            })
+
                     }).catch((error) => {
                         console.log(error)
                     });
@@ -329,10 +347,12 @@ export default class ProfileScreen extends Component<Props> {
             return (
                 <View style={styles.buttonContainer}>
                     {/* <View style={{ justifyContent: 'flex-start', backgroundColor: '#49141E' }}> */}
-                    <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{  }}>
+                    <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{}}>
                         <View style={{ justifyContent: 'flex-start' }}>
-                            <View style={{ width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20, 
-                        backgroundColor:'#ffffff', padding: 0}}>
+                            <View style={{
+                                width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20,
+                                backgroundColor: '#ffffff', padding: 0
+                            }}>
                                 <Image source={require('../../assets/images/owner2.png')} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                             </View>
 

@@ -23,13 +23,13 @@ export default class SearchResultView extends Component<Props> {
 
     static navigationOptions({ navigation }) {
         return {
-            headerRight: <TouchableOpacity onPress={() => {
+            headerLeft: <TouchableOpacity onPress={() => {
                 navigation.navigate('Search');
             }}>
                 <AntDesign
                     name="home"
                     size={24}
-                    style={{ marginRight: 10 }}
+                    style={{ marginHorizontal: 20 }}
                 />
             </TouchableOpacity>
         };
