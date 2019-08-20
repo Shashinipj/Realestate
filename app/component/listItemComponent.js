@@ -4,6 +4,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Accounting from 'accounting-js';
+import { db } from '../Database/db';
 
 
 type Props = {
@@ -65,12 +66,9 @@ export default class ListItem extends Component<Props> {
         onPressEdit: () => null
     };
 
-
-
     static navigationOptions = {
         header: null
     };
-
 
     constructor() {
         super();
@@ -133,7 +131,6 @@ export default class ListItem extends Component<Props> {
         }
     }
 
-
     renderIcon_Heart() {
         const { data1, showFavouriteIcon, enableFavouriteIcon, favouriteMarked } = this.props;
 
@@ -170,11 +167,8 @@ export default class ListItem extends Component<Props> {
                         style={{ marginRight: 0 }}
                     />
                 </TouchableOpacity>
-
             );
         }
-
-
     }
 
     renderIcon_Delete() {
@@ -226,7 +220,6 @@ export default class ListItem extends Component<Props> {
 
                     {/* <Text style={{}}>pause</Text> */}
                 </TouchableOpacity>
-
             );
         }
 
@@ -237,7 +230,6 @@ export default class ListItem extends Component<Props> {
                     onPress={this.onPress_Show}
                     style={{ padding: 3 }}
                 >
-
                     <AntDesign
                         name="caretright"
                         size={20}
@@ -271,7 +263,6 @@ export default class ListItem extends Component<Props> {
 
                 {/* <Text style={{}}>Edit</Text> */}
             </TouchableOpacity>
-
         );
     }
 

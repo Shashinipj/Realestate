@@ -182,6 +182,7 @@ export default class SearchResultView extends Component<Props> {
         let priceRange = maxPrice - minPrice;
         let landSize = propData.landSize;
         let featureKeywords = propData.keyWords;
+        let viewport = propData.viewport;
 
         // console.log(this.props.navigation.state.params.data);
 
@@ -200,80 +201,82 @@ export default class SearchResultView extends Component<Props> {
                     for (const propId in propTypeObj.Property) {
                         const propObj = propTypeObj.Property[propId];
 
+                        // if (location == '' || propObj.Address == location) {
+                        if (viewport == null || (propObj.lat <= viewport.northeast.lat + 0.04) && (propObj.lat >= viewport.southwest.lat - 0.04)) {
 
-                        if (location == '' || propObj.Address == location) {
+                            if (viewport == null || (propObj.lon <= viewport.northeast.lng + 0.04) && (propObj.lon >= viewport.southwest.lng - 0.04)) {
 
-                            if (actionType == null || propObj.PropAction == actionType) {
-                                console.log("test");
+                                if (actionType == null || propObj.PropAction == actionType) {
+                                    // console.log("test");
+                                    // console.log('propObj.lat', propObj.lat);
+                                    // console.log('viewport.northeast.lat', viewport.northeast.lat);
+                                    // console.log('viewport.southwest.lat', viewport.southwest.lat);
+                                    // console.log('viewport.northeast.lat + 0.04', viewport.northeast.lat + 0.04);
+                                    // console.log('viewport.southwest.lat - 0.04', viewport.southwest.lat - 0.04);
 
-                                if (propType == null || propType[propObj.PropTypeId]) {
+                                    if (propType == null || propType[propObj.PropTypeId]) {
 
-                                    if (bedRooms == -1 || propObj.Bedrooms >= bedRooms) {
+                                        if (bedRooms == -1 || propObj.Bedrooms >= bedRooms) {
 
-                                        if (bathRooms == -1 || propObj.Bathrooms >= bathRooms) {
+                                            if (bathRooms == -1 || propObj.Bathrooms >= bathRooms) {
 
-                                            if (carSpace == -1 || propObj.CarPark >= bathRooms) {
+                                                if (carSpace == -1 || propObj.CarPark >= bathRooms) {
 
-                                                if (landSize == 0 || propObj.LandSize >= landSize) {
+                                                    if (landSize == 0 || propObj.LandSize >= landSize) {
 
-                                                    if (priceRange == 0 || ((maxPrice >= propObj.Price) && (propObj.Price >= minPrice))) {
+                                                        if (priceRange == 0 || ((maxPrice >= propObj.Price) && (propObj.Price >= minPrice))) {
 
-                                                        if (propObj.Visible == true) {
+                                                            if (propObj.Visible == true) {
 
-                                                            let hasKeyword = false;
-                                                            if (featureKeywords != "") {
-                                                                const arrFeatureKeywords = featureKeywords.split(",");
+                                                                let hasKeyword = false;
+                                                                if (featureKeywords != "") {
+                                                                    const arrFeatureKeywords = featureKeywords.split(",");
 
-                                                                // loopKeyword:
-                                                                for (let i = 0; i < arrFeatureKeywords.length; i++) {
-                                                                    const keyWord = arrFeatureKeywords[i];
+                                                                    // loopKeyword:
+                                                                    for (let i = 0; i < arrFeatureKeywords.length; i++) {
+                                                                        const keyWord = arrFeatureKeywords[i];
 
-                                                                    let keywordFound = false;
-                                                                    if (propObj.Features) {
-                                                                        for (let j = 0; j < propObj.Features.length; j++) {
-                                                                            const featureName = propObj.Features[j];
+                                                                        let keywordFound = false;
+                                                                        if (propObj.Features) {
+                                                                            for (let j = 0; j < propObj.Features.length; j++) {
+                                                                                const featureName = propObj.Features[j];
 
-                                                                            const reg = new RegExp(featureName, "gi");
-                                                                            if (reg.test(keyWord)) {
-                                                                                keywordFound = true;
-                                                                                break;
-                                                                                // break loopKeyword;
+                                                                                const reg = new RegExp(featureName, "gi");
+                                                                                if (reg.test(keyWord)) {
+                                                                                    keywordFound = true;
+                                                                                    break;
+                                                                                    // break loopKeyword;
+                                                                                }
                                                                             }
                                                                         }
-                                                                    }
 
-                                                                    if (keywordFound) {
-                                                                        hasKeyword = true;
-                                                                    } else {
-                                                                        hasKeyword = false;
-                                                                        break;
+                                                                        if (keywordFound) {
+                                                                            hasKeyword = true;
+                                                                        } else {
+                                                                            hasKeyword = false;
+                                                                            break;
+                                                                        }
                                                                     }
                                                                 }
-                                                            }
 
-                                                            if (featureKeywords == "" || hasKeyword) {
+                                                                if (featureKeywords == "" || hasKeyword) {
 
-                                                                const propObjNew = {
-                                                                    ...propObj,
+                                                                    const propObjNew = {
+                                                                        ...propObj,
 
-                                                                    isFavourite: false
-                                                                };
+                                                                        isFavourite: false
+                                                                    };
 
-                                                                if (user) {
+                                                                    // console.log(this.state.collectionList);
 
+                                                                    filteredProperties.push(propObjNew);
+                                                                    // console.log('filteredProperties', filteredProperties);
+                                                                    // console.log("propId:", propObjNew.PropId);
                                                                 }
-
-                                                                // propObjNew.isFavourite = true;
-                                                                console.log(this.state.collectionList);
-
-                                                                filteredProperties.push(propObjNew);
-                                                                console.log('filteredProperties', filteredProperties);
-                                                                // console.log(maxPrice >= (propObj.Price >= minPrice))
-                                                                console.log("propId:", propObjNew.PropId);
-                                                                // this.getPropImages(propObjNew.PropId);
                                                             }
                                                         }
                                                     }
+                                                    // }
                                                 }
                                             }
                                         }
@@ -281,9 +284,6 @@ export default class SearchResultView extends Component<Props> {
                                 }
                             }
                         }
-
-                        
-                        // this.getPropImages(propId);
                     }
                 }
             }
@@ -330,17 +330,6 @@ export default class SearchResultView extends Component<Props> {
         });
     }
 
-    // getPropImages(propId) {
-    //     const imageRef = firebase.storage().ref(`PropImages/${propId}`);
-
-    //     console.log("imageRef:",imageRef)
-    //     // const sampleImage = imageRef.getDownloadURL().then(
-    //     //     result => console.log('result', result)
-    //     // );
-
-    //     const sampleImage = imageRef.getDownloadURL()
-    //     console.log("sampleImage:",sampleImage)
-    // }
 
     getCollectionNames(user) {
         db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection);
@@ -356,17 +345,11 @@ export default class SearchResultView extends Component<Props> {
         const arrColl = [];
         const arrCollPropList = []
         for (const collectionId in collections) {
-            console.log('collections[collectionId]', collections[collectionId]);
+            // console.log('collections[collectionId]', collections[collectionId]);
             arrColl.push(collectionId);
-            // const temparr = collections[collectionId]
 
-            // arrCollPropList.push(temparr);
             console.log('arrColl', arrColl);
             console.log('collectionId', collectionId);
-
-            // for (const a in temparr){
-            //     console.log('temparr[a]',temparr[a]);
-            // }
         }
 
         this.setState({
@@ -403,11 +386,6 @@ export default class SearchResultView extends Component<Props> {
             });
     }
 
-    // changefavouriteIcon(visible) {
-    //     this.setState({
-    //         isFavourite: visible
-    //     })
-    // }
 
     renderCreateNewCollectionDialog() {
 
@@ -455,7 +433,6 @@ export default class SearchResultView extends Component<Props> {
     getFavouritePropertyId(id) {
         console.log(id);
     }
-
 
     renderItem({ item, index }) {
 
@@ -523,9 +500,7 @@ export default class SearchResultView extends Component<Props> {
                         }}
                     />
             );
-
     }
-
 
     render() {
         return (

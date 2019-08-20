@@ -357,7 +357,7 @@ export default class SearchScreen extends Component {
                         </View>
                         :
                         <FlatList
-                            data={this.state.featuredList}
+                            data={this.state.featuredList.reverse()}
                             renderItem={item => this.renderItem(item)}
                             keyExtractor={(item, index) => {
                                 return "" + index;

@@ -62,13 +62,13 @@ export default class SearchBarScreen extends Component {
             sortOrder: -1,
 
             loading: true,
-            recentSearchList: []
+            recentSearchList: [],
+            viewport: null
         };
     }
 
     async componentDidMount() {
         this.getMyValue();
-
     }
 
     ResetFilters() {
@@ -109,7 +109,7 @@ export default class SearchBarScreen extends Component {
         try {
             console.log('location');
             console.log(location.description);
-            const value = await AsyncStorage.getItem('@LocationList')
+            const value = await AsyncStorage.getItem('@LocationSearchList')
 
             let locationFound = false;
 
@@ -127,50 +127,63 @@ export default class SearchBarScreen extends Component {
                 }
             }
 
-
             for (let i = 0; i < arr.length; i++) {
                 const obj = arr[i];
 
-                console.log('loc.description');
-                console.log(obj.description);
+                // console.log('loc.description');
+                // console.log(obj.description);
+                console.log('location.description', location.name);
+                console.log('obj.description', obj.name);
 
-                if (location.description == obj.description) {
+                if (location.name == obj.name) {
                     locationFound = true;
                     arr.splice(i, 1);
                     break
                 }
             }
 
-            // if (arr.length > 4) {
-            // this.state.recentSearchList.splice(0, 1);
+
+            if(arr.length>=4){
+                arr.splice(arr.length - 1, 1);
+                console.log(arr.length);
+                
+            }
             // arr.splice(arr.length - 1, 1);
-            arr.splice(arr.length - 1, 1);
-            console.log(arr.length);
+            // console.log(arr.length);
             // }
 
+            // arr = [
+            //     location,
+            //     ...arr
+            // ];
             arr = [
-                location,
+                {
+                    name: location.name,
+                    geometry: location.geometry
+                },
                 ...arr
             ];
 
             this.state.recentSearchList = arr;
+            console.log('this.state.recentSearchList', this.state.recentSearchList);
 
-            await AsyncStorage.setItem('@LocationList', JSON.stringify(arr));
-
+            // for (const i in this.state.recentSearchList) {
+            //     const loc = this.state.recentSearchList[i];
+            //     console.log('loc.name', loc.name);
             // }
 
+            await AsyncStorage.setItem('@LocationSearchList', JSON.stringify(arr));
 
         } catch (e) {
             console.log(e);
         }
-
-
     }
 
     getMyValue = async () => {
 
         try {
-            const value = await AsyncStorage.getItem('@LocationList')
+            const value = await AsyncStorage.getItem('@LocationSearchList')
+            console.log('value', value);
             if (value) {
                 this.setState({
                     recentSearchList: JSON.parse(value)
@@ -183,7 +196,6 @@ export default class SearchBarScreen extends Component {
 
         console.log('Done')
         console.log(this.state.recentSearchList.length);
-
     }
 
     RenderSortOrderTextView() {
@@ -385,7 +397,6 @@ export default class SearchBarScreen extends Component {
                     this.state.isSelectedVilla = !this.state.isSelectedVilla;
                     // propertyType: 4
                     break;
-
             }
 
             let hasFilters = false;
@@ -466,7 +477,6 @@ export default class SearchBarScreen extends Component {
                 </Modal>
             </View>
         );
-
     }
 
     renderPriceDetails() {
@@ -993,7 +1003,6 @@ export default class SearchBarScreen extends Component {
 
                     </View>
 
-
                     <View style={styles.separatorView}></View>
 
                     <View style={[styles.mainCategoryView, { flexDirection: 'row' }]}>
@@ -1182,17 +1191,28 @@ export default class SearchBarScreen extends Component {
                 renderDescription={row => row.description || row.formatted_address || row.name}
                 // renderDescription={row =>  row.formatted_address}
                 onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                    console.log('data', data);
-                    // console.log('details', details.geometry.location.lat);
-                    // console.log('details', details.geometry.location.lng);
-                    console.log('details', details.geometry);
+                    // console.log('data', data);
+                    // console.log('details', details);
+                    // // console.log('details', details.geometry.location.lat);
+                    // // console.log('details', details.geometry.location.lng);
+                    // console.log('details.geometry', details.geometry);
+                    // console.log(data.description);
+
+                    console.log(data, details);
                     console.log(data.description);
+                    console.log('details', details.geometry.location.lat);
+                    console.log('details', details.geometry.location.lng);
+                    console.log('ViewPortnortheast', details.geometry.viewport.northeast);
+                    console.log('ViewPortsouthwest', details.geometry.viewport.southwest);
+
                     this.setFilterModalVisible();
                     this.setState({
-                        location: data.description
+                        location: data.description,
+                        viewport: details.geometry.viewport
                     });
                     this.ResetFilters();
-                    this.setValue(data);
+                    // this.setValue(data, details);
+                    this.setValue(details);
                 }}
 
                 getDefaultValue={() => ''}
@@ -1202,8 +1222,10 @@ export default class SearchBarScreen extends Component {
                     key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
                     language: 'en', // language of the results
                     types: '(cities)', // default: 'geocode'
-                    region: "Canada",
-                    components: 'country:ca'
+                    region: "LK",
+                    components: 'country:lk'
+                    // region: "Canada",
+                    // components: 'country:ca'
                 }}
 
                 styles={{
