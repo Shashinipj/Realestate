@@ -103,10 +103,10 @@ export default class ProfileScreen extends Component<Props> {
                                     // console.log('propObj.Visible',propObj.Visible);
 
                                     if (propId == i) {
-                                        console.log("propObj", propObj);
+                                        // console.log("propObj", propObj);
                                         arrCont.push(propObj);
                                         // console.log('propObjNew.isVisible',propObjNew.isVisible);
-                                        console.log('arrCont.', arrCont);
+                                        // console.log('arrCont.', arrCont);
 
                                     }
                                 }

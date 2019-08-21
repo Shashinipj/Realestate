@@ -50,22 +50,25 @@ export default class SearchResultView extends Component<Props> {
             loggedUser: '',
             loading: true,
 
-            isFavourite: false
+            // isFavourite: false,
+            favPropIds: []
         };
 
         this.onValueCollection = this.onValueCollection.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
         const user = firebase.auth().currentUser;
         if (user) {
             this.getCollectionNames(user);
+            await this.getFavouritePropertyId(user);
             this.setState({
                 loggedUser: user
             })
 
             this.getSearchResults(user, null);
+            // console.log('this.state.favPropIds', this.state.favPropIds);
         }
         else {
             this.getSearchResults(user, null);
@@ -133,7 +136,7 @@ export default class SearchResultView extends Component<Props> {
                         console.log(option.label);
                         // this.addToCollection(option.label);
                         this.renderModal();
-                        this.RenderModalSelectedItem(option);
+                        this.renderModalSelectedItem(option);
 
                     }}
                     closeOnChange={true}
@@ -146,7 +149,7 @@ export default class SearchResultView extends Component<Props> {
         }
     }
 
-    RenderModalSelectedItem(option) {
+    renderModalSelectedItem(option) {
         if (option.key == 0) {
 
             if (this.state.loggedUser) {
@@ -264,10 +267,24 @@ export default class SearchResultView extends Component<Props> {
                                                                     const propObjNew = {
                                                                         ...propObj,
 
-                                                                        isFavourite: false
+                                                                        isFavourite: false,
+                                                                        collectionName: null
                                                                     };
 
-                                                                    // console.log(this.state.collectionList);
+                                                                    for (const i in this.state.favPropIds) {
+                                                                        const favProp = this.state.favPropIds[i];
+                                                                        console.log('favProp', favProp);
+
+                                                                        if (favProp.favPropId == propObj.PropId) {
+                                                                            console.log('matched');
+
+                                                                            propObjNew.isFavourite = true;
+                                                                            propObjNew.collectionName = favProp.collName;
+                                                                            console.log('propObjNew.collectionName', propObjNew.collectionName);
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                    // console.log('this.state.collectionList',this.state.collectionList);
 
                                                                     filteredProperties.push(propObjNew);
                                                                     // console.log('filteredProperties', filteredProperties);
@@ -335,6 +352,45 @@ export default class SearchResultView extends Component<Props> {
         db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection);
     }
 
+    getFavouritePropertyId(user) {
+
+        return new Promise((resolve, reject) => {
+            console.log('user', user.uid);
+
+            const listFavProps = []
+
+            db.ref(`Users/${user.uid}/Collections`).on('value', (snapshot) => {
+                const collections = snapshot.val();
+                console.log('favoutiteProps', collections);
+                for (const collName in collections) {
+                    console.log('favoutiteProps[i]', collections[collName]);
+                    const favProps = collections[collName]
+
+                    for (const favPropId in favProps) {
+                        // const oProp = favProps[favPropId];
+
+                        console.log('favPropId', favPropId);
+                        listFavProps.push({
+                            favPropId,
+                            collName
+                        });
+                        console.log('listFavProps', listFavProps);
+                    }
+                }
+
+                this.setState({
+                    favPropIds: listFavProps
+                });
+                console.log('favProps', listFavProps);
+                resolve(true);
+            })
+
+        })
+
+    }
+
+
+
     /**
      * @param {firebase.database.DataSnapshot} snapshot
      */
@@ -377,10 +433,18 @@ export default class SearchResultView extends Component<Props> {
 
         db.ref(`Users/${user.uid}/Collections/${collectionName}/${this.state.propertyID}`).set(true)
             .then(() => {
+                const oProp = this.state.propProperties.find((val, index) => {
+                    return val.PropId == this.state.propertyID;
+                });
+
+                if (oProp) {
+                    oProp.isFavourite = true;
+                }
+
                 console.log('Inserted!');
                 // this.changefavouriteIcon(true);
                 this.handleCreateNewCollectionCancel();
-                console.log(this.state.isFavourite);
+                // console.log(this.state.isFavourite);
             }).catch((error) => {
                 console.log(error)
             });
@@ -430,9 +494,66 @@ export default class SearchResultView extends Component<Props> {
         );
     }
 
-    getFavouritePropertyId(id) {
-        console.log(id);
+    deleteCollectionItem(propertyID, colName) {
+
+        // const { navigation } = this.props;
+        // const collection = navigation.getParam('CollectionData');
+        // let propIDs = collection.propIds;
+
+        const user = firebase.auth().currentUser;
+
+        db.ref(`Users/${user.uid}/Collections/${colName}/${propertyID}`).remove()
+            .then(() => {
+                // if (this.userProperties[propertyID] != undefined) {
+                //     delete this.userProperties[propertyID];
+                // }
+
+                // if (propIDs[propertyID] != undefined) {
+                //     delete propIDs[propertyID];
+                // }
+
+                // this.loadProps(propIDs);
+
+                // console.log(collection.name);
+
+                const oProp = this.state.propProperties.find((val, index) => {
+                    return val.PropId == propertyID;
+                });
+
+                if (oProp) {
+                    oProp.isFavourite = false;
+                }
+                this.setState({});
+
+                console.log('Deleted!!');
+            }).catch((error) => {
+                console.log(error)
+            });
     }
+
+    onPressRemoveFavourite(propertyID, collName) {
+
+        Alert.alert(
+            'Delete',
+            'Do you really want to delete this property?',
+            [
+                {
+                    text: 'No',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => {
+                        this.deleteCollectionItem(propertyID, collName);
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
+    }
+
+
 
     renderItem({ item, index }) {
 
@@ -440,7 +561,7 @@ export default class SearchResultView extends Component<Props> {
 
             <ListItem
                 data1={item}
-                favouriteMarked={this.state.isFavourite}
+                favouriteMarked={item.isFavourite}
                 showFavouriteIcon={true}
                 showDeleteIcon={false}
                 onPressItem={(item) => {
@@ -451,14 +572,23 @@ export default class SearchResultView extends Component<Props> {
                     if (this.state.loggedUser) {
                         this.state.propertyID = item.PropId;
 
-                        this.getFavouritePropertyId(item);
+                        // this.getFavouritePropertyId(item);
                         this.renderModal();
                     }
                     else {
                         this.pleaseLoginInAlert();
                     }
                 }}
+
+                onPressRemoveFavourite={(item) => {
+                    console.log(item.collectionName);
+
+                    this.onPressRemoveFavourite(item.PropId, item.collectionName);
+                }
+                }
             />
+
+
         );
     }
 
@@ -494,6 +624,7 @@ export default class SearchResultView extends Component<Props> {
 
                     <FlatList
                         data={this.state.propProperties}
+                        extraData={this.state}
                         renderItem={item => this.renderItem(item)}
                         keyExtractor={(item, index) => {
                             return "" + index;

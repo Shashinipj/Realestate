@@ -28,6 +28,7 @@ type Props = {
 
     onPressItem: (item: any) => void;
     onPressFavourite: (item: any, isMarked: boolean) => void;
+    onPressRemoveFavourite: (item: any) => void;
     onPressDelete: (item: any, isMarked: boolean) => void;
     onPressPause: (item: any, isMarked: boolean) => void;
     onPressShow: (item: any, isMarked: boolean) => void;
@@ -60,6 +61,7 @@ export default class ListItem extends Component<Props> {
 
         onPressItem: () => null,
         onPressFavourite: () => null,
+        onPressRemoveFavourite: () => null,
         onPressDelete: () => null,
         onPressPause: () => null,
         onPressShow: () => null,
@@ -75,6 +77,7 @@ export default class ListItem extends Component<Props> {
 
         this.onPress_Item = this.onPress_Item.bind(this);
         this.onPress_Heart = this.onPress_Heart.bind(this);
+        this.onPress_ColoredHeart = this.onPress_ColoredHeart.bind(this);
         this.onPress_Delete = this.onPress_Delete.bind(this);
         this.onPress_Pause = this.onPress_Pause.bind(this);
         this.onPress_Show = this.onPress_Show.bind(this);
@@ -96,6 +99,14 @@ export default class ListItem extends Component<Props> {
 
         if (this.props.onPressFavourite) {
             this.props.onPressFavourite(data1, favouriteMarked);
+        }
+    }
+
+    onPress_ColoredHeart() {
+        const { data1 } = this.props;
+
+        if (this.props.onPressRemoveFavourite) {
+            this.props.onPressRemoveFavourite(data1);
         }
     }
 
@@ -158,7 +169,8 @@ export default class ListItem extends Component<Props> {
             return (
                 <TouchableOpacity
                     disabled={!enableFavouriteIcon}
-                    onPress={this.onPress_Heart}
+                    onPress={this.onPress_ColoredHeart}
+                    style={{ padding: 3 }}
                 >
 
                     <Meticon
@@ -330,7 +342,7 @@ export default class ListItem extends Component<Props> {
                     </View>
 
                 </View>
-                <View style={{ borderBottomColor: '#757575', borderBottomWidth: 1, width: '100%', marginTop: 15}}></View>
+                <View style={{ borderBottomColor: '#757575', borderBottomWidth: 1, width: '100%', marginTop: 15 }}></View>
 
             </TouchableOpacity>
         );
