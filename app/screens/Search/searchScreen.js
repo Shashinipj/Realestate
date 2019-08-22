@@ -41,8 +41,12 @@ export default class SearchScreen extends Component {
 
             email: '',
             password: '',
+            confirmPassword: '',
             error: '',
             success: '',
+            UserName: '',
+            contactNumber: '',
+            address: '',
             loginState: false,
 
             loading: true,
@@ -432,9 +436,10 @@ export default class SearchScreen extends Component {
         }
 
         else {
-            if (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+            // if (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+            if (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
                 return (
-                    <View style={{ }}>
+                    <View style={{}}>
                         <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
                     </View>
                 );
@@ -572,49 +577,10 @@ export default class SearchScreen extends Component {
                     </View>
 
                     <View style={styles.modalContainer}>
-                        <Image source={require('../../assets/images/muthu.png')} style={styles.image} />
+
                         {/* <View style={{backgroundColor:'yellow', marginVertical: 5}}> */}
-                        <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
-                            <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
-                                <Icon
-                                    name="email"
-                                    type='MaterialIcons'
-                                    size={20}
-                                    color='gray'
-                                />
-                                <TextInput
-                                    label="Email"
-                                    value={this.state.email}
-                                    style={styles.textinput}
-                                    secureTextEntry={false}
-                                    onChangeText={email => this.setState({ email })}
-                                    editable={true}
-                                    maxLength={40}
-                                    placeholder='Email address' />
-                            </View>
 
-                            <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
-
-                            <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
-
-                                <Icon
-                                    name="lock"
-                                    type='MaterialIcons'
-                                    size={20}
-                                    color='gray'
-                                />
-                                <TextInput
-                                    label="Password"
-                                    value={this.state.password}
-                                    style={styles.textinput}
-                                    onChangeText={password => this.setState({ password })}
-                                    editable={true}
-                                    maxLength={40}
-                                    placeholder='Password'
-                                    secureTextEntry={true} />
-
-                            </View>
-                        </View>
+                        {this.renderForms()}
 
                         <View style={{ width: "70%" }}>
                             {this.renderSignUpSignInView()}
@@ -642,6 +608,189 @@ export default class SearchScreen extends Component {
         );
     }
 
+    renderForms() {
+
+        if (!this.state.signUpVisible) {
+            return (
+                <View>
+                    <Image source={require('../../assets/images/muthu.png')} style={styles.image} />
+                    <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                            <Icon
+                                name="email"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="Email"
+                                value={this.state.email}
+                                style={styles.textinput}
+                                secureTextEntry={false}
+                                onChangeText={email => this.setState({ email })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Email address' />
+                        </View>
+
+                        <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
+
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+
+                            <Icon
+                                name="lock"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="Password"
+                                value={this.state.password}
+                                style={styles.textinput}
+                                onChangeText={password => this.setState({ password })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Password'
+                                secureTextEntry={true} />
+
+                        </View>
+                    </View>
+                </View>
+            );
+        }
+        else {
+            return (
+                <View style={{}}>
+                    <Image source={require('../../assets/images/muthu.png')} style={[styles.image, {marginBottom: 10}]} />
+                    <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
+
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                            <Icon
+                                name="email"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="UserName"
+                                value={this.state.UserName}
+                                style={styles.textinput}
+                                secureTextEntry={false}
+                                onChangeText={UserName => this.setState({ UserName })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='User Name' />
+                        </View>
+
+                        <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
+
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                            <Icon
+                                name="email"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="Email"
+                                value={this.state.email}
+                                style={styles.textinput}
+                                secureTextEntry={false}
+                                onChangeText={email => this.setState({ email })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Email address' />
+                        </View>
+
+                        <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
+
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+
+                            <Icon
+                                name="lock"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="Password"
+                                value={this.state.password}
+                                style={styles.textinput}
+                                onChangeText={password => this.setState({ password })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Password'
+                                secureTextEntry={true} />
+
+                        </View>
+
+                        <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
+
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+
+                            <Icon
+                                name="lock"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="ConfirmPassword"
+                                value={this.state.confirmPassword}
+                                style={styles.textinput}
+                                onChangeText={confirmPassword => this.setState({ confirmPassword })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Confirm Password'
+                                secureTextEntry={true} />
+
+                        </View>
+
+                        <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
+
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                            <Icon
+                                name="email"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="ContactNumber"
+                                value={this.state.contactNumber}
+                                style={styles.textinput}
+                                secureTextEntry={false}
+                                onChangeText={contactNumber => this.setState({ contactNumber })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Contact Number' />
+                        </View>
+
+                        <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
+
+                        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
+                            <Icon
+                                name="email"
+                                type='MaterialIcons'
+                                size={20}
+                                color='gray'
+                            />
+                            <TextInput
+                                label="address"
+                                value={this.state.address}
+                                style={styles.textinput}
+                                secureTextEntry={false}
+                                onChangeText={address => this.setState({ address })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Address' />
+                        </View>
+                    </View>
+                </View>
+            );
+        }
+    }
+
     /**
      * 
      * @param {NativeSyntheticEvent<NativeScrollEvent>} event 
@@ -653,22 +802,6 @@ export default class SearchScreen extends Component {
 
             console.log(offset);
 
-            // if (offset.y <= 10) {
-            //     if (this.state.scroll) {
-            //         this.setState({
-            //             scroll: false
-            //         });
-            //     }
-            // }
-            // else if (offset.y > 0) {
-            //     if (!this.state.scroll) {
-            //         this.setState({
-            //             scroll: true
-            //         });
-            //     }
-            // }
-
-
             if (offset.y > 10) {
                 if (!this.state.scroll) {
                     this.setState({
@@ -676,6 +809,7 @@ export default class SearchScreen extends Component {
                     });
                 }
             }
+
             else {
                 this.setState({
                     scroll: false
@@ -689,9 +823,9 @@ export default class SearchScreen extends Component {
             return null;
         }
 
-        if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+        if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
+            // if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
 
-            // if (!this.state.scroll) {
             return (
                 <TouchableOpacity
                     // style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 105 }}
@@ -702,27 +836,10 @@ export default class SearchScreen extends Component {
                         console.log("touchableOpacity test add new");
                     }}>
                     <View style={[styles.addNewPropertyView, {}]}>
-                        {/* <Ionicon name="md-add-circle" size={30} color='#49141E' /> */}
                         <Ionicon name="md-add-circle" size={30} color='#ffffff' />
-                        {/* <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add Property</Text> */}
                         <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#ffffff' }}>Add Property</Text>
                     </View>
                 </TouchableOpacity>);
-            // }
-
-            // else {
-            //     return (
-            //         <TouchableOpacity
-            //             style={styles.addNewSubButton}
-            //             onPress={() => {
-            //                 this.props.navigation.navigate('AddPropertyScreen');
-            //             }}
-            //         >
-            //             <Ionicon name="md-add" size={20} color='#000000' />
-            //             <Text style={{ marginLeft: 5, fontWeight: '600' }}>Add</Text>
-            //         </TouchableOpacity>
-            //     );
-            // }
 
         }
 
@@ -734,7 +851,8 @@ export default class SearchScreen extends Component {
             return null;
         }
 
-        if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+        if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
+            // if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
 
             if (this.state.scroll) {
                 return (
@@ -872,7 +990,8 @@ const styles = StyleSheet.create({
         width: 200,
         height: 100,
         resizeMode: 'contain',
-        marginBottom: 50
+        marginBottom: 50,
+        alignSelf:'center'
 
     },
     textinput: {

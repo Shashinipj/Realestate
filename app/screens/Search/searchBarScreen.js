@@ -107,8 +107,8 @@ export default class SearchBarScreen extends Component {
     setValue = async (location) => {
 
         try {
-            console.log('location');
-            console.log(location.description);
+            // console.log('location');
+            // console.log(location.description);
             const value = await AsyncStorage.getItem('@LocationSearchList')
 
             let locationFound = false;
@@ -132,7 +132,7 @@ export default class SearchBarScreen extends Component {
 
                 // console.log('loc.description');
                 // console.log(obj.description);
-                console.log('location.description', location.name);
+                console.log('location.name', location.name);
                 console.log('obj.description', obj.name);
 
                 if (location.name == obj.name) {
@@ -896,17 +896,6 @@ export default class SearchBarScreen extends Component {
 
                         </View>
 
-                        {/* <View style={{ flexDirection: 'row' }}>
-                            <Text>Select bedroom range</Text>
-                            <Switch
-                                style={{ position: 'absolute', right: 5 }}
-                                onChange={this.handleChange}
-                                checked={this.state.checked}
-                                height={5}
-                                width={20}
-                            />
-
-                        </View> */}
                     </View>
 
                     <View style={styles.separatorView}></View>
@@ -1191,23 +1180,18 @@ export default class SearchBarScreen extends Component {
                 renderDescription={row => row.description || row.formatted_address || row.name}
                 // renderDescription={row =>  row.formatted_address}
                 onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                    // console.log('data', data);
-                    // console.log('details', details);
-                    // // console.log('details', details.geometry.location.lat);
-                    // // console.log('details', details.geometry.location.lng);
-                    // console.log('details.geometry', details.geometry);
+                
+                    // console.log(data, details);
                     // console.log(data.description);
-
-                    console.log(data, details);
-                    console.log(data.description);
-                    console.log('details', details.geometry.location.lat);
-                    console.log('details', details.geometry.location.lng);
-                    console.log('ViewPortnortheast', details.geometry.viewport.northeast);
-                    console.log('ViewPortsouthwest', details.geometry.viewport.southwest);
+                    // console.log('details', details.geometry.location.lat);
+                    // console.log('details', details.geometry.location.lng);
+                    // console.log('ViewPortnortheast', details.geometry.viewport.northeast);
+                    // console.log('ViewPortsouthwest', details.geometry.viewport.southwest);
 
                     this.setFilterModalVisible();
                     this.setState({
-                        location: data.description,
+                        // location: data.description,
+                        location: details.name,
                         viewport: details.geometry.viewport
                     });
                     this.ResetFilters();

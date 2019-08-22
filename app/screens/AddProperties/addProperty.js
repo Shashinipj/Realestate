@@ -95,8 +95,6 @@ export default class AddPropertyScreen extends Component<Props> {
     //     }).catch(e => console.log(e));
     // }
 
-
-
     cleanupImages() {
         ImagePicker.clean().then(() => {
             console.log('removed tmp images from tmp directory');

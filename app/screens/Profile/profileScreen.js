@@ -405,14 +405,14 @@ export default class ProfileScreen extends Component<Props> {
 
                                     <View>
                                         <Text style={{ color: 'grey', marginBottom: 5 }}>Username</Text>
-                                        <Text style={{ fontSize: 15 }}>Robin Peiterson</Text>
+                                        <Text style={{ fontSize: 15 }}>Theepan Muthulingam</Text>
 
                                     </View>
 
                                     <View style={{ marginTop: 20 }}>
                                         <Text style={{ color: 'grey', marginBottom: 5 }}>Email</Text>
-                                        {/* <Text style={{ fontSize: 15 }}>{this.state.userEmail}</Text> */}
-                                        <Text style={{ fontSize: 15 }}>robinpeiter@gmail.com</Text>
+                                        <Text style={{ fontSize: 15 }}>{this.state.userEmail}</Text>
+                                        {/* <Text style={{ fontSize: 15 }}>robinpeiter@gmail.com</Text> */}
 
                                     </View>
 
@@ -458,7 +458,8 @@ export default class ProfileScreen extends Component<Props> {
                             </View>
 
                             {
-                                (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
+                                // (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
+                                (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
                                     <View style={{}}>
                                         <TouchableOpacity onPress={() => {
                                             this.props.navigation.navigate('AddPropertyScreen');
@@ -508,7 +509,7 @@ export default class ProfileScreen extends Component<Props> {
 
     renderTabIndicator() {
 
-        if (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+        if (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
             let tabs = [{
                 text: 'About',
                 // iconSource: require('../imgs/ic_tab_home_normal.png'),
@@ -589,6 +590,7 @@ export default class ProfileScreen extends Component<Props> {
                 onPressEdit={(item, isMarked) => {
                     // this.state.propertyID = item.propId;
                     console.log(item.PropId);
+                    console.log(item);
                     // console.log(this.state.visibleAd);
                     // this.onPressShowButton(item.PropId, item.PropAction);
                     this.props.navigation.navigate("EditPropertyScreen", { PropertyData: item });

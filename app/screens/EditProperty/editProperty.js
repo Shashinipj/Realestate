@@ -151,28 +151,78 @@ export default class EditPropertyScreen extends Component<Props>  {
             isFeatured: property.isFeatured,
             houseCondition: property.Condition,
             isVisible: property.Visible,
+            images: property.images
 
         });
 
     }
 
-    renderImage(image) {
-        return (
-            <TouchableOpacity style={{}} onPress={() => {
-                this.setState({
-                    defaultImage: image
-                })
-            }} >
-                <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
-                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
-                        <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
-                    </TouchableOpacity>
+    renderImage() {
 
-                </ImageBackground>
-            </TouchableOpacity>
+        console.log('this.state.images',this.state.images);
+        // console.log('images',images);
 
-        );
+        for (const i in this.state.images) {
+        // for (const image in images) {
+            const image = this.state.images[i];
+            console.log("image", image);
+
+            return (
+                <TouchableOpacity style={{}} onPress={() => {
+                    this.setState({
+                        defaultImage: image
+                    })
+                }} >
+
+                    {/* <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={{uri: image}} > </ImageBackground> */}
+
+                    {/* <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
+                        <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
+                            <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
+                        </TouchableOpacity>
+
+                    </ImageBackground> */}
+
+                </TouchableOpacity>
+
+            );
+        }
+
+        // return (
+        //     <TouchableOpacity style={{}} onPress={() => {
+        //         this.setState({
+        //             defaultImage: image
+        //         })
+        //     }} >
+
+        //         <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
+        //             <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
+        //                 <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
+        //             </TouchableOpacity>
+
+        //         </ImageBackground>
+        //     </TouchableOpacity>
+
+        // );
     }
+
+    // renderImage(image) {
+    //     return (
+    //         <TouchableOpacity style={{}} onPress={() => {
+    //             this.setState({
+    //                 defaultImage: image
+    //             })
+    //         }} >
+    //             <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
+    //                 <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
+    //                     <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
+    //                 </TouchableOpacity>
+
+    //             </ImageBackground>
+    //         </TouchableOpacity>
+
+    //     );
+    // }
 
     removeImages(image) {
         let arr = this.state.images;
@@ -410,10 +460,6 @@ export default class EditPropertyScreen extends Component<Props>  {
                     console.log(error)
                 });
         }
-
-
-
-
     }
 
     returnImageScrollView() {
@@ -434,7 +480,6 @@ export default class EditPropertyScreen extends Component<Props>  {
                     </View>
 
                 </TouchableOpacity>
-
             );
         }
         else {
@@ -511,9 +556,12 @@ export default class EditPropertyScreen extends Component<Props>  {
                                             : null))
                                 }
 
-                                {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
+                                {/* {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
                                     null
-                                }
+                                } */}
+
+                                {/* {this.renderImage.bind(this)} */}
+                                {this.renderImage.bind(this)}
 
                             </ScrollView>
                         </View>
@@ -525,7 +573,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Title</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 // maxLength={300}
                                 onChangeText={(title) => this.setState({ title })}
                                 value={this.state.title}
@@ -535,7 +583,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Description</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 multiline={true}
                                 onChangeText={(description) => this.setState({ description })}
                                 value={this.state.description}
@@ -545,7 +593,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Price</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 onChangeText={(price) => this.setState({ price })}
                                 value={this.state.price}
                                 keyboardType='numeric'
@@ -624,7 +672,6 @@ export default class EditPropertyScreen extends Component<Props>  {
                                             this.state.propertyType == 3 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                                 : styles.propertTypeButtons
                                         }>
-
                                             <Meticon name='home-outline' size={30} color={this.state.propertyType == 3 ? 'white' : 'gray'} />
 
                                         </View>
@@ -650,7 +697,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bedrooms</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 onChangeText={(bedrooms) => this.setState({ bedrooms })}
                                 value={this.state.bedrooms}
                                 keyboardType='numeric'
@@ -660,7 +707,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bathrooms</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 onChangeText={(bathrooms) => this.setState({ bathrooms })}
                                 value={this.state.bathrooms}
                                 keyboardType='numeric'
@@ -670,7 +717,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Parking Slots</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 onChangeText={(parkingSlots) => this.setState({ parkingSlots })}
                                 value={this.state.parkingSlots}
                                 keyboardType='numeric'
@@ -699,7 +746,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size(Square Feet)</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 onChangeText={(landSize) => this.setState({ landSize })}
                                 value={this.state.landSize}
                                 keyboardType='numeric'
@@ -709,7 +756,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30, paddingBottom: 5  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30, paddingBottom: 5 }}
                                 multiline={true}
                                 placeholder='e.g Pool, garage'
                                 onChangeText={
@@ -722,7 +769,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Condition of the House</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 onChangeText={(houseCondition) => this.setState({ houseCondition })}
                                 value={this.state.houseCondition}
                             />
@@ -731,7 +778,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Owner</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 // maxLength={300}
                                 onChangeText={(owner) => this.setState({ owner })}
                                 value={this.state.owner}
@@ -741,7 +788,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                         <View style={{ margin: 10, width: '90%' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Contact Number</Text>
                             <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30  }}
+                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
                                 onChangeText={(contactNumber) => this.setState({ contactNumber })}
                                 value={this.state.contactNumber}
                                 keyboardType='numeric'
@@ -785,7 +832,6 @@ export default class EditPropertyScreen extends Component<Props>  {
                             console.log('Add button clicked');
                             this.onPressSaveButton();
                         }}
-
                     >
                         <View style={{
                             backgroundColor: '#49141E', marginVertical: 7, flex: 1, marginHorizontal: 10, width: 300,

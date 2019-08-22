@@ -386,9 +386,7 @@ export default class SearchResultView extends Component<Props> {
             })
 
         })
-
     }
-
 
 
     /**
@@ -496,25 +494,10 @@ export default class SearchResultView extends Component<Props> {
 
     deleteCollectionItem(propertyID, colName) {
 
-        // const { navigation } = this.props;
-        // const collection = navigation.getParam('CollectionData');
-        // let propIDs = collection.propIds;
-
         const user = firebase.auth().currentUser;
 
         db.ref(`Users/${user.uid}/Collections/${colName}/${propertyID}`).remove()
             .then(() => {
-                // if (this.userProperties[propertyID] != undefined) {
-                //     delete this.userProperties[propertyID];
-                // }
-
-                // if (propIDs[propertyID] != undefined) {
-                //     delete propIDs[propertyID];
-                // }
-
-                // this.loadProps(propIDs);
-
-                // console.log(collection.name);
 
                 const oProp = this.state.propProperties.find((val, index) => {
                     return val.PropId == propertyID;
@@ -554,7 +537,6 @@ export default class SearchResultView extends Component<Props> {
     }
 
 
-
     renderItem({ item, index }) {
 
         return (
@@ -587,11 +569,8 @@ export default class SearchResultView extends Component<Props> {
                 }
                 }
             />
-
-
         );
     }
-
 
     renderResultView() {
         if (this.state.loading) {
@@ -621,7 +600,6 @@ export default class SearchResultView extends Component<Props> {
                         </TouchableOpacity>
                     </View>
                     :
-
                     <FlatList
                         data={this.state.propProperties}
                         extraData={this.state}

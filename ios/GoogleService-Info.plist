@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1093883421506-7e08453lrq4jl1kmr0d4f7n69epkgmia.apps.googleusercontent.com</string>
+	<string>600562295208-f5hact7m4lhbjddtncq7hs4lcb4ejqju.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1093883421506-7e08453lrq4jl1kmr0d4f7n69epkgmia</string>
+	<string>com.googleusercontent.apps.600562295208-f5hact7m4lhbjddtncq7hs4lcb4ejqju</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAlN9avE52Jnqso_BP7VUAroWx4DKZ0WnI</string>
+	<string>AIzaSyDgvYW4q3httME2in6qgD-_OT-qSUL6XnM</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1093883421506</string>
+	<string>600562295208</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.rootcodelabs.native.example.Realestate</string>
 	<key>PROJECT_ID</key>
-	<string>realestate-be70e</string>
+	<string>realstatedb-2adc9</string>
 	<key>STORAGE_BUCKET</key>
-	<string>realestate-be70e.appspot.com</string>
+	<string>realstatedb-2adc9.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,8 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1093883421506:ios:81e40ecf0127186b</string>
+	<string>1:600562295208:ios:81e40ecf0127186b</string>
 	<key>DATABASE_URL</key>
-	<string>https://realestate-be70e.firebaseio.com</string>
+	<string>https://realstatedb-2adc9.firebaseio.com</string>
 </dict>
 </plist>
