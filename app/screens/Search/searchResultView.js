@@ -419,6 +419,13 @@ export default class SearchResultView extends Component<Props> {
         // db.ref('Collections/').child(user.uid).child(this.state.collectionName).child(this.state.propertyID).set(true)
         db.ref(`Users/${user.uid}/Collections/${this.state.collectionName}/${this.state.propertyID}`).set(true)
             .then(() => {
+                const oProp = this.state.propProperties.find((val, index) => {
+                    return val.PropId == this.state.propertyID;
+                });
+
+                if (oProp) {
+                    oProp.isFavourite = true;
+                }
                 console.log('Inserted!');
                 this.handleCreateNewCollectionCancel();
             }).catch((error) => {

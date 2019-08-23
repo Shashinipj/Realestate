@@ -11,7 +11,10 @@ import firebase from 'react-native-firebase';
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 import Accounting from 'accounting-js';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import MetComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FeaturedListItem from '../../component/featuredListItemComponent';
+import RNFetchBlob from 'react-native-fetch-blob';
+import ImagePicker from 'react-native-image-crop-picker';
 // import FeaturedListItem from "../../component/featuredListItemComponent";
 
 let PropRef = db.ref('/PropertyType');
@@ -44,7 +47,7 @@ export default class SearchScreen extends Component {
             confirmPassword: '',
             error: '',
             success: '',
-            UserName: '',
+            userName: '',
             contactNumber: '',
             address: '',
             loginState: false,
@@ -53,7 +56,9 @@ export default class SearchScreen extends Component {
             scroll: false,
             uid: '',
 
-            refreshing: false
+            refreshing: false,
+            profilePic: null,
+            profilePicUrl: null
         };
 
         // this.forgotPassword_Modal = this.forgotPassword_Modal.bind(this);
@@ -64,7 +69,6 @@ export default class SearchScreen extends Component {
         firebase.auth().onAuthStateChanged(user => {
             this.fetchUser(user);
             console.log("USER: " + user);
-
         });
 
         this.loadData();
@@ -100,7 +104,6 @@ export default class SearchScreen extends Component {
                                 featuredProps.push(propObj);
                             }
                         }
-
                     }
                 }
 
@@ -112,11 +115,8 @@ export default class SearchScreen extends Component {
                 }, () => {
                     resolve();
                 });
-
             });
         });
-
-
     }
 
     fetchUser(user) {
@@ -132,8 +132,14 @@ export default class SearchScreen extends Component {
                 email: '',
                 loginState: false,
                 password: '',
+                confirmPassword: '',
                 error: '',
                 success: '',
+                userName: '',
+                contactNumber: '',
+                address: '',
+                profilePic: null,
+                profilePicUrl: null,
             });
         }
     }
@@ -142,95 +148,24 @@ export default class SearchScreen extends Component {
         this.setState({ modalVisible: visible });
     }
 
-    // handleChange(checked) {
-    //     this.setState({ checked });
-    // }
-
     onPress_Register() {
         this.setState({
             signUpVisible: !this.state.signUpVisible,
             email: '',
             password: '',
+            confirmPassword: '',
             error: '',
-            success: ''
+            success: '',
+            userName: '',
+            contactNumber: '',
+            address: '',
+            profilePic: null,
+            profilePicUrl: null,
         });
     }
 
     forgotPassword_Modal(visible) {
-        // Alert.alert(
-        //     'Forgot password',
-        //     'Open web browser to reset your password via our mobile website?',
-        //     [
-        //         {
-        //             text: 'Cancel',
-        //             onPress: () => console.log('Cancel Pressed'),
-        //             style: 'cancel',
-        //         },
-        //         { text: 'OK', onPress: () => console.log('OK Pressed') },
-        //     ],
-        //     { cancelable: false },
-        // );
-
-
         this.setState({ forgotPasswordModal: visible });
-
-    }
-
-    renderForgotPasswordModal() {
-        return (
-
-            <Modal
-                // animationType="slide"
-
-                transparent={true}
-                visible={this.state.forgotPasswordModal}
-                onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                }}>
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 30 }}>
-
-                    <View style={{
-                        backgroundColor: '#ffffff', width: '90%', height: '25%', margin: 20, alignItems: 'center', justifyContent: 'center',
-                        borderRadius: 15
-                    }}>
-                        {/* <Text>Please enter your email</Text> */}
-                        <View style={{ borderBottomWidth: 1, width: '90%', backgroundColor: '#ffffff' }}>
-                            <TextInput
-                                label="Email"
-                                value={this.state.email}
-                                style={styles.textinput}
-                                secureTextEntry={false}
-                                onChangeText={email => this.setState({ email })}
-                                editable={true}
-                                maxLength={40}
-                                placeholder='Please enter your email'
-                            />
-
-                        </View>
-                        <View style={{ flexDirection: 'row', padding: 10, marginTop: 20 }}>
-
-                            <View style={{ alignContent: 'flex-start', flex: 1, alignItems: 'center' }}>
-                                <TouchableOpacity onPress={() => this.forgotPassword_Modal(false)} >
-                                    <Text style={{ fontSize: 17, fontWeight: '500' }}>Cancel</Text>
-                                </TouchableOpacity>
-
-                            </View>
-
-                            <View style={{ alignContent: 'flex-start', flex: 1, alignItems: 'center' }}>
-                                <TouchableOpacity onPress={() => {
-                                    this.forgotPassword(this.state.email);
-                                }}>
-                                    <Text style={{ fontSize: 17, fontWeight: '500' }}>OK</Text>
-                                </TouchableOpacity>
-                            </View>
-
-                        </View>
-
-                    </View>
-                </View>
-
-            </Modal>
-        );
     }
 
     forgotPassword(yourEmail) {
@@ -263,11 +198,42 @@ export default class SearchScreen extends Component {
                 let errorCode = error.code
                 let errorMessage = error.message;
                 if (errorCode == 'auth/weak-password') {
-                    this.onLoginFailure.bind(this)('Weak password!')
+                    this.onLoginFailure('Weak password!')
                 } else {
-                    this.onLoginFailure.bind(this)(errorMessage)
+                    this.onLoginFailure(errorMessage)
                 }
             });
+    }
+
+    validateSignUpForm() {
+        const { userName, email, password, confirmPassword, contactNumber, address } = this.state;
+
+        if (userName != '') {
+            if (password != '') {
+                if (confirmPassword != '') {
+                    if (contactNumber != '') {
+                        if (password == confirmPassword) {
+                            this.onSignUPButtonPress();
+                        }
+                        else {
+                            alert('Passwords do not match!');
+                        }
+                    }
+                    else {
+                        alert('Please enter your contact number')
+                    }
+                }
+                else {
+                    alert('Please confirm your Password');
+                }
+            }
+            else {
+                alert('Please enter a password ');
+            }
+        }
+        else {
+            alert('Please enter a user name');
+        }
     }
 
     onSignInButtonPress() {
@@ -278,6 +244,7 @@ export default class SearchScreen extends Component {
             .auth()
             .signInWithEmailAndPassword(email, password)
             .then(() => {
+                this.saveUserDetails();
                 this.onLoginSuccess();
                 this.clearAsyncStorage();
             })
@@ -286,6 +253,89 @@ export default class SearchScreen extends Component {
                 let errorMessage = error.message;
                 this.onLoginFailure(errorMessage)
             });
+    }
+
+    saveUserDetails() {
+        const user = firebase.auth().currentUser;
+
+        this.saveProfilePicture(this.state.profilePic, user.uid)
+            .then(() => {
+                db.ref(`Users/${user.uid}/UserDetails`)
+                    .set(
+                        {
+                            UserName: this.state.userName,
+                            Email: this.state.email,
+                            ContactNumber: this.state.contactNumber,
+                            Address: this.state.address,
+                            ProfilePicUrl: this.state.profilePicUrl
+
+                        })
+                    .then(() => {
+
+                        console.log('Saved User Details!!!');
+                        // console.log('image1', this.state.images);
+                        alert("Succefully created a account!");
+                        // this.resetPropertyView();
+
+                        // this.props.navigation.pop();
+                    }).catch((error) => {
+                        console.log(error)
+                    });
+
+            }).catch((error) => {
+                console.log(error)
+            });
+
+
+    }
+
+    saveProfilePicture(profilePic, uid) {
+
+        return new Promise((resolve, reject) => {
+
+            console.log('profilePic', profilePic);
+
+            const image = profilePic.uri
+
+            const Blob = RNFetchBlob.polyfill.Blob
+            const fs = RNFetchBlob.fs
+            window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+            window.Blob = Blob
+
+            let imageUrl = [];
+            let uploadBlob = null
+            const imgName = new Date().getTime();
+
+            console.log('imgName', imgName);
+            const imageRef = firebase.storage().ref(`ProfilePictures/${uid}`);
+            let mime = 'image/jpg'
+            fs.readFile(image, 'base64')
+                .then((data) => {
+                    return Blob.build(data, { type: `${mime};BASE64` })
+                })
+                .then((blob) => {
+                    uploadBlob = blob
+                    return imageRef.put(blob._ref, { contentType: mime });
+                })
+                .then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                })
+                .then((url) => {
+                    // URL of the image uploaded on Firebase storage
+                    console.log(url);
+                    this.setState({
+                        profilePicUrl: url
+                    });
+                    console.log('profilePicUrl', this.state.profilePicUrl);
+                    resolve(true);
+                })
+                .catch((error) => {
+                    console.log(error);
+
+                    reject(error);
+                });
+        });
     }
 
     clearAsyncStorage = async () => {
@@ -307,14 +357,87 @@ export default class SearchScreen extends Component {
         this.setState({
             email: '',
             password: '',
+            confirmPassword: '',
             error: '',
             success: '',
+            userName: '',
+            contactNumber: '',
+            address: '',
+            profilePic: null,
+            profilePicUrl: null,
             loading: false
         })
     }
 
+    /**
+   * 
+   * @param {NativeSyntheticEvent<NativeScrollEvent>} event 
+   */
+    onScroll(event) {
+
+        if (event && event.nativeEvent) {
+            const offset = event.nativeEvent.contentOffset;
+
+            console.log(offset);
+
+            if (offset.y > 10) {
+                if (!this.state.scroll) {
+                    this.setState({
+                        scroll: true
+                    });
+                }
+            }
+
+            else {
+                this.setState({
+                    scroll: false
+                });
+            }
+        }
+    }
+
     onLoginFailure(errorMessage) {
         this.setState({ error: errorMessage, loading: false, success: '' })
+    }
+
+    onRefresh() {
+        this.setState({
+            refreshing: true,
+            // loading: false
+        });
+        this.loadData()
+            .then(() => {
+                this.setState({
+                    refreshing: false,
+                    // loading: false
+                });
+            });
+    }
+
+    pickProfilePicture() {
+        ImagePicker.openPicker({
+            width: 500,
+            height: 500,
+            // cropping: cropit,
+            // cropperCircleOverlay: circular,
+            compressImageMaxWidth: 1000,
+            compressImageMaxHeight: 1000,
+            compressImageQuality: 1,
+            // compressVideoPreset: 'MediumQuality',
+            includeExif: true,
+        }).then(image => {
+            console.log('received image', image);
+            this.setState({
+                // profilePic: {  width: image.width, height: image.height, mime: image.mime },
+                profilePic: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
+                // images: null
+            });
+
+            // console.log('image', this.state.image.uri);
+        }).catch(e => {
+            console.log(e);
+            Alert.alert(e.message ? e.message : e);
+        });
     }
 
     renderJoinButton() {
@@ -414,7 +537,72 @@ export default class SearchScreen extends Component {
                 </View>
             );
         }
+    }
 
+    renderImage(image) {
+        return (
+            <TouchableOpacity style={{}} onPress={this.pickProfilePicture.bind(this)} >
+                <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 50 }} source={image} >
+                    {/* <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
+                        <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
+                    </TouchableOpacity> */}
+
+                </Image>
+            </TouchableOpacity>
+
+        );
+    }
+
+    renderForgotPasswordModal() {
+        return (
+
+            <Modal
+                // animationType="slide"
+                transparent={true}
+                visible={this.state.forgotPasswordModal}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+
+                    <View style={{
+                        backgroundColor: '#ffffff', width: '90%', height: '25%', margin: 20, alignItems: 'center', justifyContent: 'center',
+                        borderRadius: 15
+                    }}>
+                        <View style={{ borderBottomWidth: 1, width: '90%', backgroundColor: '#ffffff' }}>
+                            <TextInput
+                                label="Email"
+                                value={this.state.email}
+                                style={styles.textinput}
+                                secureTextEntry={false}
+                                onChangeText={email => this.setState({ email })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Please enter your email'
+                            />
+
+                        </View>
+                        <View style={{ flexDirection: 'row', padding: 10, marginTop: 20 }}>
+
+                            <View style={{ alignContent: 'flex-start', flex: 1, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => this.forgotPassword_Modal(false)} >
+                                    <Text style={{ fontSize: 17, fontWeight: '500' }}>Cancel</Text>
+                                </TouchableOpacity>
+
+                            </View>
+
+                            <View style={{ alignContent: 'flex-start', flex: 1, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => {
+                                    this.forgotPassword(this.state.email);
+                                }}>
+                                    <Text style={{ fontSize: 17, fontWeight: '500' }}>OK</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        );
     }
 
     renderItem({ item, index }) {
@@ -427,8 +615,7 @@ export default class SearchScreen extends Component {
         );
     }
 
-
-    loginScreenImage() {
+    renderLoginScreenImage() {
         if (!this.state.loginState) {
             return (
                 <Image source={require('../../assets/images/search-home.jpg')} style={styles.imageTop} />
@@ -454,22 +641,6 @@ export default class SearchScreen extends Component {
         }
     }
 
-    onRefresh() {
-        this.setState({
-            refreshing: true,
-            // loading: false
-        });
-        this.loadData()
-            .then(() => {
-                this.setState({
-                    refreshing: false,
-                    // loading: false
-                });
-            });
-
-
-    }
-
     renderSignUpSignInView() {
         if (!this.state.signUpVisible) {
 
@@ -488,18 +659,13 @@ export default class SearchScreen extends Component {
                     <View style={{}}>
                         <TouchableOpacity style={{ margin: 20 }} onPress={() => {
                             this.forgotPassword_Modal(true);
-                            // this.setModalVisible(false);
-                        }
-                        }>
-                            {/* <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text> */}
+                        }}>
                             <Text style={{ color: '#212121', fontSize: 12, fontWeight: '600' }}>Forgot your password?</Text>
                         </TouchableOpacity>
 
                         <View style={{ flexDirection: 'row' }}>
-                            {/* <Text style={{ color: '#616161', fontSize: 12 }}>Don't have an account? {' '}</Text> */}
                             <Text style={{ color: '#eeeeee', fontSize: 12, fontWeight: '700' }}>Don't have an account? {' '}</Text>
                             <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                                {/* <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Register</Text> */}
                                 <Text style={{ color: '#212121', fontSize: 12, fontWeight: '600' }}>Register</Text>
                             </TouchableOpacity>
                         </View>
@@ -512,32 +678,23 @@ export default class SearchScreen extends Component {
             return (
                 <View style={{ alignItems: "center" }} >
                     <View style={{ alignSelf: 'center', width: '100%' }}>
-                        <TouchableOpacity style={styles.loginButton} onPress={this.onSignUPButtonPress.bind(this)}>
+                        <TouchableOpacity style={styles.loginButton} onPress={this.validateSignUpForm.bind(this)}>
                             <Text style={{ textAlign: 'center', color: '#ffffff' }}>Create account</Text>
-
                         </TouchableOpacity>
                     </View>
 
-                    {/* <TouchableOpacity style={{ margin: 20 }} onPress={this.forgotPassword_Alert}> */}
-                    {/* <Text style={{ color: '#49141E', fontSize: 12 }}>Forgot your password?</Text> */}
-
                     <View style={{ flexDirection: 'row', margin: 20 }}>
-                        {/* <Text style={{ color: '#616161', fontSize: 12 }}>Already have an account? {' '}</Text> */}
                         <Text style={{ color: '#eeeeee', fontSize: 12, fontWeight: '700' }}>Already have an account? {' '}</Text>
                         <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
-                            {/* <Text style={{ color: '#49141E', fontSize: 12, fontWeight: '500' }}>Sign in</Text> */}
                             <Text style={{ color: '#212121', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
                         </TouchableOpacity>
                     </View>
-
-                    {/* </TouchableOpacity> */}
-
                 </View>
             );
         }
     }
 
-    showJoinModal() {
+    renderJoinModal() {
 
         return (
 
@@ -548,7 +705,6 @@ export default class SearchScreen extends Component {
                 onRequestClose={() => {
                     Alert.alert('Modal has been closed.');
                 }}>
-                {/* <View style={{ marginTop: 22, backgroundColor: '#f3d500' }}> */}
 
                 {/* <ImageBackground source={require('../../assets/images/skycraper.jpg')} style={{height:'100%', width:'100%'}}> */}
                 <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{ height: '100%', width: '100%' }}>
@@ -563,8 +719,7 @@ export default class SearchScreen extends Component {
                             }}
                             onPress={() => {
                                 this.setModalVisible(!this.state.modalVisible);
-                                // this.onLoginSuccess.bind(this);
-                                this.loginReset.bind(this)();
+                                this.loginReset();
                             }}>
 
                             <Icon
@@ -577,8 +732,6 @@ export default class SearchScreen extends Component {
                     </View>
 
                     <View style={styles.modalContainer}>
-
-                        {/* <View style={{backgroundColor:'yellow', marginVertical: 5}}> */}
 
                         {this.renderForms()}
 
@@ -661,22 +814,37 @@ export default class SearchScreen extends Component {
         else {
             return (
                 <View style={{}}>
-                    <Image source={require('../../assets/images/muthu.png')} style={[styles.image, {marginBottom: 10}]} />
+                    <Image source={require('../../assets/images/muthu.png')} style={[styles.image, { marginBottom: 10 }]} />
+
+                    <TouchableOpacity onPress={this.pickProfilePicture.bind(this)}>
+                        <View style={{
+                            width: 100, height: 100, alignSelf: 'center', backgroundColor: '#ffffff', marginBottom: 15,
+                            borderRadius: 50
+                        }}>
+                            {this.state.profilePic ? <View style={{
+                                width: 100, height: 100, alignSelf: 'center', backgroundColor: '#ffffff', marginBottom: 10,
+                                borderRadius: 50
+                            }}>{this.renderImage(this.state.profilePic)}</View> :
+                                null
+                            }
+                        </View>
+                    </TouchableOpacity>
+
                     <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
 
                         <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
                             <Icon
-                                name="email"
+                                name="person"
                                 type='MaterialIcons'
-                                size={20}
+                                size={25}
                                 color='gray'
                             />
                             <TextInput
                                 label="UserName"
-                                value={this.state.UserName}
+                                value={this.state.userName}
                                 style={styles.textinput}
                                 secureTextEntry={false}
-                                onChangeText={UserName => this.setState({ UserName })}
+                                onChangeText={userName => this.setState({ userName })}
                                 editable={true}
                                 maxLength={40}
                                 placeholder='User Name' />
@@ -750,7 +918,7 @@ export default class SearchScreen extends Component {
 
                         <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
                             <Icon
-                                name="email"
+                                name="phone"
                                 type='MaterialIcons'
                                 size={20}
                                 color='gray'
@@ -769,10 +937,10 @@ export default class SearchScreen extends Component {
                         <View style={{ height: 1, backgroundColor: '#E0E0E0', width: '100%' }}></View>
 
                         <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
-                            <Icon
-                                name="email"
-                                type='MaterialIcons'
-                                size={20}
+                            <MetComIcon
+                                name="home-map-marker"
+                                type='MaterialCommunityIcons'
+                                size={25}
                                 color='gray'
                             />
                             <TextInput
@@ -791,33 +959,6 @@ export default class SearchScreen extends Component {
         }
     }
 
-    /**
-     * 
-     * @param {NativeSyntheticEvent<NativeScrollEvent>} event 
-     */
-    onScroll(event) {
-
-        if (event && event.nativeEvent) {
-            const offset = event.nativeEvent.contentOffset;
-
-            console.log(offset);
-
-            if (offset.y > 10) {
-                if (!this.state.scroll) {
-                    this.setState({
-                        scroll: true
-                    });
-                }
-            }
-
-            else {
-                this.setState({
-                    scroll: false
-                });
-            }
-        }
-    }
-
     renderAddNewProperty() {
         if (this.state.refreshing) {
             return null;
@@ -828,9 +969,7 @@ export default class SearchScreen extends Component {
 
             return (
                 <TouchableOpacity
-                    // style={{ backgroundColor: 'green', position: 'absolute', flex: 1, width: '100%', top: 105 }}
                     style={{ backgroundColor: 'green', flex: 1, width: '100%' }}
-                    // style={styles.addNewPropertyView}
                     onPress={() => {
                         this.props.navigation.navigate('AddPropertyScreen');
                         console.log("touchableOpacity test add new");
@@ -876,9 +1015,6 @@ export default class SearchScreen extends Component {
 
         return (
             <SafeAreaView style={styles.container}>
-
-                {/* <ScrollView> */}
-
                 <View style={{}}>
                     <View style={styles.searchBarView}>
 
@@ -910,23 +1046,18 @@ export default class SearchScreen extends Component {
                         />
                     }
                 >
-
                     {this.renderAddNewProperty()}
-                    {this.loginScreenImage()}
+                    {this.renderLoginScreenImage()}
 
                     <View style={styles.bottomContainer}>
 
                         {this.renderJoinButton()}
 
                     </View>
-
                 </ScrollView>
 
-
                 {this.renderAddNewProperty2()}
-
-                {this.showJoinModal()}
-
+                {this.renderJoinModal()}
 
             </SafeAreaView>
         );
@@ -984,14 +1115,14 @@ const styles = StyleSheet.create({
         // backgroundColor: '#757575',
         flex: 1,
         alignItems: 'center',
-        paddingTop: 50
+        // paddingTop: 30
     },
     image: {
         width: 200,
         height: 100,
         resizeMode: 'contain',
         marginBottom: 50,
-        alignSelf:'center'
+        alignSelf: 'center'
 
     },
     textinput: {

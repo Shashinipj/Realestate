@@ -95,13 +95,13 @@ export default class AddPropertyScreen extends Component<Props> {
     //     }).catch(e => console.log(e));
     // }
 
-    cleanupImages() {
-        ImagePicker.clean().then(() => {
-            console.log('removed tmp images from tmp directory');
-        }).catch(e => {
-            console.log(e);
-        });
-    }
+    // cleanupImages() {
+    //     ImagePicker.clean().then(() => {
+    //         console.log('removed tmp images from tmp directory');
+    //     }).catch(e => {
+    //         console.log(e);
+    //     });
+    // }
 
     pickSingle() {
         ImagePicker.openPicker({
@@ -207,11 +207,9 @@ export default class AddPropertyScreen extends Component<Props> {
             window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
             window.Blob = Blob
 
-
             let imageUrl = [];
             let uploadBlob = null
             const imgName = new Date().getTime();
-
 
             console.log('imgName', imgName);
             const imageRef = firebase.storage().ref(`PropImages/${propID}/${imgName}`);
@@ -222,8 +220,6 @@ export default class AddPropertyScreen extends Component<Props> {
                 })
                 .then((blob) => {
                     uploadBlob = blob
-                    // return imageRef.put(blob, { contentType: mime })
-
                     return imageRef.put(blob._ref, { contentType: mime });
                 })
                 .then(() => {
@@ -243,7 +239,6 @@ export default class AddPropertyScreen extends Component<Props> {
                     reject(error);
                 });
         });
-
     }
 
     locationModalVisible(visible) {
@@ -548,7 +543,6 @@ export default class AddPropertyScreen extends Component<Props> {
                     </View>
 
                 </TouchableOpacity>
-
             );
         }
         else {

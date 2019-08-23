@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage, Image, ScrollView, FlatList, ImageBackground } from 'react-native';
-import { NavigationProp, NavigationEvents } from 'react-navigation';
+import {
+    View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage,
+    Image, ScrollView, FlatList, ImageBackground, Modal, TextInput
+} from 'react-native';
+import { NavigationProp, NavigationEvents, SafeAreaView } from 'react-navigation';
 import firebase from 'react-native-firebase';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -9,6 +12,7 @@ import Switch from 'react-native-switch-pro'
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { db, fbStorage } from '../../Database/db';
 import ListItem from '../../component/listItemComponent'
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -36,7 +40,13 @@ export default class ProfileScreen extends Component<Props> {
             myProperties: [],
             uid: '',
             propertyID: '',
-            visibleAd: false
+            visibleAd: false,
+            userName: '',
+            profilePic: '',
+            contactNumber: '',
+            address: '',
+
+            editModalVisible: false
         };
     }
 
@@ -57,6 +67,7 @@ export default class ProfileScreen extends Component<Props> {
 
         if (user) {
             this.getMyProperties(user);
+            this.getUserDetails(user);
             this.setState({
                 userEmail: user.email,
                 loggedIn: true,
@@ -68,6 +79,22 @@ export default class ProfileScreen extends Component<Props> {
                 userEmail: '',
                 loggedIn: false,
                 uid: ''
+            });
+        }
+    }
+
+    getUserDetails(user) {
+        if (user) {
+            db.ref(`Users/${user.uid}/UserDetails`).once('value', (snapshot) => {
+                const userdetails = snapshot.val();
+                console.log('userdetails', userdetails);
+
+                this.setState({
+                    userName: userdetails.UserName,
+                    profilePic: userdetails.ProfilePicUrl,
+                    contactNumber: userdetails.ContactNumber,
+                    address: userdetails.Address
+                });
             });
         }
     }
@@ -129,16 +156,20 @@ export default class ProfileScreen extends Component<Props> {
 
 
     switchLocationEnable(value) {
-
         this.setState({
             isLocationEnable: value
         });
     }
 
     switchNotificationEnable(value) {
-
         this.setState({
             receiveNotification: value
+        });
+    }
+
+    onPressProfileEditButton(visible) {
+        this.setState({
+            editModalVisible: visible
         });
     }
 
@@ -316,6 +347,82 @@ export default class ProfileScreen extends Component<Props> {
 
     }
 
+    renderEditProfileModal() {
+
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={this.state.editModalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                    <View style={{
+                        backgroundColor: '#e0e0e0', width: '90%', height: '70%', margin: 20, justifyContent: 'center',
+                        borderRadius: 15, padding: 10
+                    }}>
+
+                        <TouchableOpacity style={{ alignSelf: 'flex-end', padding: 10 }} onPress={() => {
+                            this.onPressProfileEditButton(false);
+                        }}>
+                            <Text>Close</Text>
+                        </TouchableOpacity>
+
+                        <ScrollView style={{  }}>
+                            <View>
+                                <Text style={{ color: 'grey', marginBottom: 5 }}>Username</Text>
+                                {/* <Text style={{ fontSize: 15 }}>{this.state.userName}</Text> */}
+                                <TextInput
+                                label="UserName"
+                                value={this.state.userName}
+                                style={[styles.textinput, {backgroundColor:'white', padding: 5}]}
+                                secureTextEntry={false}
+                                onChangeText={userName => this.setState({ userName })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='User Name' />
+
+                            </View>
+
+                            <View style={{ marginTop: 20 }}>
+                                <Text style={{ color: 'grey', marginBottom: 5 }}>Contact Number</Text>
+                                {/* <Text style={{ fontSize: 15 }}>{this.state.contactNumber}</Text> */}
+                                <TextInput
+                                label="ContactNumber"
+                                value={this.state.contactNumber}
+                                style={[styles.textinput, {backgroundColor:'white', padding: 5}]}
+                                secureTextEntry={false}
+                                onChangeText={contactNumber => this.setState({ contactNumber })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Contact Number' />
+                            </View>
+
+                            <View style={{ marginTop: 20 }}>
+                                <Text style={{ color: 'grey', marginBottom: 5 }}>Address</Text>
+                                {/* <Text style={{ fontSize: 15 }}>{this.state.address}</Text> */}
+                                <TextInput
+                                label="address"
+                                value={this.state.address}
+                                style={[styles.textinput, {backgroundColor:'white', padding: 5}]}
+                                secureTextEntry={false}
+                                onChangeText={address => this.setState({ address })}
+                                editable={true}
+                                maxLength={40}
+                                placeholder='Address' />
+
+                            </View>
+
+                        </ScrollView>
+                    </View>
+                </View>
+
+            </Modal>
+        );
+
+    }
+
     renderProfileView() {
         if (!this.state.loggedIn) {
             return (
@@ -336,32 +443,27 @@ export default class ProfileScreen extends Component<Props> {
                             </View>
                         </TouchableOpacity>
                     </View>
-
                 </View>
             );
         }
 
         else if (this.state.loggedIn) {
-            console.log("list: ", this.state.myProperties);
+            // console.log("list: ", this.state.myProperties);
 
             return (
                 <View style={styles.buttonContainer}>
-                    {/* <View style={{ justifyContent: 'flex-start', backgroundColor: '#49141E' }}> */}
                     <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{}}>
                         <View style={{ justifyContent: 'flex-start' }}>
                             <View style={{
                                 width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20,
                                 backgroundColor: '#ffffff', padding: 0
                             }}>
-                                <Image source={require('../../assets/images/owner2.png')} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
+                                <Image source={{ uri: this.state.profilePic }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                             </View>
-
-                            {/* <Text style={{ color: '#ffffff', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>Robin Peiterson</Text> */}
-                            <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>Theepan Muthulingam</Text>
+                            <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>{this.state.userName}</Text>
 
                         </View>
                     </ImageBackground>
-
 
                     <View style={{ backgroundColor: '#ffffff', flex: 1, justifyContent: 'center' }}>
 
@@ -372,53 +474,67 @@ export default class ProfileScreen extends Component<Props> {
                             <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', alignContent: 'center', paddingLeft: 30 }}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        {/* <Meticon name="email-outline" size={25} style={{ color: '#49141E' }} /> */}
                                         <Meticon name="email-outline" size={25} style={{ color: '#212121' }} />
                                     </View>
                                     <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text>
-                                    {/* <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>robinpeiter@gmail.com</Text> */}
 
                                 </View>
 
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        {/* <Meticon name="phone" size={25} style={{ color: '#49141E' }} /> */}
                                         <Meticon name="phone" size={25} style={{ color: '#212121' }} />
                                     </View>
-                                    <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>+94 77 1111111</Text>
+                                    <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.contactNumber}</Text>
 
                                 </View>
 
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        {/* <Octicons name="location" size={25} style={{ color: '#49141E' }} /> */}
                                         <Octicons name="location" size={25} style={{ color: '#212121' }} />
                                     </View>
-                                    <Text style={{ fontSize: 15, fontWeight: '400', justifyContent: 'center', color: 'grey', alignSelf: 'center' }}>Colombo</Text>
+                                    <Text style={{ fontSize: 15, fontWeight: '400', justifyContent: 'center', color: 'grey', alignSelf: 'center' }}>{this.state.address}</Text>
 
                                 </View>
                             </View>
 
 
                             <View style={{ padding: 10, paddingHorizontal: 30, backgroundColor: '#ffffff', }}>
-                                <ScrollView style={{ paddingTop: 10 }}>
+
+                                <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => {
+                                    this.onPressProfileEditButton(true);
+                                }}>
+                                    <View>
+                                        {/* <Text>Edit</Text> */}
+                                        <AntDesign
+                                            name="edit"
+                                            size={20}
+                                            style={{ marginRight: 0 }}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+
+                                <ScrollView style={{ paddingTop: 20 }}>
 
                                     <View>
                                         <Text style={{ color: 'grey', marginBottom: 5 }}>Username</Text>
-                                        <Text style={{ fontSize: 15 }}>Theepan Muthulingam</Text>
+                                        <Text style={{ fontSize: 15 }}>{this.state.userName}</Text>
 
                                     </View>
 
                                     <View style={{ marginTop: 20 }}>
                                         <Text style={{ color: 'grey', marginBottom: 5 }}>Email</Text>
                                         <Text style={{ fontSize: 15 }}>{this.state.userEmail}</Text>
-                                        {/* <Text style={{ fontSize: 15 }}>robinpeiter@gmail.com</Text> */}
 
                                     </View>
 
                                     <View style={{ marginTop: 20 }}>
-                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Location</Text>
-                                        <Text style={{ fontSize: 15 }}>Colombo</Text>
+                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Contact Number</Text>
+                                        <Text style={{ fontSize: 15 }}>{this.state.contactNumber}</Text>
+                                    </View>
+
+                                    <View style={{ marginTop: 20 }}>
+                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Address</Text>
+                                        <Text style={{ fontSize: 15 }}>{this.state.address}</Text>
                                     </View>
 
                                     <View style={{ marginTop: 20 }}>
@@ -603,7 +719,7 @@ export default class ProfileScreen extends Component<Props> {
         return (
             <View style={styles.container}>
                 {this.renderProfileView()}
-
+                {this.renderEditProfileModal()}
             </View>
         );
     }
