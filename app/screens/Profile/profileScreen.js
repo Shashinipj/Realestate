@@ -66,8 +66,12 @@ export default class ProfileScreen extends Component<Props> {
         console.log("UUUSER:", user);
 
         if (user) {
-            this.getMyProperties(user);
-            this.getUserDetails(user);
+            if (this.userProperties) {
+
+                this.getMyProperties(user);
+                this.getUserDetails(user);
+            }
+
             this.setState({
                 userEmail: user.email,
                 loggedIn: true,
@@ -352,14 +356,15 @@ export default class ProfileScreen extends Component<Props> {
         return (
             <Modal
                 animationType="slide"
-                transparent={true}
+                transparent={false}
                 visible={this.state.editModalVisible}
                 onRequestClose={() => {
                     Alert.alert('Modal has been closed.');
                 }}>
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 30 }}> */}
+                <SafeAreaView>
                     <View style={{
-                        backgroundColor: '#e0e0e0', width: '90%', height: '70%', margin: 20, justifyContent: 'center',
+                        backgroundColor: '#e0e0e0', width: '90%', height: '90%', margin: 20, justifyContent: 'center',
                         borderRadius: 15, padding: 10
                     }}>
 
@@ -369,19 +374,37 @@ export default class ProfileScreen extends Component<Props> {
                             <Text>Close</Text>
                         </TouchableOpacity>
 
-                        <ScrollView style={{  }}>
+                        <ScrollView style={{}}>
+
+                            <TouchableOpacity
+                            // onPress={this.pickProfilePicture.bind(this)}
+                            >
+                                <View style={{
+                                    width: 100, height: 100, alignSelf: 'center', backgroundColor: '#ffffff', marginBottom: 15,
+                                    borderRadius: 50
+                                }}>
+                                    <Image source={{ uri: this.state.profilePic }} style={{ width: 100, height: 100, borderRadius: 50, borderColor: '#ffffff', }} />
+                                    {/* {this.state.profilePic ? <View style={{
+                                        width: 100, height: 100, alignSelf: 'center', backgroundColor: '#ffffff', marginBottom: 10,
+                                        borderRadius: 50
+                                    }}>{this.renderImage(this.state.profilePic)}</View> :
+                                        null
+                                    } */}
+                                </View>
+                            </TouchableOpacity>
+
                             <View>
                                 <Text style={{ color: 'grey', marginBottom: 5 }}>Username</Text>
                                 {/* <Text style={{ fontSize: 15 }}>{this.state.userName}</Text> */}
                                 <TextInput
-                                label="UserName"
-                                value={this.state.userName}
-                                style={[styles.textinput, {backgroundColor:'white', padding: 5}]}
-                                secureTextEntry={false}
-                                onChangeText={userName => this.setState({ userName })}
-                                editable={true}
-                                maxLength={40}
-                                placeholder='User Name' />
+                                    label="UserName"
+                                    value={this.state.userName}
+                                    style={[styles.textinput, { backgroundColor: 'white', padding: 5 }]}
+                                    secureTextEntry={false}
+                                    onChangeText={userName => this.setState({ userName })}
+                                    editable={true}
+                                    maxLength={40}
+                                    placeholder='User Name' />
 
                             </View>
 
@@ -389,34 +412,38 @@ export default class ProfileScreen extends Component<Props> {
                                 <Text style={{ color: 'grey', marginBottom: 5 }}>Contact Number</Text>
                                 {/* <Text style={{ fontSize: 15 }}>{this.state.contactNumber}</Text> */}
                                 <TextInput
-                                label="ContactNumber"
-                                value={this.state.contactNumber}
-                                style={[styles.textinput, {backgroundColor:'white', padding: 5}]}
-                                secureTextEntry={false}
-                                onChangeText={contactNumber => this.setState({ contactNumber })}
-                                editable={true}
-                                maxLength={40}
-                                placeholder='Contact Number' />
+                                    label="ContactNumber"
+                                    value={this.state.contactNumber}
+                                    style={[styles.textinput, { backgroundColor: 'white', padding: 5 }]}
+                                    secureTextEntry={false}
+                                    onChangeText={contactNumber => this.setState({ contactNumber })}
+                                    editable={true}
+                                    maxLength={40}
+                                    placeholder='Contact Number' />
                             </View>
 
                             <View style={{ marginTop: 20 }}>
                                 <Text style={{ color: 'grey', marginBottom: 5 }}>Address</Text>
                                 {/* <Text style={{ fontSize: 15 }}>{this.state.address}</Text> */}
                                 <TextInput
-                                label="address"
-                                value={this.state.address}
-                                style={[styles.textinput, {backgroundColor:'white', padding: 5}]}
-                                secureTextEntry={false}
-                                onChangeText={address => this.setState({ address })}
-                                editable={true}
-                                maxLength={40}
-                                placeholder='Address' />
+                                    label="address"
+                                    value={this.state.address}
+                                    style={[styles.textinput, { backgroundColor: 'white', padding: 5 }]}
+                                    secureTextEntry={false}
+                                    onChangeText={address => this.setState({ address })}
+                                    editable={true}
+                                    maxLength={40}
+                                    placeholder='Address' />
 
                             </View>
 
                         </ScrollView>
+                        <TouchableOpacity style={{height: 30, width:'50%', backgroundColor:'#000000', alignSelf:'center', justifyContent:'center', borderRadius:4}}>
+                                    <Text style={{color:'white', fontSize:17, textAlign:'center'}}>Save</Text>
+                        </TouchableOpacity>
                     </View>
-                </View>
+                    {/* </View> */}
+                </SafeAreaView>
 
             </Modal>
         );

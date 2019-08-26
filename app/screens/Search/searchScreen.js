@@ -148,7 +148,7 @@ export default class SearchScreen extends Component {
         this.setState({ modalVisible: visible });
     }
 
-    onPress_Register() {
+    clearStateData() {
         this.setState({
             signUpVisible: !this.state.signUpVisible,
             email: '',
@@ -191,18 +191,22 @@ export default class SearchScreen extends Component {
             .auth()
             .createUserWithEmailAndPassword(this.state.email, this.state.password)
             .then(() => {
-                this.onSignInButtonPress();
+                this.saveUserDetails().then(() => {
+                    this.onSignInButtonPress();
+                })
+                    //   .catch(error => this.setState({ errorMessage: error.message }))
+                    .catch((error) => {
+                        let errorCode = error.code
+                        let errorMessage = error.message;
+                        if (errorCode == 'auth/weak-password') {
+                            this.onLoginFailure('Weak password!')
+                        } else {
+                            this.onLoginFailure(errorMessage)
+                        }
+                    });
+            }).catch((error) => {
+                console.log("save user data error: ", error);
             })
-            //   .catch(error => this.setState({ errorMessage: error.message }))
-            .catch((error) => {
-                let errorCode = error.code
-                let errorMessage = error.message;
-                if (errorCode == 'auth/weak-password') {
-                    this.onLoginFailure('Weak password!')
-                } else {
-                    this.onLoginFailure(errorMessage)
-                }
-            });
     }
 
     validateSignUpForm() {
@@ -244,7 +248,7 @@ export default class SearchScreen extends Component {
             .auth()
             .signInWithEmailAndPassword(email, password)
             .then(() => {
-                this.saveUserDetails();
+
                 this.onLoginSuccess();
                 this.clearAsyncStorage();
             })
@@ -256,37 +260,43 @@ export default class SearchScreen extends Component {
     }
 
     saveUserDetails() {
-        const user = firebase.auth().currentUser;
 
-        this.saveProfilePicture(this.state.profilePic, user.uid)
-            .then(() => {
-                db.ref(`Users/${user.uid}/UserDetails`)
-                    .set(
-                        {
-                            UserName: this.state.userName,
-                            Email: this.state.email,
-                            ContactNumber: this.state.contactNumber,
-                            Address: this.state.address,
-                            ProfilePicUrl: this.state.profilePicUrl
+        return new Promise((resolve, reject) => {
+            const user = firebase.auth().currentUser;
 
-                        })
-                    .then(() => {
+            this.saveProfilePicture(this.state.profilePic, user.uid)
+                .then(() => {
+                    db.ref(`Users/${user.uid}/UserDetails`)
+                        .set(
+                            {
+                                UserName: this.state.userName,
+                                Email: this.state.email,
+                                ContactNumber: this.state.contactNumber,
+                                Address: this.state.address,
+                                ProfilePicUrl: this.state.profilePicUrl
 
-                        console.log('Saved User Details!!!');
-                        // console.log('image1', this.state.images);
-                        alert("Succefully created a account!");
-                        // this.resetPropertyView();
+                            })
+                        .then(() => {
 
-                        // this.props.navigation.pop();
-                    }).catch((error) => {
-                        console.log(error)
-                    });
+                            console.log('Saved User Details!!!');
+                            // console.log('image1', this.state.images);
+                            // alert("Succefully created a account!");
+                            // this.setModalVisible(false);
+                            // this.resetPropertyView();
 
-            }).catch((error) => {
-                console.log(error)
-            });
+                            // this.props.navigation.pop();
+                            resolve(true);
+                        }).catch((error) => {
+                            console.log(error);
+                            reject(error);
+                        });
 
+                }).catch((error) => {
+                    console.log(error);
+                    reject(error);
+                });
 
+        });
     }
 
     saveProfilePicture(profilePic, uid) {
@@ -348,6 +358,7 @@ export default class SearchScreen extends Component {
         this.setState({
             error: '',
             success: 'Successfully login',
+            // modalVisible: false,
             modalVisible: !this.state.modalVisible,
             loginState: true
         })
@@ -665,7 +676,7 @@ export default class SearchScreen extends Component {
 
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={{ color: '#eeeeee', fontSize: 12, fontWeight: '700' }}>Don't have an account? {' '}</Text>
-                            <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
+                            <TouchableOpacity onPress={this.clearStateData.bind(this)}>
                                 <Text style={{ color: '#212121', fontSize: 12, fontWeight: '600' }}>Register</Text>
                             </TouchableOpacity>
                         </View>
@@ -685,7 +696,7 @@ export default class SearchScreen extends Component {
 
                     <View style={{ flexDirection: 'row', margin: 20 }}>
                         <Text style={{ color: '#eeeeee', fontSize: 12, fontWeight: '700' }}>Already have an account? {' '}</Text>
-                        <TouchableOpacity onPress={this.onPress_Register.bind(this)}>
+                        <TouchableOpacity onPress={this.clearStateData.bind(this)}>
                             <Text style={{ color: '#212121', fontSize: 12, fontWeight: '500' }}>Sign in</Text>
                         </TouchableOpacity>
                     </View>
