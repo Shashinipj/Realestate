@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage,
-    Image, ScrollView, FlatList, ImageBackground, Modal, TextInput
+    Image, ScrollView, FlatList, ImageBackground, Modal, TextInput, ActivityIndicator
 } from 'react-native';
 import { NavigationProp, NavigationEvents, SafeAreaView } from 'react-navigation';
 import firebase from 'react-native-firebase';
@@ -13,6 +13,8 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import { db, fbStorage } from '../../Database/db';
 import ListItem from '../../component/listItemComponent'
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import RNFetchBlob from 'react-native-fetch-blob';
+import ImagePicker from 'react-native-image-crop-picker';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -29,6 +31,9 @@ export default class ProfileScreen extends Component<Props> {
 
     userProperties = {};
 
+    isPicChanged = false;
+    isDetailsChanged = false;
+
     constructor(props) {
         super(props);
 
@@ -43,10 +48,12 @@ export default class ProfileScreen extends Component<Props> {
             visibleAd: false,
             userName: '',
             profilePic: '',
+            profilePicUrl: '',
             contactNumber: '',
             address: '',
 
-            editModalVisible: false
+            editModalVisible: false,
+            loading: true,
         };
     }
 
@@ -66,11 +73,8 @@ export default class ProfileScreen extends Component<Props> {
         console.log("UUUSER:", user);
 
         if (user) {
-            if (this.userProperties) {
-
-                this.getMyProperties(user);
-                this.getUserDetails(user);
-            }
+            this.getMyProperties(user);
+            this.getUserDetails(user);
 
             this.setState({
                 userEmail: user.email,
@@ -89,16 +93,18 @@ export default class ProfileScreen extends Component<Props> {
 
     getUserDetails(user) {
         if (user) {
-            db.ref(`Users/${user.uid}/UserDetails`).once('value', (snapshot) => {
+            db.ref(`Users/${user.uid}/UserDetails`).on('value', (snapshot) => {
                 const userdetails = snapshot.val();
                 console.log('userdetails', userdetails);
-
-                this.setState({
-                    userName: userdetails.UserName,
-                    profilePic: userdetails.ProfilePicUrl,
-                    contactNumber: userdetails.ContactNumber,
-                    address: userdetails.Address
-                });
+                if (userdetails) {
+                    this.setState({
+                        userName: userdetails.UserName,
+                        // profilePic: userdetails.ProfilePicUrl,
+                        profilePicUrl: userdetails.ProfilePicUrl,
+                        contactNumber: userdetails.ContactNumber,
+                        address: userdetails.Address
+                    });
+                }
             });
         }
     }
@@ -172,9 +178,20 @@ export default class ProfileScreen extends Component<Props> {
     }
 
     onPressProfileEditButton(visible) {
+        this.isPicChanged = false;
+
+        if (visible) {
+            this.state.profilePic = this.state.profilePicUrl;
+        }
+
         this.setState({
-            editModalVisible: visible
+            editModalVisible: visible,
         });
+        if (visible == false) {
+            this.setState({
+                // profilePic: '',
+            });
+        }
     }
 
 
@@ -351,7 +368,206 @@ export default class ProfileScreen extends Component<Props> {
 
     }
 
+    // editProfile() {
+
+    //     const user = firebase.auth().currentUser;
+
+    //     db.ref(`Users/${user.uid}/UserDetails`)
+    //         .update(
+    //             {
+    //                 UserName: this.state.userName,
+    //                 ContactNumber: this.state.contactNumber,
+    //                 Address: this.state.address,
+    //                 ProfilePicUrl: this.state.profilePicUrl
+
+    //             })
+    //         .then(() => {
+
+
+    //             // this.saveProfilePicture(this.state.profilePic, user.uid)
+    //             //     .then(() => {
+
+    //             //         this.onPressProfileEditButton(false);
+    //             //         console.log('Update User Details!!!');
+
+    //             //     }).catch((error) => {
+    //             //         console.log('image update error', error);
+    //             //     });
+    //             // this.setState({
+    //             //     loading: false,
+    //             // });
+
+
+    //         }).catch((error) => {
+    //             console.log('update error', error);
+    //         });
+    // }
+
+    updateProfilePic() {
+
+        return new Promise((resolve, reject) => {
+
+            if (!this.isPicChanged) {
+                resolve(true);
+                return;
+            }
+
+            const user = firebase.auth().currentUser;
+
+            this.saveProfilePicture(this.state.profilePic, user.uid)
+                .then(() => {
+
+                    // this.onPressProfileEditButton(false);
+                    console.log('Update User PROFILE PIC!!!');
+                    resolve(true);
+
+                }).catch((error) => {
+                    console.log('image update error', error);
+                    reject(error);
+                });
+        });
+
+
+    }
+
+    updateUserDetails() {
+        return new Promise((resolve, reject) => {
+
+            if (!this.isDetailsChanged) {
+                resolve(true);
+                return;
+            }
+
+            const user = firebase.auth().currentUser;
+
+            db.ref(`Users/${user.uid}/UserDetails`)
+                .update(
+                    {
+                        UserName: this.state.userName,
+                        ContactNumber: this.state.contactNumber,
+                        Address: this.state.address,
+                        ProfilePicUrl: this.state.profilePicUrl
+
+                    })
+                .then(() => {
+                    resolve(true);
+                }).catch((error) => {
+                    console.log('update error', error);
+                    reject(error);
+                });
+        });
+
+    }
+
+    pickProfilePicture() {
+        ImagePicker.openPicker({
+            width: 500,
+            height: 500,
+            // cropping: cropit,
+            // cropperCircleOverlay: circular,
+            compressImageMaxWidth: 1000,
+            compressImageMaxHeight: 1000,
+            compressImageQuality: 1,
+            // compressVideoPreset: 'MediumQuality',
+            includeExif: true,
+        }).then(image => {
+            console.log('received image', image.path);
+
+            this.isPicChanged = true;
+
+            this.setState({
+                // profilePic: {  width: image.width, height: image.height, mime: image.mime },
+                // profilePicUrl: image.path,
+                profilePic: image.path,
+                // profilePic: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
+                // images: null
+            });
+
+            // console.log('image', this.state.image.uri);
+        }).catch(e => {
+            console.log(e);
+            Alert.alert(e.message ? e.message : e);
+        });
+    }
+
+    renderImage() {
+        return (
+            <TouchableOpacity style={{}} onPress={this.pickProfilePicture.bind(this)} >
+                {/* <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 50 }} source={{ uri: this.state.profilePicUrl }} /> */}
+                {/* <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 50 }} source={image} > */}
+                {/* <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
+                        <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
+                    </TouchableOpacity> */}
+
+                {/* {(this.isPicChanged) ? */}
+                {/* <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 50 }} source={{ uri: this.state.profilePic }} />  */}
+                {/* : */}
+                <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 50 }} source={{ uri: this.state.profilePic }} />
+                {/* } */}
+
+
+            </TouchableOpacity>
+
+        );
+    }
+
+    saveProfilePicture(profilePicPath, uid) {
+
+        return new Promise((resolve, reject) => {
+
+            console.log('profilePic', profilePicPath);
+
+            const image = profilePicPath;
+
+            const Blob = RNFetchBlob.polyfill.Blob
+            const fs = RNFetchBlob.fs
+            window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+            window.Blob = Blob
+
+            // let imageUrl = [];
+            let uploadBlob = null
+            // const imgName = new Date().getTime();
+
+            // console.log('imgName', imgName);
+            const imageRef = firebase.storage().ref(`ProfilePictures/${uid}`);
+            let mime = 'image/jpg'
+            fs.readFile(image, 'base64')
+                .then((data) => {
+                    return Blob.build(data, { type: `${mime};BASE64` })
+                })
+                .then((blob) => {
+                    uploadBlob = blob
+                    return imageRef.put(blob._ref, { contentType: mime });
+                })
+                .then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                })
+                .then((url) => {
+                    // URL of the image uploaded on Firebase storage
+                    console.log(url);
+
+                    this.setState({
+                        profilePicUrl: url
+                    }, () => {
+                        console.log('profilePicUrl', this.state.profilePicUrl);
+                        resolve(true);
+                    });
+
+
+                })
+                .catch((error) => {
+                    console.log(error);
+
+                    reject(error);
+                });
+        });
+    }
+
+
     renderEditProfileModal() {
+
+        console.log("profilePicUrl", this.state.profilePicUrl);
 
         return (
             <Modal
@@ -363,6 +579,18 @@ export default class ProfileScreen extends Component<Props> {
                 }}>
                 {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 30 }}> */}
                 <SafeAreaView>
+
+                    {/* {(this.state.loading) ?
+                        <View style={styles.loader}>
+                            <ActivityIndicator
+                                size='small'
+                                color="#757575"
+                                style={styles.activityIndicator}
+                            />
+                        </View>
+                        : */}
+
+
                     <View style={{
                         backgroundColor: '#e0e0e0', width: '90%', height: '90%', margin: 20, justifyContent: 'center',
                         borderRadius: 15, padding: 10
@@ -377,19 +605,15 @@ export default class ProfileScreen extends Component<Props> {
                         <ScrollView style={{}}>
 
                             <TouchableOpacity
-                            // onPress={this.pickProfilePicture.bind(this)}
+                                onPress={() => {
+                                    this.pickProfilePicture();
+                                }}
                             >
                                 <View style={{
                                     width: 100, height: 100, alignSelf: 'center', backgroundColor: '#ffffff', marginBottom: 15,
                                     borderRadius: 50
                                 }}>
-                                    <Image source={{ uri: this.state.profilePic }} style={{ width: 100, height: 100, borderRadius: 50, borderColor: '#ffffff', }} />
-                                    {/* {this.state.profilePic ? <View style={{
-                                        width: 100, height: 100, alignSelf: 'center', backgroundColor: '#ffffff', marginBottom: 10,
-                                        borderRadius: 50
-                                    }}>{this.renderImage(this.state.profilePic)}</View> :
-                                        null
-                                    } */}
+                                    {this.renderImage()}
                                 </View>
                             </TouchableOpacity>
 
@@ -401,7 +625,10 @@ export default class ProfileScreen extends Component<Props> {
                                     value={this.state.userName}
                                     style={[styles.textinput, { backgroundColor: 'white', padding: 5 }]}
                                     secureTextEntry={false}
-                                    onChangeText={userName => this.setState({ userName })}
+                                    onChangeText={userName => {
+                                        this.setState({ userName });
+                                        this.isDetailsChanged = true;
+                                    }}
                                     editable={true}
                                     maxLength={40}
                                     placeholder='User Name' />
@@ -438,11 +665,23 @@ export default class ProfileScreen extends Component<Props> {
                             </View>
 
                         </ScrollView>
-                        <TouchableOpacity style={{height: 30, width:'50%', backgroundColor:'#000000', alignSelf:'center', justifyContent:'center', borderRadius:4}}>
-                                    <Text style={{color:'white', fontSize:17, textAlign:'center'}}>Save</Text>
+                        <TouchableOpacity style={{ height: 30, width: '50%', backgroundColor: '#000000', alignSelf: 'center', justifyContent: 'center', borderRadius: 4 }}
+                            onPress={async () => {
+                                // this.editProfile();
+                                try {
+                                    await this.updateProfilePic();
+                                    await this.updateUserDetails()
+    
+                                    this.onPressProfileEditButton(false);
+                                } catch (error) {
+                                    console.log(error);                                    
+                                }
+                            }}>
+                            <Text style={{ color: 'white', fontSize: 17, textAlign: 'center' }}>Save</Text>
                         </TouchableOpacity>
                     </View>
-                    {/* </View> */}
+                    {/* } */}
+
                 </SafeAreaView>
 
             </Modal>
@@ -456,7 +695,7 @@ export default class ProfileScreen extends Component<Props> {
                 <View style={[styles.buttonContainer, { justifyContent: 'center', backgroundColor: '#ffffff' }]}>
                     <Text style={{ textAlign: 'center', fontWeight: '400', fontSize: 15, color: '#000000' }}>
                         Please Login to see user details
-                        </Text>
+                    </Text>
 
                     <View style={{ justifyContent: 'center', alignContent: 'center' }}>
                         <TouchableOpacity onPress={() => {
@@ -485,7 +724,12 @@ export default class ProfileScreen extends Component<Props> {
                                 width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20,
                                 backgroundColor: '#ffffff', padding: 0
                             }}>
+                                {/* {(this.isPicChanged) ?
+                             <Image source={{ uri: this.state.profilePic }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
+                                :
                                 <Image source={{ uri: this.state.profilePic }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
+                            } */}
+                                <Image source={{ uri: this.state.profilePicUrl }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                             </View>
                             <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>{this.state.userName}</Text>
 
@@ -785,5 +1029,9 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         textAlign: 'center',
         fontSize: 17
-    }
+    },
+    activityIndicator: {
+        flex: 1,
+        height: 120
+    },
 })
