@@ -389,7 +389,7 @@ export default class SearchScreen extends Component {
         if (event && event.nativeEvent) {
             const offset = event.nativeEvent.contentOffset;
 
-            console.log(offset);
+            // console.log(offset);
 
             if (offset.y > 10) {
                 if (!this.state.scroll) {

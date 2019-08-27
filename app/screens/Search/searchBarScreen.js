@@ -143,10 +143,10 @@ export default class SearchBarScreen extends Component {
             }
 
 
-            if(arr.length>=4){
+            if (arr.length >= 4) {
                 arr.splice(arr.length - 1, 1);
                 console.log(arr.length);
-                
+
             }
             // arr.splice(arr.length - 1, 1);
             // console.log(arr.length);
@@ -785,7 +785,40 @@ export default class SearchBarScreen extends Component {
 
                     <View style={styles.separatorView}></View>
 
-                    {this.renderPriceDetails()}
+                    {/* {this.renderPriceDetails()} */}
+                    <View style={{ marginHorizontal: 5 }}>
+                        <Text style={styles.mainCategoryText}>Price range</Text>
+                        <View style={{ flexDirection: 'row', paddingHorizontal: 20, marginTop: 20 }}>
+                            <View style={{ flex: 1, flexDirection: 'column' }}>
+                                <Text style={{ fontSize: 12, marginBottom: 5 }}>From</Text>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ fontSize: 15, marginBottom: 5 }}>$</Text>
+                                    <TextInput
+                                        placeholder='Min'
+                                        style={{ borderColor: 'black', backgroundColor: '#e0e0e0', width: 70, textAlign: 'center', marginLeft: 10 }}
+                                        value={this.state.rangeLow}
+                                        onChangeText={rangeLow => this.setState({ rangeLow })}
+                                        keyboardType='numeric'
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={{ flex: 1, flexDirection: 'column' }}>
+                                <Text style={{ fontSize: 12, marginBottom: 5 }}>To</Text>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ fontSize: 15, marginBottom: 5 }}>$</Text>
+                                    <TextInput
+                                        placeholder='Max'
+                                        style={{ borderColor: 'black', backgroundColor: '#e0e0e0', width: 70, textAlign: 'center', marginLeft: 10 }}
+                                        value={this.state.rangeHigh}
+                                        onChangeText={rangeHigh => this.setState({ rangeHigh })}
+                                        keyboardType='numeric'
+                                    />
+                                </View>
+                            </View>
+
+                        </View>
+                    </View>
 
                     <View style={styles.separatorView}></View>
 
@@ -1180,7 +1213,7 @@ export default class SearchBarScreen extends Component {
                 renderDescription={row => row.description || row.formatted_address || row.name}
                 // renderDescription={row =>  row.formatted_address}
                 onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                
+
                     // console.log(data, details);
                     // console.log(data.description);
                     // console.log('details', details.geometry.location.lat);

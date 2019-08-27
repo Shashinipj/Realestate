@@ -67,11 +67,11 @@ export default class SearchResultView extends Component<Props> {
                 loggedUser: user
             })
 
-            this.getSearchResults(user, null);
+            this.getSearchResults(user);
             // console.log('this.state.favPropIds', this.state.favPropIds);
         }
         else {
-            this.getSearchResults(user, null);
+            this.getSearchResults(user);
         }
 
     }
@@ -170,7 +170,7 @@ export default class SearchResultView extends Component<Props> {
     }
 
 
-    getSearchResults(user, collections) {
+    getSearchResults(user) {
         let propData = this.props.navigation.state.params.data;
         console.log(propData);
 
@@ -180,8 +180,8 @@ export default class SearchResultView extends Component<Props> {
         let bathRooms = propData.bathRooms;
         let carSpace = propData.carSpace;
         let location = propData.location;
-        let minPrice = propData.rangeLow;
-        let maxPrice = propData.rangeHigh;
+        let minPrice = parseFloat(propData.rangeLow);
+        let maxPrice = parseFloat(propData.rangeHigh);
         let priceRange = maxPrice - minPrice;
         let landSize = propData.landSize;
         let featureKeywords = propData.keyWords;
@@ -190,6 +190,9 @@ export default class SearchResultView extends Component<Props> {
         // console.log(this.props.navigation.state.params.data);
 
         let filteredProperties = [];
+        console.log("pricerange1", priceRange);
+        console.log("maxPrice1", maxPrice);
+        console.log("minPrice1", minPrice);
 
 
         PropRef.on('value', (snapshot) => {
@@ -227,7 +230,10 @@ export default class SearchResultView extends Component<Props> {
 
                                                     if (landSize == 0 || propObj.LandSize >= landSize) {
 
-                                                        if (priceRange == 0 || ((maxPrice >= propObj.Price) && (propObj.Price >= minPrice))) {
+                                                        if (priceRange == 0 || (propObj.Price <= maxPrice && propObj.Price >= minPrice)) {
+                                                            console.log("pricerange", priceRange);
+                                                            console.log("maxPrice", maxPrice);
+                                                            console.log("minPrice", minPrice);
 
                                                             if (propObj.Visible == true) {
 

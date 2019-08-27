@@ -7,6 +7,7 @@ import Accounting from 'accounting-js';
 import ImageSlider from 'react-native-image-slider';
 import ListItem from '../../component/listItemComponent';
 import firebase from 'react-native-firebase';
+import { SearchBar } from 'react-native-elements';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -16,12 +17,12 @@ export default class CollectionDetailScreen extends Component {
 
         const collection = navigation.getParam('CollectionData');
 
-
         return {
             title: collection.name
         };
-
     };
+
+    arrayholder = [];
 
     userProperties = {};
 
@@ -30,7 +31,8 @@ export default class CollectionDetailScreen extends Component {
 
         this.state = {
             propProperties: [],
-            collectionName: ''
+            collectionName: '',
+            search: '',
         };
     }
 
@@ -75,6 +77,7 @@ export default class CollectionDetailScreen extends Component {
             this.setState({
                 propProperties: filteredProperties
             });
+            this.arrayholder = filteredProperties;
         });
     }
 
@@ -103,6 +106,26 @@ export default class CollectionDetailScreen extends Component {
             }).catch((error) => {
                 console.log(error)
             });
+    }
+
+    updateSearch(search) {
+        this.setState({ search });
+    };
+
+    SearchFilterFunction(text) {
+        //passing the inserted text in textinput
+        const newData = this.arrayholder.filter(function (item) {
+            //applying filter for the inserted text in search bar
+            const itemData = item.Address ? item.Address.toUpperCase() : ''.toUpperCase();
+            const textData = text.toUpperCase();
+            return itemData.indexOf(textData) > -1;
+        });
+        this.setState({
+            //setting the filtered newData on datasource
+            //After setting the data it will automatically re-render the view
+            propProperties: newData,
+            search: text,
+        });
     }
 
     onPressDeleteButton(propertyID) {
@@ -154,9 +177,33 @@ export default class CollectionDetailScreen extends Component {
 
 
     render() {
+
+        const { search } = this.state;
         return (
 
             <View style={{ flex: 1 }}>
+
+                <SearchBar
+                    round
+                    placeholder="Type Here..."
+                    onChangeText={this.updateSearch}
+                    value={search}
+                    lightTheme='true'
+                    containerStyle={{
+                        height: 50,
+                        backgroundColor: '#bdbdbd',
+                        // borderTopWidth: 0,
+                    }}
+                    inputContainerStyle={{
+                        height: 30,
+                        backgroundColor: '#e0e0e0'
+                    }}
+                    inputStyle={{
+                        fontSize: 14,
+                    }}
+                    onChangeText={text => this.SearchFilterFunction(text)}
+                    onClear={text => this.SearchFilterFunction('')}
+                />
                 {/* {(this.state.propProperties.length == 0) ?
                     // this.props.navigation.navigate("Collections")
                     <View style={{backgroundColor:'red'}}>
