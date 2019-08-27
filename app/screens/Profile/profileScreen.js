@@ -293,7 +293,14 @@ export default class ProfileScreen extends Component<Props> {
     loginReset() {
         this.setState({
             userEmail: '',
-            loggedIn: false
+            loggedIn: false,
+            userName: '',
+            profilePic: '',
+            profilePicUrl: '',
+            contactNumber: '',
+            address: '',
+            uid: '',
+            propertyID: '',
         })
     }
 

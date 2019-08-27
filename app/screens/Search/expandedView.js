@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Modal, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Text, Image, TouchableOpacity, Modal, SafeAreaView, Linking } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -351,7 +351,7 @@ export default class ExpandedView extends Component {
                 {/* {this.showMapModal()} */}
 
                 <View style={{ height: 60, backgroundColor: 'white', alignItems: 'center' }}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com') }>
 
                         <View style={{
                             backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10, width: 300,

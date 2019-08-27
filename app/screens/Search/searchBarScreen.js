@@ -267,7 +267,7 @@ export default class SearchBarScreen extends Component {
                         }>Price (Low - High)</Text>
                     </TouchableOpacity>
 
-                    {/* <TouchableOpacity
+                    <TouchableOpacity
                         onPress={() => {
                             this.sortOrderSelected(3);
                             this.OnPress_SortOrder();
@@ -287,7 +287,7 @@ export default class SearchBarScreen extends Component {
                         <Text style={
                             this.state.sortOrder == 4 ? styles.sortTextSelected : styles.sortText
                         }>Date (Oldest - Newest)</Text>
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
 
                 </View>
 

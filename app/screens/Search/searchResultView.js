@@ -336,6 +336,42 @@ export default class SearchResultView extends Component<Props> {
 
             }
 
+            else if (sortType == 3) {
+
+                filteredProperties.sort((a, b) => {
+
+                    console.log("a.AddedDate", a.AddedDate);
+                    console.log("b.AddedDate", b.AddedDate);
+
+                    if (a.AddedDate < b.AddedDate) {
+                        return 1;
+                    } else if (a.AddedDate > b.AddedDate) {
+                        return -1;
+                    }
+
+                    return 0;
+                });
+
+            }
+
+            else if (sortType == 4) {
+
+                filteredProperties.sort((a, b) => {
+
+                    console.log("a.AddedDate", a.AddedDate);
+                    console.log("b.AddedDate", b.AddedDate);
+
+                    if (a.AddedDate < b.AddedDate) {
+                        return -1;
+                    } else if (a.AddedDate > b.AddedDate) {
+                        return 1;
+                    }
+
+                    return 0;
+                });
+
+            }
+
             // for(const i in this.state.collectionListProperties){
             //     console.log('this.state.collectionListProperties', i);
             // }

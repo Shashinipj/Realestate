@@ -14,7 +14,6 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import { db } from '../../Database/db';
-import { placeholder } from '@babel/types';
 let PropRef = db.ref('/PropertyType');
 
 const PropertyTypes = {
@@ -190,7 +189,9 @@ export default class AddPropertyScreen extends Component<Props> {
             this.getSelectedImages(currentImage, userUID, propID)
                 .then(() => {
                     this.uploadImages(imgarr, index + 1, userUID, propID, callback);
-                });
+                }).catch((error)=>{
+                    console.log("error", error);
+                })
         }
     }
 
@@ -241,11 +242,261 @@ export default class AddPropertyScreen extends Component<Props> {
         });
     }
 
+    resetPropertyView() {
+
+        return new Promise((resolve, reject) => {
+
+            this.setState({
+                image: null,
+                images: null,
+                // imagesBase64: null,
+                defaultImage: null,
+                title: '',
+                description: '',
+                price: '',
+
+                advertisementType: 1,
+                propertyType: 1,
+
+                bedrooms: null,
+                bathrooms: null,
+                parkingSlots: null,
+                location: '',
+
+                keyWords: '',
+                keyWordsArr: [],
+
+                contactNumber: null,
+                isFeatured: false,
+                houseCondition: '',
+                landSize: 0,
+                owner: '',
+                PropId: null
+
+            }, () => {
+                resolve();
+            });
+        });
+    }
+
+    removeImages(image) {
+        let arr = this.state.images;
+        arr.splice(image, 1);
+
+        this.setState({
+            images: arr
+        });
+
+    }
+
+
     locationModalVisible(visible) {
         this.setState({
             locationModal: visible
         });
     }
+
+    isAdvertisementTypeButtonPress(buttonNo) {
+        this.setState({
+            advertisementType: buttonNo
+        });
+    }
+
+    isPropertyTypeButtonPressed(btnNo) {
+        this.setState({
+            propertyType: btnNo
+        });
+    }
+
+    isFeaturedEnable(value) {
+
+        this.setState({
+            isFeatured: value
+        });
+    }
+
+    isVisibleEnable(value) {
+
+        this.setState({
+            isVisible: value
+        });
+    }
+
+    addNewProperty() {
+
+        this.setState({
+            loading: true
+        });
+
+        db.ref(`PropertyType/${this.state.advertisementType}/Property`).push(
+            {
+
+            }
+        ).then((fbRef) => {
+
+            const user = firebase.auth().currentUser;
+
+            this.setState({
+                PropId: fbRef.key
+            })
+            this.uploadImages(this.state.images, 0, user.uid, fbRef.key, () => {
+                console.log('Upload DONE: ');
+                this.addToFirebaseDB(fbRef)
+            });
+
+            console.log('Inserted!', fbRef.key)
+
+        }).catch((error) => {
+            console.log(error)
+        });
+    }
+
+
+    addToFirebaseDB(fbRef) {
+
+        const user = firebase.auth().currentUser;
+        const addedDate = new Date().getTime();
+
+        db.ref(`Users/${user.uid}/UserProperties/${fbRef.key}`).set(true)
+            .then(() => {
+
+                db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
+                    .set(
+                        {
+                            Title: this.state.title,
+                            Address: this.state.location,
+                            Bathrooms: this.state.bathrooms,
+                            Bedrooms: this.state.bedrooms,
+                            CarPark: this.state.parkingSlots,
+                            Description: this.state.description,
+                            Features: this.state.keyWordsArr,
+                            LandSize: this.state.landSize,
+                            Owner: this.state.owner,
+                            ContactNumber: this.state.contactNumber,
+                            Price: this.state.price,
+                            PropAction: this.state.advertisementType,
+                            PropId: fbRef.key,
+                            PropTypeId: this.state.propertyType,
+                            isFeatured: this.state.isFeatured,
+                            Condition: this.state.houseCondition,
+                            Visible: this.state.isVisible,
+                            images: this.state.imgUrlArr,
+                            lat: this.state.lat,
+                            lon: this.state.lon,
+                            AddedDate: addedDate,
+                        })
+                    .then(() => {
+                        console.log('Inserted!!!');
+                        // console.log('image1', this.state.images);
+                        this.setState({
+                            loading: false
+                        });
+                        alert("Succefully Added!");
+                        this.resetPropertyView();
+
+                        this.props.navigation.pop();
+                    }).catch((error) => {
+                        console.log(error)
+                    });
+            });
+    }
+
+    returnImageScrollView() {
+
+        const { images: savedImages } = this.state;
+        let arrLength = savedImages ? savedImages.length : 0
+
+        if (arrLength < 8) {
+            return (
+
+                // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                    <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                        <Icon
+                            name="add-a-photo"
+                            type='MaterialIcons'
+                            size={30}
+                        />
+                    </View>
+
+                </TouchableOpacity>
+            );
+        }
+        else {
+            return null
+        }
+    }
+
+    getKeyWords(text) {
+
+        this.setState({
+            keyWords: text,
+            keyWordsArr: text.split(",")
+        });
+        // console.log(this.state.keyWordsArr)
+    }
+
+    checkEmptyFields() {
+        const { title, description, price, owner, location, images, contactNumber } = this.state
+
+        if (images.length > 0) {
+            if (title != '') {
+                if (description != '') {
+                    if (price != '') {
+                        if (location != '') {
+                            if (owner != '') {
+                                if (contactNumber != '') {
+                                    // alert('success');
+                                    this.addNewProperty();
+                                } else {
+                                    alert('Please enter contact number');
+                                }
+                            } else {
+                                alert('Please enter the owner');
+                            }
+                        } else {
+                            alert('Please enter the location for the property');
+                        }
+                    } else {
+                        alert('Please enter price for the property');
+                    }
+                } else {
+                    alert('Please enter a description for the property');
+                }
+            } else {
+                alert('Please enter a title for the property');
+            }
+        } else {
+            alert('Please upload images of the property');
+        }
+    }
+
+    renderImage(image) {
+        return (
+            <TouchableOpacity style={{}} onPress={() => {
+                this.setState({
+                    defaultImage: image
+                })
+            }} >
+                <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
+                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
+                        <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
+                    </TouchableOpacity>
+
+                </ImageBackground>
+            </TouchableOpacity>
+
+        );
+    }
+
+    renderInitialImage(i) {
+        return (
+            <View>
+                <Image style={{ width: 300, height: 200, resizeMode: 'cover', margin: 5 }} source={i} />
+            </View>
+        );
+    }
+
 
     renderLocationModal() {
 
@@ -348,251 +599,6 @@ export default class AddPropertyScreen extends Component<Props> {
         );
     }
 
-    resetPropertyView() {
-
-        return new Promise((resolve, reject) => {
-
-            this.setState({
-                image: null,
-                images: null,
-                // imagesBase64: null,
-                defaultImage: null,
-                title: '',
-                description: '',
-                price: '',
-
-                advertisementType: 1,
-                propertyType: 1,
-
-                bedrooms: null,
-                bathrooms: null,
-                parkingSlots: null,
-                location: '',
-
-                keyWords: '',
-                keyWordsArr: [],
-
-                contactNumber: null,
-                isFeatured: false,
-                houseCondition: '',
-                landSize: 0,
-                owner: '',
-                PropId: null
-
-            }, () => {
-                resolve();
-            });
-        });
-    }
-
-    renderImage(image) {
-        return (
-            <TouchableOpacity style={{}} onPress={() => {
-                this.setState({
-                    defaultImage: image
-                })
-            }} >
-                <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
-                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
-                        <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
-                    </TouchableOpacity>
-
-                </ImageBackground>
-            </TouchableOpacity>
-
-        );
-    }
-
-    removeImages(image) {
-        let arr = this.state.images;
-        arr.splice(image, 1);
-
-        this.setState({
-            images: arr
-        });
-
-    }
-
-    renderInitialImage(i) {
-        return (
-            <View>
-                <Image style={{ width: 300, height: 200, resizeMode: 'cover', margin: 5 }} source={i} />
-            </View>
-        );
-    }
-
-    isAdvertisementTypeButtonPress(buttonNo) {
-        this.setState({
-            advertisementType: buttonNo
-        });
-    }
-
-    isPropertyTypeButtonPressed(btnNo) {
-        this.setState({
-            propertyType: btnNo
-        });
-    }
-
-    isFeaturedEnable(value) {
-
-        this.setState({
-            isFeatured: value
-        });
-    }
-
-    isVisibleEnable(value) {
-
-        this.setState({
-            isVisible: value
-        });
-    }
-
-    addNewProperty() {
-
-        this.setState({
-            loading: true
-        });
-
-        db.ref(`PropertyType/${this.state.advertisementType}/Property`).push(
-            {
-
-            }
-        ).then((fbRef) => {
-
-            const user = firebase.auth().currentUser;
-
-            this.setState({
-                PropId: fbRef.key
-            })
-            this.uploadImages(this.state.images, 0, user.uid, fbRef.key, () => {
-                console.log('Upload DONE: ');
-                this.addToFirebaseDB(fbRef)
-            });
-
-            console.log('Inserted!', fbRef.key)
-
-        }).catch((error) => {
-            console.log(error)
-        });
-    }
-
-
-    addToFirebaseDB(fbRef) {
-
-        const user = firebase.auth().currentUser;
-
-        db.ref(`Users/${user.uid}/UserProperties/${fbRef.key}`).set(true)
-            .then(() => {
-
-                db.ref(`PropertyType/${this.state.advertisementType}/Property/${fbRef.key}`)
-                    .set(
-                        {
-                            Title: this.state.title,
-                            Address: this.state.location,
-                            Bathrooms: this.state.bathrooms,
-                            Bedrooms: this.state.bedrooms,
-                            CarPark: this.state.parkingSlots,
-                            Description: this.state.description,
-                            Features: this.state.keyWordsArr,
-                            LandSize: this.state.landSize,
-                            Owner: this.state.owner,
-                            ContactNumber: this.state.contactNumber,
-                            Price: this.state.price,
-                            PropAction: this.state.advertisementType,
-                            PropId: fbRef.key,
-                            PropTypeId: this.state.propertyType,
-                            isFeatured: this.state.isFeatured,
-                            Condition: this.state.houseCondition,
-                            Visible: this.state.isVisible,
-                            images: this.state.imgUrlArr,
-                            lat: this.state.lat,
-                            lon: this.state.lon
-                        })
-                    .then(() => {
-                        console.log('Inserted!!!');
-                        // console.log('image1', this.state.images);
-                        this.setState({
-                            loading: false
-                        });
-                        alert("Succefully Added!");
-                        this.resetPropertyView();
-
-                        this.props.navigation.pop();
-                    }).catch((error) => {
-                        console.log(error)
-                    });
-            });
-    }
-
-    returnImageScrollView() {
-
-        const { images: savedImages } = this.state;
-        let arrLength = savedImages ? savedImages.length : 0
-
-        if (arrLength < 8) {
-            return (
-
-                // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                    <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                        <Icon
-                            name="add-a-photo"
-                            type='MaterialIcons'
-                            size={30}
-                        />
-                    </View>
-
-                </TouchableOpacity>
-            );
-        }
-        else {
-            return null
-        }
-    }
-
-    getKeyWords(text) {
-
-        this.setState({
-            keyWords: text,
-            keyWordsArr: text.split(",")
-        });
-        // console.log(this.state.keyWordsArr)
-    }
-
-    checkEmptyFields() {
-        const { title, description, price, owner, location, images, contactNumber } = this.state
-
-        if (images.length > 0) {
-            if (title != '') {
-                if (description != '') {
-                    if (price != '') {
-                        if (location != '') {
-                            if (owner != '') {
-                                if (contactNumber != '') {
-                                    // alert('success');
-                                    this.addNewProperty();
-                                } else {
-                                    alert('Please enter contact number');
-                                }
-                            } else {
-                                alert('Please enter the owner');
-                            }
-                        } else {
-                            alert('Please enter the location for the property');
-                        }
-                    } else {
-                        alert('Please enter price for the property');
-                    }
-                } else {
-                    alert('Please enter a description for the property');
-                }
-            } else {
-                alert('Please enter a title for the property');
-            }
-        } else {
-            alert('Please upload images of the property');
-        }
-    }
 
     render() {
 
