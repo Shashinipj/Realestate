@@ -15,9 +15,11 @@ import MetComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FeaturedListItem from '../../component/featuredListItemComponent';
 import RNFetchBlob from 'react-native-fetch-blob';
 import ImagePicker from 'react-native-image-crop-picker';
+import { NavigationProp, NavigationEvents } from 'react-navigation';
 // import FeaturedListItem from "../../component/featuredListItemComponent";
 
 let PropRef = db.ref('/PropertyType');
+var _ = require('lodash');
 
 export default class SearchScreen extends Component {
 
@@ -25,6 +27,8 @@ export default class SearchScreen extends Component {
         header: null,
 
     };
+
+
 
     arrayholder = [];
 
@@ -36,6 +40,7 @@ export default class SearchScreen extends Component {
             propertiesBuy: [],
             propertiesRent: [],
             featuredList: [],
+            nearByList: [],
             search: '',
             modalVisible: false,
             forgotPasswordModal: false,
@@ -58,7 +63,11 @@ export default class SearchScreen extends Component {
 
             refreshing: false,
             profilePic: null,
-            profilePicUrl: null
+            profilePicUrl: null,
+
+            currentLat: null,
+            currentLon: null,
+            currentLocation: false,
         };
 
         // this.forgotPassword_Modal = this.forgotPassword_Modal.bind(this);
@@ -71,7 +80,57 @@ export default class SearchScreen extends Component {
             console.log("USER: " + user);
         });
 
-        this.loadData();
+
+        this.getCurrentLocation().then(() => {
+            this.loadData().then(() => {
+                console.log("successfully leaded data!");
+            }).catch((error) => {
+                console.log("data loading error", error);
+            })
+        }).catch((error) => {
+            Alert.alert(error.message);
+        })
+
+    }
+
+    getCurrentLocation() {
+
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    // const location = JSON.stringify(position);
+
+                    // console.log("current location", location);
+                    // // this.setState({ location });
+                    // this.setState({
+                    //     currentLat: location.latitude,
+                    //     currentLon: location.longitude,
+                    // });
+
+                    const latitude = Number(position.coords.latitude.toFixed(6));
+                    const longitude = Number(position.coords.longitude.toFixed(6));
+
+                    console.log("latitude", latitude);
+                    console.log("longitude", longitude);
+
+
+                    this.setState({
+                        currentLat: latitude,
+                        currentLon: longitude,
+                        currentLocation: true
+                    });
+
+                    resolve(true);
+
+                },
+                (error) => {
+
+                    reject(error);
+                },
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+            );
+
+        });
     }
 
     loadData() {
@@ -80,6 +139,11 @@ export default class SearchScreen extends Component {
             let buyProperties = [];
             let rentProperties = [];
             let featuredProps = [];
+            let nearbyProps = [];
+
+            const radius = 0.1
+
+            const { currentLocation, currentLat, currentLon } = this.state
 
             PropRef.once('value', (snapshot) => {
                 // console.log("VAL ", snapshot);
@@ -103,6 +167,12 @@ export default class SearchScreen extends Component {
                             if (propObj.isFeatured == true) {
                                 featuredProps.push(propObj);
                             }
+                            if (currentLocation == false || (propObj.lat <= currentLat + radius) && (propObj.lat >= currentLat - radius)) {
+
+                                if (currentLocation == false || (propObj.lon <= currentLon + radius) && (propObj.lon >= currentLon - radius)) {
+                                    nearbyProps.push(propObj);
+                                }
+                            }
                         }
                     }
                 }
@@ -111,6 +181,8 @@ export default class SearchScreen extends Component {
                     propertiesBuy: buyProperties,
                     propertiesRent: rentProperties,
                     featuredList: featuredProps,
+                    nearByList: nearbyProps,
+
                     loading: false
                 }, () => {
                     resolve();
@@ -295,7 +367,6 @@ export default class SearchScreen extends Component {
                     console.log(error);
                     reject(error);
                 });
-
         });
     }
 
@@ -458,13 +529,11 @@ export default class SearchScreen extends Component {
 
                     <Text style={{ fontSize: 18, fontWeight: '400' }}>Never miss a property again</Text>
 
-                    <View style={{ marginVertical: 20 }}>
+                    <View style={{ marginVertical: 10 }}>
                         <Text style={{ textAlign: 'center', color: 'gray', fontSize: 13 }}>
                             Save your searches and be notified when {"\n"}new matching properties hit the market
                                 </Text>
                     </View>
-
-
 
                     <TouchableOpacity style={styles.joinButton}
                         onPress={() => {
@@ -475,6 +544,10 @@ export default class SearchScreen extends Component {
                         <Text style={{ textAlign: 'center', color: '#ffffff', fontWeight: '600' }}>Login</Text>
 
                     </TouchableOpacity>
+
+
+
+
                 </View>
             );
         }
@@ -1062,6 +1135,26 @@ export default class SearchScreen extends Component {
 
                     <View style={styles.bottomContainer}>
 
+                        <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties around you</Text>
+                        {(this.state.loading) ?
+                            <View style={styles.loader}>
+                                <ActivityIndicator
+                                    size='small'
+                                    color="#757575"
+                                    style={styles.activityIndicator}
+                                />
+                            </View>
+                            :
+                            <FlatList
+                                data={this.state.nearByList}
+                                renderItem={item => this.renderItem(item)}
+                                keyExtractor={(item, index) => {
+                                    return "" + index;
+                                }}
+                                horizontal={true}
+                            />
+                        }
+
                         {this.renderJoinButton()}
 
                     </View>
@@ -1083,7 +1176,7 @@ const styles = StyleSheet.create({
     },
     imageTop: {
         width: '100%',
-        height: 300,
+        height: 250,
         marginTop: 5,
         borderRadius: 5,
     },
@@ -1095,7 +1188,7 @@ const styles = StyleSheet.create({
     textContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 15
+        marginTop: 10
     },
     joinButton: {
         // backgroundColor: '#f3d500',

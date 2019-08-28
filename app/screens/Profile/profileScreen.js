@@ -63,6 +63,7 @@ export default class ProfileScreen extends Component<Props> {
             this.fetchUser(user);
             console.log("USER: " + user);
         });
+        
     }
 
     componentWillUnmount() {
