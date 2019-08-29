@@ -189,7 +189,7 @@ export default class AddPropertyScreen extends Component<Props> {
             this.getSelectedImages(currentImage, userUID, propID)
                 .then(() => {
                     this.uploadImages(imgarr, index + 1, userUID, propID, callback);
-                }).catch((error)=>{
+                }).catch((error) => {
                     console.log("error", error);
                 })
         }
@@ -277,16 +277,6 @@ export default class AddPropertyScreen extends Component<Props> {
                 resolve();
             });
         });
-    }
-
-    removeImages(image) {
-        let arr = this.state.images;
-        arr.splice(image, 1);
-
-        this.setState({
-            images: arr
-        });
-
     }
 
 
@@ -471,7 +461,7 @@ export default class AddPropertyScreen extends Component<Props> {
         }
     }
 
-    renderImage(image) {
+    renderImage(image, index) {
         return (
             <TouchableOpacity style={{}} onPress={() => {
                 this.setState({
@@ -479,7 +469,7 @@ export default class AddPropertyScreen extends Component<Props> {
                 })
             }} >
                 <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
-                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
+                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(index)}>
                         <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
                     </TouchableOpacity>
 
@@ -622,18 +612,18 @@ export default class AddPropertyScreen extends Component<Props> {
                     <ScrollView style={{}}>
                         <View style={{ alignItems: 'center' }}>
 
-                            <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
+                            {/* <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
 
                                 {this.state.defaultImage ? <Image source={this.state.defaultImage} style={{ width: 300, height: 200, alignItems: 'center' }} />
                                     : <Text style={{ fontWeight: '600', color: 'white' }}>Select a default image</Text>
                                 }
 
-                            </View>
+                            </View> */}
 
                             <View style={{ height: 130 }}>
 
                                 <ScrollView horizontal={true}
-                                    style={{ marginTop: 10, flex: 1 }}
+                                    style={{ marginHorizontal: 20, flex: 1 }}
                                 >
 
                                     {arrLength == 0 ?
@@ -674,7 +664,11 @@ export default class AddPropertyScreen extends Component<Props> {
                                         // )
                                     }
 
-                                    {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
+                                    {this.state.images && this.state.images.length ? this.state.images.map((v, i) => {
+                                        return (
+                                            <View key={"" + i} style={{}}>{this.renderImage(v, i)}</View>
+                                        );
+                                    }) :
                                         null
                                     }
 

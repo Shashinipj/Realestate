@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Alert, TouchableWithoutFeedback, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput, Modal } from 'react-native';
+import {
+    View, StyleSheet, Text, Alert, TouchableWithoutFeedback, ScrollView, TouchableOpacity,
+    Image, ImageBackground, TextInput, Modal, FlatList
+} from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -8,6 +11,7 @@ import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Switch from 'react-native-switch-pro'
 import firebase from 'react-native-firebase';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 import { db } from '../../Database/db';
 
@@ -29,6 +33,8 @@ export default class EditPropertyScreen extends Component<Props>  {
             image: null,
             images: null,
             defaultImage: null,
+            newImages: null,
+            updatedImageUrls: null,
             title: '',
             description: '',
             price: '',
@@ -57,20 +63,21 @@ export default class EditPropertyScreen extends Component<Props>  {
     }
 
     pickMultiple() {
-        const { images: savedImages } = this.state;
+        const { newImages: selectedImages, images: savedImages } = this.state;
+
 
         ImagePicker.openPicker({
             multiple: true,
             waitAnimationEnd: false,
             includeExif: true,
             forceJpg: true,
-            maxFiles: 8 - (savedImages ? savedImages.length : 0)
-        }).then(images => {
+            maxFiles: (8 - savedImages.length) - (selectedImages ? selectedImages.length : 0)
+        }).then(newImages => {
             this.setState({
                 image: null,
-                images: [
-                    ...(savedImages || []),
-                    ...(images.map(i => {
+                newImages: [
+                    ...(selectedImages || []),
+                    ...(newImages.map(i => {
                         console.log('received image', i);
                         return { uri: i.path, width: i.width, height: i.height, mime: i.mime };
                     }))
@@ -151,78 +158,41 @@ export default class EditPropertyScreen extends Component<Props>  {
             isFeatured: property.isFeatured,
             houseCondition: property.Condition,
             isVisible: property.Visible,
-            images: property.images
+            images: [
+                ...property.images
+            ]
 
         });
 
     }
 
-    renderImage() {
+    renderImage(image, index) {
+        return (
+            <TouchableOpacity style={{}} onPress={() => {
+                // this.setState({
+                //     defaultImage: image
+                // })
+            }} >
+                <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
+                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeSelectedImages(index)}>
+                        <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
+                    </TouchableOpacity>
 
-        console.log('this.state.images',this.state.images);
-        // console.log('images',images);
+                </ImageBackground>
+            </TouchableOpacity>
 
-        for (const i in this.state.images) {
-        // for (const image in images) {
-            const image = this.state.images[i];
-            console.log("image", image);
-
-            return (
-                <TouchableOpacity style={{}} onPress={() => {
-                    this.setState({
-                        defaultImage: image
-                    })
-                }} >
-
-                    {/* <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={{uri: image}} > </ImageBackground> */}
-
-                    {/* <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
-                        <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
-                            <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
-                        </TouchableOpacity>
-
-                    </ImageBackground> */}
-
-                </TouchableOpacity>
-
-            );
-        }
-
-        // return (
-        //     <TouchableOpacity style={{}} onPress={() => {
-        //         this.setState({
-        //             defaultImage: image
-        //         })
-        //     }} >
-
-        //         <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
-        //             <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
-        //                 <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
-        //             </TouchableOpacity>
-
-        //         </ImageBackground>
-        //     </TouchableOpacity>
-
-        // );
+        );
     }
 
-    // renderImage(image) {
-    //     return (
-    //         <TouchableOpacity style={{}} onPress={() => {
-    //             this.setState({
-    //                 defaultImage: image
-    //             })
-    //         }} >
-    //             <ImageBackground style={{ width: 100, height: 100, resizeMode: 'cover', margin: 5 }} source={image} >
-    //                 <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
-    //                     <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
-    //                 </TouchableOpacity>
+    removeSelectedImages(image) {
+        let arr = this.state.newImages;
+        arr.splice(image, 1);
 
-    //             </ImageBackground>
-    //         </TouchableOpacity>
+        this.setState({
+            newImages: arr
+        });
 
-    //     );
-    // }
+    }
 
     removeImages(image) {
         let arr = this.state.images;
@@ -329,8 +299,6 @@ export default class EditPropertyScreen extends Component<Props>  {
                             predefinedPlacesDescription: {
                                 color: '#757575'
                             },
-
-
                         }}
 
                         currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
@@ -390,10 +358,95 @@ export default class EditPropertyScreen extends Component<Props>  {
         );
     }
 
+    uploadImages(imgarr, index, userUID, propID, callback) {
+        if (index >= imgarr.length) {
+            if (callback) {
+                callback();
+            }
+        } else {
+            const currentImage = imgarr[index];
+            console.log("imgarr", imgarr);
+
+            this.getSelectedImages(currentImage, userUID, propID)
+                .then(() => {
+                    this.uploadImages(imgarr, index + 1, userUID, propID, callback);
+                }).catch((error) => {
+                    console.log("error", error);
+                })
+        }
+    }
+
+    getSelectedImages(currentImage, uid, propID) {
+
+        return new Promise((resolve, reject) => {
+
+            console.log('currentImage', currentImage);
+
+            const image = currentImage.uri
+
+            const Blob = RNFetchBlob.polyfill.Blob
+            const fs = RNFetchBlob.fs
+            window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+            window.Blob = Blob
+
+            let imageUrl = [];
+            let uploadBlob = null
+            const imgName = new Date().getTime();
+
+            console.log('imgName', imgName);
+            const imageRef = firebase.storage().ref(`PropImages/${propID}/${imgName}`);
+            let mime = 'image/jpg'
+            fs.readFile(image, 'base64')
+                .then((data) => {
+                    return Blob.build(data, { type: `${mime};BASE64` })
+                })
+                .then((blob) => {
+                    uploadBlob = blob
+                    return imageRef.put(blob._ref, { contentType: mime });
+                })
+                .then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                })
+                .then((url) => {
+                    // URL of the image uploaded on Firebase storage
+                    console.log(url);
+                    this.state.updatedImageUrls.push(url);
+                    console.log('updatedImageUrls', this.state.updatedImageUrls);
+                    resolve(true);
+                })
+                .catch((error) => {
+                    console.log(error);
+
+                    reject(error);
+                });
+        });
+    }
+
     updateProperty() {
 
-        // const user = firebase.auth().currentUser;
+        const user = firebase.auth().currentUser;
 
+        const { PropId, images } = this.state
+
+        this.setState({
+            updatedImageUrls: [
+                ...images
+            ]
+        });
+
+        if (this.state.newImages && this.state.newImages.length > 0) {
+            this.uploadImages(this.state.newImages, 0, user.uid, PropId, () => {
+                console.log('Upload DONE: ');
+                this.updateFirebaseDB();
+            });
+        }
+        else {
+            this.updateFirebaseDB()
+        }
+    }
+
+    updateFirebaseDB() {
         const { navigation } = this.props;
         const property = navigation.getParam('PropertyData');
 
@@ -419,7 +472,8 @@ export default class EditPropertyScreen extends Component<Props>  {
                         PropTypeId: this.state.propertyType,
                         isFeatured: this.state.isFeatured,
                         Condition: this.state.houseCondition,
-                        Visible: this.state.isVisible
+                        Visible: this.state.isVisible,
+                        images: this.state.updatedImageUrls
                     })
                 .then(() => {
                     console.log('Inserted!');
@@ -428,7 +482,6 @@ export default class EditPropertyScreen extends Component<Props>  {
                 }).catch((error) => {
                     console.log(error)
                 });
-
         }
         else {
             db.ref(`PropertyType/${this.state.advertisementType}/Property/${this.state.PropId}`)
@@ -450,7 +503,8 @@ export default class EditPropertyScreen extends Component<Props>  {
                         PropTypeId: this.state.propertyType,
                         isFeatured: this.state.isFeatured,
                         Condition: this.state.houseCondition,
-                        Visible: this.state.isVisible
+                        Visible: this.state.isVisible,
+                        images: this.state.updatedImageUrls
                     })
                 .then(() => {
                     console.log('Inserted!');
@@ -495,10 +549,43 @@ export default class EditPropertyScreen extends Component<Props>  {
         });
     }
 
+    removeImages(imgIndex) {
+        /**
+         * @type {any[]}
+         */
+        let arr = this.state.images;
+
+        arr.splice(imgIndex, 1);
+
+        this.setState({
+            images: arr
+        });
+
+    }
+
+    renderItem({ item, index }) {
+        console.log("item", item);
+        return (
+            <View>
+                <ImageBackground source={{ uri: item }} style={{ width: 100, height: 100, margin: 5 }}>
+                    <TouchableOpacity
+                        style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }}
+                        onPress={this.removeImages.bind(this, index)}
+                    >
+                        <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
+                    </TouchableOpacity>
+                </ImageBackground>
+            </View>
+        );
+
+    }
+
     render() {
 
-        const { images: savedImages } = this.state;
-        arrLength = savedImages ? savedImages.length : 0
+        const { images: savedImages, newImages: selectedImages } = this.state;
+        arrLength1 = savedImages ? savedImages.length : 0
+        arrLength2 = selectedImages ? selectedImages.length : 0
+        arrLength = arrLength1 + arrLength2;
 
         // const { navigation } = this.props;
         // const property = navigation.getParam('PropertyData');
@@ -509,13 +596,25 @@ export default class EditPropertyScreen extends Component<Props>  {
                 <ScrollView style={{}}>
                     <View style={{ alignItems: 'center' }}>
 
-                        <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
+                        <FlatList
+                            data={this.state.images}
+                            extraData={this.state}
+                            renderItem={item => this.renderItem(item)}
+                            keyExtractor={(item, index) => {
+                                return "" + index;
+                            }}
+                            horizontal={true}
+                        />
+
+
+
+                        {/* <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
 
                             {this.state.defaultImage ? <Image source={this.state.defaultImage} style={{ width: 300, height: 200, alignItems: 'center' }} />
                                 : <Text style={{ fontWeight: '600', color: 'white' }}>Select a default image</Text>
                             }
 
-                        </View>
+                        </View> */}
 
                         <View style={{ height: 130 }}>
 
@@ -537,9 +636,7 @@ export default class EditPropertyScreen extends Component<Props>  {
                                         </TouchableOpacity>
 
                                     </View>
-
                                     :
-
                                     (
                                         (arrLength < 8 ?
                                             <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
@@ -555,13 +652,13 @@ export default class EditPropertyScreen extends Component<Props>  {
 
                                             : null))
                                 }
-
-                                {/* {this.state.images ? this.state.images.map(i => <View key={i.uri} style={{}}>{this.renderImage(i)}</View>) :
+                                {this.state.newImages && this.state.newImages.length ? this.state.newImages.map((v, i) => {
+                                    return (
+                                        <View key={"" + i} style={{}}>{this.renderImage(v, i)}</View>
+                                    );
+                                }) :
                                     null
-                                } */}
-
-                                {/* {this.renderImage.bind(this)} */}
-                                {this.renderImage.bind(this)}
+                                }
 
                             </ScrollView>
                         </View>
