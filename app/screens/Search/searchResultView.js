@@ -226,7 +226,7 @@ export default class SearchResultView extends Component<Props> {
 
                                             if (bathRooms == -1 || propObj.Bathrooms >= bathRooms) {
 
-                                                if (carSpace == -1 || propObj.CarPark >= bathRooms) {
+                                                if (carSpace == -1 || propObj.CarPark >= carSpace) {
 
                                                     if (landSize == 0 || propObj.LandSize >= landSize) {
 
@@ -372,10 +372,8 @@ export default class SearchResultView extends Component<Props> {
                     } else if (a.AddedDate > b.AddedDate) {
                         return 1;
                     }
-
                     return 0;
                 });
-
             }
 
             // for(const i in this.state.collectionListProperties){
@@ -640,8 +638,8 @@ export default class SearchResultView extends Component<Props> {
                         <TouchableOpacity onPress={() => {
                             this.props.navigation.navigate('Search');
                         }}>
-                            <View style={{ height: 30, alignItems: 'center', borderRadius: 10, backgroundColor: '#f3d500', justifyContent: 'center', paddingHorizontal: 10, marginTop: 20 }}>
-                                <Text>
+                            <View style={{ height: 30, alignItems: 'center', borderRadius: 10, backgroundColor: '#212121', justifyContent: 'center', paddingHorizontal: 10, marginTop: 20 }}>
+                                <Text style={{ textAlign: 'center', color: '#ffffff', fontWeight: '600' }}>
                                     Back to home
                             </Text>
 
@@ -661,8 +659,36 @@ export default class SearchResultView extends Component<Props> {
     }
 
     render() {
+
+        let propData = this.props.navigation.state.params.data;
+
         return (
             <View style={styles.container}>
+
+                <View style={{
+                    position: "absolute",
+                    // top: 30,
+                    left: 0,
+                    zIndex: 2,
+                    width: "100%",
+                    // marginTop: 40,
+                    backgroundColor: 'rgba(244, 244, 244, .97)'
+                }}>
+
+                    <View style={{ position: 'relative', alignSelf: 'flex-end' }}>
+                        <TouchableOpacity style={styles.resetFilterButton}
+                            onPress={() => {
+                                this.props.navigation.navigate('FilterScreen', { propData: propData });
+                            }
+                                // this.ResetFilters()
+                            }
+                        >
+
+                            <Text style={{ fontSize: 10 }}>SHOW FILTERS</Text>
+
+                        </TouchableOpacity>
+                    </View>
+                </View>
 
                 {this.renderResultView()}
                 {this.renderCreateNewCollectionDialog()}
@@ -676,7 +702,7 @@ export default class SearchResultView extends Component<Props> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 0,
+        paddingTop: 40,
     },
     loader: {
         flex: 1,
@@ -684,5 +710,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#fff"
     },
-
+    resetFilterButton: {
+        backgroundColor: "white",
+        margin: 12,
+        padding: 5,
+        borderRadius: 15,
+        paddingHorizontal: 10
+    },
 });

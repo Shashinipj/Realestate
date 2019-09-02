@@ -184,7 +184,7 @@ export default class ExpandedView extends Component {
                             <View style={styles.userProfileView}>
 
                                 {/* <Image source={require('../../assets/images/owner2.jpg')} style={{ width: 40, height: 40, borderRadius: 20 }} /> */}
-                                <Image source={require('../../assets/images/owner2.png')} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor:'#ffffff' }} />
+                                <Image source={require('../../assets/images/owner2.png')} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#ffffff' }} />
                             </View>
                         </View>
                         {/* <ImageBackground style={styles.imageBackground}> */}
@@ -350,14 +350,27 @@ export default class ExpandedView extends Component {
                 </ScrollView>
                 {/* {this.showMapModal()} */}
 
-                <View style={{ height: 60, backgroundColor: 'white', alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com') }>
+                <View style={{ height: 60, backgroundColor: 'white', alignItems: 'center', flexDirection:'row', justifyContent:'space-between' }}>
+                    <TouchableOpacity onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com')} style={{flex: 1}}>
 
                         <View style={{
-                            backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10, width: 300,
+                            backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10, 
                             borderRadius: 7, alignItems: 'center', justifyContent: 'center'
                         }}>
                             <Text style={{ color: 'white', fontWeight: '600' }}>Email agent</Text>
+                        </View>
+
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                    // onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com')} 
+                    style={{flex: 1}}>
+
+                        <View style={{
+                            backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10, 
+                            borderRadius: 7, alignItems: 'center', justifyContent: 'center'
+                        }}>
+                            <Text style={{ color: 'white', fontWeight: '600' }}>Make an Appoinment</Text>
                         </View>
 
                     </TouchableOpacity>

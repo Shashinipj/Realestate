@@ -6,6 +6,7 @@ import SearchScreen from '../screens/Search/searchScreen';
 import NotificationScreen from '../screens/Notifications/notificationScreen';
 import ProfileScreen from '../screens/Profile/profileScreen';
 import SearchBarScreen from '../screens/Search/searchBarScreen';
+import FilterScreen from '../screens/Search/filterScreen';
 import SearchResultView from '../screens/Search/searchResultView';
 import ExpandedView from '../screens/Search/expandedView';
 import CollectionDetailScreen from '../screens/Collection/collectionDetailScreen';
@@ -29,6 +30,9 @@ const searchStack = createStackNavigator({
     },
     ExpandedView: {
         screen: ExpandedView
+    },
+    FilterScreen: {
+        screen: FilterScreen
     }
 
 });
@@ -111,7 +115,7 @@ const TabNavigator = createBottomTabNavigator({
             )
         },
     },
-    Me: {
+    Profile: {
         screen: profileStack,
 
         navigationOptions: {
@@ -125,7 +129,6 @@ const TabNavigator = createBottomTabNavigator({
             )
         },
     },
-
 });
 
 const mainStack = createStackNavigator(

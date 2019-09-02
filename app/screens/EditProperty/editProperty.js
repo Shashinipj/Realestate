@@ -606,8 +606,6 @@ export default class EditPropertyScreen extends Component<Props>  {
                             horizontal={true}
                         />
 
-
-
                         {/* <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
 
                             {this.state.defaultImage ? <Image source={this.state.defaultImage} style={{ width: 300, height: 200, alignItems: 'center' }} />
@@ -891,8 +889,6 @@ export default class EditPropertyScreen extends Component<Props>  {
                                 keyboardType='numeric'
                             />
                         </View>
-
-
 
                         <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
                             <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>is Featured</Text>
