@@ -16,6 +16,7 @@ import FeaturedListItem from '../../component/featuredListItemComponent';
 import RNFetchBlob from 'react-native-fetch-blob';
 import ImagePicker from 'react-native-image-crop-picker';
 import { NavigationProp, NavigationEvents } from 'react-navigation';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 // import FeaturedListItem from "../../component/featuredListItemComponent";
 
 let PropRef = db.ref('/PropertyType');
@@ -845,12 +846,43 @@ export default class SearchScreen extends Component {
         );
     }
 
+    googleLogin = async () => {
+        try {
+          // Add any configuration settings here:
+          await GoogleSignin.configure({
+            //   iosClientId:"235395364316-q3lpp65igj5d79cdeg7jdet5u0se1ikr.apps.googleusercontent.com",
+            //   webClientId:"235395364316-c661ftcc5dn8moa65kr0o4sjcgkmn4fj.apps.googleusercontent.com",
+            //   offlineAccess: false
+          });
+      
+          const data = await GoogleSignin.signIn();
+      
+          // create a new firebase credential with the token
+          const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken)
+          // login with credential
+          const currentUser = await firebase.auth().signInWithCredential(credential);
+      
+          console.info(JSON.stringify(currentUser.toJSON()));
+        } catch (e) {
+          console.error("google login error",e);
+        }
+      }
+
     renderForms() {
 
         if (!this.state.signUpVisible) {
             return (
                 <View>
                     <Image source={require('../../assets/images/muthu.png')} style={styles.image} />
+
+                    <GoogleSigninButton
+                        style={{ width: 192, height: 48 }}
+                        size={GoogleSigninButton.Size.Wide}
+                        color={GoogleSigninButton.Color.Dark}
+                        onPress={this.googleLogin}
+                        // disabled={this.state.isSigninInProgress} 
+                        />
+
                     <View style={{ width: '70%', alignItems: 'center', borderWidth: 1, borderRadius: 4, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' }}>
                         <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5 }}>
                             <Icon

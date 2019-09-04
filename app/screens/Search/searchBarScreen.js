@@ -148,14 +148,7 @@ export default class SearchBarScreen extends Component {
                 console.log(arr.length);
 
             }
-            // arr.splice(arr.length - 1, 1);
-            // console.log(arr.length);
-            // }
-
-            // arr = [
-            //     location,
-            //     ...arr
-            // ];
+           
             arr = [
                 {
                     name: location.name,
@@ -166,11 +159,6 @@ export default class SearchBarScreen extends Component {
 
             this.state.recentSearchList = arr;
             console.log('this.state.recentSearchList', this.state.recentSearchList);
-
-            // for (const i in this.state.recentSearchList) {
-            //     const loc = this.state.recentSearchList[i];
-            //     console.log('loc.name', loc.name);
-            // }
 
             await AsyncStorage.setItem('@LocationSearchList', JSON.stringify(arr));
 
