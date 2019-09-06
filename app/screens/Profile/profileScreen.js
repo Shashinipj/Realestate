@@ -63,7 +63,7 @@ export default class ProfileScreen extends Component<Props> {
             this.fetchUser(user);
             console.log("USER: " + user);
         });
-        
+
     }
 
     componentWillUnmount() {
@@ -80,14 +80,16 @@ export default class ProfileScreen extends Component<Props> {
             this.setState({
                 userEmail: user.email,
                 loggedIn: true,
-                uid: user.uid
+                uid: user.uid,
+                loading: false
             });
         }
         else {
             this.setState({
                 userEmail: '',
                 loggedIn: false,
-                uid: ''
+                uid: '',
+                loading: false
             });
         }
     }
@@ -209,9 +211,16 @@ export default class ProfileScreen extends Component<Props> {
                 },
                 {
                     text: 'Yes', onPress: () => {
+                        // this.setState({
+                        //     loading: true
+                        // });
+
                         firebase.auth().signOut()
                             .then(() => {
-                                this.setState({ loggedIn: false });
+                                this.setState({
+                                    loggedIn: false,
+                                    loading: false
+                                });
                                 this.loginReset();
                                 this.props.navigation.navigate('Search');
                                 this.clearAsyncStorage();
@@ -679,10 +688,10 @@ export default class ProfileScreen extends Component<Props> {
                                 try {
                                     await this.updateProfilePic();
                                     await this.updateUserDetails()
-    
+
                                     this.onPressProfileEditButton(false);
                                 } catch (error) {
-                                    console.log(error);                                    
+                                    console.log(error);
                                 }
                             }}>
                             <Text style={{ color: 'white', fontSize: 17, textAlign: 'center' }}>Save</Text>
@@ -698,6 +707,7 @@ export default class ProfileScreen extends Component<Props> {
     }
 
     renderProfileView() {
+
         if (!this.state.loggedIn) {
             return (
                 <View style={[styles.buttonContainer, { justifyContent: 'center', backgroundColor: '#ffffff' }]}>
@@ -726,180 +736,193 @@ export default class ProfileScreen extends Component<Props> {
 
             return (
                 <View style={styles.buttonContainer}>
-                    <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{}}>
-                        <View style={{ justifyContent: 'flex-start' }}>
-                            <View style={{
-                                width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20,
-                                backgroundColor: '#ffffff', padding: 0
-                            }}>
-                                {/* {(this.isPicChanged) ?
+                    {(this.state.loading) ?
+                        <View style={styles.loader}>
+                            <ActivityIndicator
+                                size='small'
+                                color="#757575"
+                                style={styles.activityIndicator}
+                            />
+                        </View>
+                        :
+                       <View style={styles.buttonContainer}>
+                            <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{}}>
+                                <View style={{ justifyContent: 'flex-start' }}>
+                                    <View style={{
+                                        width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20,
+                                        backgroundColor: '#ffffff', padding: 0
+                                    }}>
+                                        {/* {(this.isPicChanged) ?
                              <Image source={{ uri: this.state.profilePic }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                                 :
                                 <Image source={{ uri: this.state.profilePic }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                             } */}
-                                <Image source={{ uri: this.state.profilePicUrl }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
-                            </View>
-                            <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>{this.state.userName}</Text>
-
-                        </View>
-                    </ImageBackground>
-
-                    <View style={{ backgroundColor: '#ffffff', flex: 1, justifyContent: 'center' }}>
-
-                        <IndicatorViewPager
-                            style={{ flex: 1, backgroundColor: '#ffffff', flexDirection: 'column-reverse' }}
-                            indicator={this.renderTabIndicator()}
-                        >
-                            <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', alignContent: 'center', paddingLeft: 30 }}>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        <Meticon name="email-outline" size={25} style={{ color: '#212121' }} />
+                                        <Image source={{ uri: this.state.profilePicUrl }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                                     </View>
-                                    <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text>
+                                    <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>{this.state.userName}</Text>
 
                                 </View>
+                            </ImageBackground>
 
-                                <View style={{ flexDirection: 'row' }}>
-                                    <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        <Meticon name="phone" size={25} style={{ color: '#212121' }} />
-                                    </View>
-                                    <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.contactNumber}</Text>
+                            <View style={{ backgroundColor: '#ffffff', flex: 1, justifyContent: 'center' }}>
 
-                                </View>
-
-                                <View style={{ flexDirection: 'row' }}>
-                                    <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                        <Octicons name="location" size={25} style={{ color: '#212121' }} />
-                                    </View>
-                                    <Text style={{ fontSize: 15, fontWeight: '400', justifyContent: 'center', color: 'grey', alignSelf: 'center' }}>{this.state.address}</Text>
-
-                                </View>
-                            </View>
-
-
-                            <View style={{ padding: 10, paddingHorizontal: 30, backgroundColor: '#ffffff', }}>
-
-                                <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => {
-                                    this.onPressProfileEditButton(true);
-                                }}>
-                                    <View>
-                                        {/* <Text>Edit</Text> */}
-                                        <AntDesign
-                                            name="edit"
-                                            size={20}
-                                            style={{ marginRight: 0 }}
-                                        />
-                                    </View>
-                                </TouchableOpacity>
-
-                                <ScrollView style={{ paddingTop: 20 }}>
-
-                                    <View>
-                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Username</Text>
-                                        <Text style={{ fontSize: 15 }}>{this.state.userName}</Text>
-
-                                    </View>
-
-                                    <View style={{ marginTop: 20 }}>
-                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Email</Text>
-                                        <Text style={{ fontSize: 15 }}>{this.state.userEmail}</Text>
-
-                                    </View>
-
-                                    <View style={{ marginTop: 20 }}>
-                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Contact Number</Text>
-                                        <Text style={{ fontSize: 15 }}>{this.state.contactNumber}</Text>
-                                    </View>
-
-                                    <View style={{ marginTop: 20 }}>
-                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Address</Text>
-                                        <Text style={{ fontSize: 15 }}>{this.state.address}</Text>
-                                    </View>
-
-                                    <View style={{ marginTop: 20 }}>
-                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Get Current Location</Text>
+                                <IndicatorViewPager
+                                    style={{ flex: 1, backgroundColor: '#ffffff', flexDirection: 'column-reverse' }}
+                                    indicator={this.renderTabIndicator()}
+                                >
+                                    <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', alignContent: 'center', paddingLeft: 30 }}>
                                         <View style={{ flexDirection: 'row' }}>
-
-                                            <Text style={{ fontSize: 15 }}>{this.state.isLocationEnable ? 'Enable' : 'Disable'}</Text>
-                                            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                                                <Switch
-                                                    value={this.state.isLocationEnable}
-                                                    onSyncPress={() => { this.switchLocationEnable(!this.state.isLocationEnable) }}
-                                                    style={{}}
-                                                />
-
+                                            <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                <Meticon name="email-outline" size={25} style={{ color: '#212121' }} />
                                             </View>
+                                            <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text>
+
+                                        </View>
+
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                <Meticon name="phone" size={25} style={{ color: '#212121' }} />
+                                            </View>
+                                            <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.contactNumber}</Text>
+
+                                        </View>
+
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                <Octicons name="location" size={25} style={{ color: '#212121' }} />
+                                            </View>
+                                            <Text style={{ fontSize: 15, fontWeight: '400', justifyContent: 'center', color: 'grey', alignSelf: 'center' }}>{this.state.address}</Text>
+
                                         </View>
                                     </View>
 
-                                    <View style={{ marginTop: 20 }}>
-                                        <Text style={{ color: 'grey', marginBottom: 5 }}>Receive Notifications</Text>
-                                        <View style={{ flexDirection: 'row' }}>
 
-                                            <Text style={{ fontSize: 15 }}>{this.state.receiveNotification ? 'Enable' : 'Disable'}</Text>
-                                            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                                                <Switch
-                                                    value={this.state.receiveNotification}
-                                                    onSyncPress={() => { this.switchNotificationEnable(!this.state.receiveNotification) }}
-                                                    style={{}}
-                                                />
+                                    <View style={{ padding: 10, paddingHorizontal: 30, backgroundColor: '#ffffff', }}>
 
-                                            </View>
-                                        </View>
-                                    </View>
-
-                                </ScrollView>
-
-                            </View>
-
-                            {
-                                // (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
-                                (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
-                                    <View style={{}}>
-                                        <TouchableOpacity onPress={() => {
-                                            this.props.navigation.navigate('AddPropertyScreen');
+                                        <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => {
+                                            this.onPressProfileEditButton(true);
                                         }}>
-
-                                            {/* <View style={{ height: 50, backgroundColor: '#f3d500', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}> */}
-                                            <View style={{ height: 50, backgroundColor: '#bdbdbd', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-                                                {/* <Ionicon name="md-add-circle" size={30} color='#49141E' /> */}
-                                                <Ionicon name="md-add-circle" size={30} color='#212121' />
-                                                {/* <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add new property</Text> */}
-                                                <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#212121' }}>Add new property</Text>
+                                            <View>
+                                                {/* <Text>Edit</Text> */}
+                                                <AntDesign
+                                                    name="edit"
+                                                    size={20}
+                                                    style={{ marginRight: 0 }}
+                                                />
                                             </View>
                                         </TouchableOpacity>
 
-                                        <View style={{ flex: 1 }}>
-                                            <FlatList
-                                                data={this.state.myProperties}
-                                                // extraData={this.state}
-                                                renderItem={item => this.renderMyProperties(item)}
-                                                keyExtractor={(item, index) => {
-                                                    return "" + index;
-                                                }}
-                                            />
-                                        </View>
+                                        <ScrollView style={{ paddingTop: 20 }}>
+
+                                            <View>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Username</Text>
+                                                <Text style={{ fontSize: 15 }}>{this.state.userName}</Text>
+
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Email</Text>
+                                                <Text style={{ fontSize: 15 }}>{this.state.userEmail}</Text>
+
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Contact Number</Text>
+                                                <Text style={{ fontSize: 15 }}>{this.state.contactNumber}</Text>
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Address</Text>
+                                                <Text style={{ fontSize: 15 }}>{this.state.address}</Text>
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Get Current Location</Text>
+                                                <View style={{ flexDirection: 'row' }}>
+
+                                                    <Text style={{ fontSize: 15 }}>{this.state.isLocationEnable ? 'Enable' : 'Disable'}</Text>
+                                                    <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                                        <Switch
+                                                            value={this.state.isLocationEnable}
+                                                            onSyncPress={() => { this.switchLocationEnable(!this.state.isLocationEnable) }}
+                                                            style={{}}
+                                                        />
+
+                                                    </View>
+                                                </View>
+                                            </View>
+
+                                            <View style={{ marginTop: 20, paddingBottom: 30 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Receive Notifications</Text>
+                                                <View style={{ flexDirection: 'row' }}>
+
+                                                    <Text style={{ fontSize: 15 }}>{this.state.receiveNotification ? 'Enable' : 'Disable'}</Text>
+                                                    <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                                        <Switch
+                                                            value={this.state.receiveNotification}
+                                                            onSyncPress={() => { this.switchNotificationEnable(!this.state.receiveNotification) }}
+                                                            style={{}}
+                                                        />
+
+                                                    </View>
+                                                </View>
+                                            </View>
+
+                                        </ScrollView>
+
                                     </View>
-                                    :
-                                    null
-                            }
 
-                        </IndicatorViewPager>
-                    </View>
+                                    {
+                                        // (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
+                                        (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
+                                            <View style={{}}>
+                                                <TouchableOpacity onPress={() => {
+                                                    this.props.navigation.navigate('AddPropertyScreen');
+                                                }}>
+
+                                                    {/* <View style={{ height: 50, backgroundColor: '#f3d500', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}> */}
+                                                    <View style={{ height: 50, backgroundColor: '#bdbdbd', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                                                        {/* <Ionicon name="md-add-circle" size={30} color='#49141E' /> */}
+                                                        <Ionicon name="md-add-circle" size={30} color='#212121' />
+                                                        {/* <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add new property</Text> */}
+                                                        <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#212121' }}>Add new property</Text>
+                                                    </View>
+                                                </TouchableOpacity>
+
+                                                <View style={{ flex: 1 }}>
+                                                    <FlatList
+                                                        data={this.state.myProperties}
+                                                        // extraData={this.state}
+                                                        renderItem={item => this.renderMyProperties(item)}
+                                                        keyExtractor={(item, index) => {
+                                                            return "" + index;
+                                                        }}
+                                                    />
+                                                </View>
+                                            </View>
+                                            :
+                                            null
+                                    }
+
+                                </IndicatorViewPager>
+                            </View>
 
 
-                    <TouchableOpacity style={{ backgroundColor: '#ffffff' }} onPress={() => {
-                        this.onPressSignOutButton();
-                    }}>
-                        <View style={[styles.buttons, { backgroundColor: '#bdbdbd' }]}>
-                            <Text style={[styles.buttonText, { color: '#212121' }]}>
-                                Sign Out
+                            <TouchableOpacity style={{ backgroundColor: '#ffffff' }} onPress={() => {
+                                this.onPressSignOutButton();
+                            }}>
+                                <View style={[styles.buttons, { backgroundColor: '#bdbdbd' }]}>
+                                    <Text style={[styles.buttonText, { color: '#212121' }]}>
+                                        Sign Out
                                 </Text>
+                                </View>
+                            </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
+                    }
                 </View>
             );
         }
+
     }
 
     renderTabIndicator() {
@@ -997,8 +1020,20 @@ export default class ProfileScreen extends Component<Props> {
     render() {
         return (
             <View style={styles.container}>
+                {/* {(this.state.loading) ?
+                    <View style={styles.loader}>
+                        <ActivityIndicator
+                            size='small'
+                            color="#757575"
+                            style={styles.activityIndicator}
+                        />
+                    </View>
+                    :  */}
+                {/* <View style={styles.container}> */}
                 {this.renderProfileView()}
                 {this.renderEditProfileModal()}
+                {/* </View> */}
+                {/* } */}
             </View>
         );
     }
@@ -1041,5 +1076,11 @@ const styles = StyleSheet.create({
     activityIndicator: {
         flex: 1,
         height: 120
+    },
+    loader: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff"
     },
 })

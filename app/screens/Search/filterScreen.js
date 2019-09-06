@@ -75,8 +75,6 @@ export default class FilterScreen extends Component {
         if(filters){
             
         }
-
-
     }
 
 

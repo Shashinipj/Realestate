@@ -247,7 +247,6 @@ export default class ListItem extends Component<Props> {
                         size={20}
                         style={{ marginRight: 0 }}
                     />
-
                     {/* <Text style={{}}>Play</Text> */}
                 </TouchableOpacity>
             );
@@ -323,9 +322,9 @@ export default class ListItem extends Component<Props> {
                                     <Ionicon name="ios-car" size={17} />
                                     <Text style={styles.subDetailsText}>{this.props.data1.CarPark}</Text>
 
-                                    <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
+                                    {/* <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View> */}
 
-                                    <Text style={styles.subDetailsText}>{this.props.data1.PropType}</Text>
+                                    {/* <Text style={styles.subDetailsText}>{this.props.data1.PropType}</Text> */}
                                 </View>
                             </View>
 

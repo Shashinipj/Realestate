@@ -194,15 +194,6 @@ export default class EditPropertyScreen extends Component<Props>  {
 
     }
 
-    removeImages(image) {
-        let arr = this.state.images;
-        arr.splice(image, 1);
-
-        this.setState({
-            images: arr
-        });
-    }
-
     renderInitialImage(i) {
         return (
             <View>
@@ -560,6 +551,8 @@ export default class EditPropertyScreen extends Component<Props>  {
         this.setState({
             images: arr
         });
+
+        console.log('remove image1');
 
     }
 

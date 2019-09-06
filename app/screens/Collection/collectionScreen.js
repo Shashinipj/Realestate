@@ -84,7 +84,7 @@ export default class CollectionScreen extends Component {
         const currentUser = firebase.auth().currentUser;
 
         if (user) {
-            db.ref(`Users/${user.uid}/Collections/${this.state.collectionName}`).on('value', (snapshot) => {
+            db.ref(`Users/${currentUser.uid}/Collections/${this.state.collectionName}`).on('value', (snapshot) => {
                 const collections = snapshot.val();
                 console.log(collections);
 
@@ -107,7 +107,6 @@ export default class CollectionScreen extends Component {
                     loading: false
                 });
             });
-
         }
     }
 

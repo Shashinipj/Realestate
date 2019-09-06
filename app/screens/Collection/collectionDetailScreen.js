@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TextInputProps, FlatList, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
+import {
+    View, StyleSheet, Text, TextInputProps, FlatList,
+    TouchableOpacity, Image, ImageBackground, Alert
+} from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { db } from '../../Database/db';
@@ -33,28 +36,71 @@ export default class CollectionDetailScreen extends Component {
             propProperties: [],
             collectionName: '',
             search: '',
+            loginStatus: false
         };
+
+        this.onValueCollection = this.onValueCollection.bind(this);
     }
 
     componentDidMount() {
+        // const { navigation } = this.props;
+        // const collection = navigation.getParam('CollectionData');
+
+        // let propIDs = collection.propIds;
+
+        // this.loadProps(propIDs);
+
+        firebase.auth().onAuthStateChanged(user => {
+            this.fetchUser(user);
+
+            console.log("USER: " + user);
+        });
+
+
+    }
+
+    componentWillUnmount() {
+        const user = firebase.auth().currentUser;
+
+        if (user) {
+            db.ref('/PropertyType').off('value', this.onValueCollection);
+        }
+     }
+
+    fetchUser(user) {
+
+        const { navigation } = this.props;
+        const collection = navigation.getParam('CollectionData');
+
+        let propIDs = collection.propIds;
+        if (user) {
+            this.loadProps(propIDs);
+            this.setState({
+                loginStatus: true
+            });
+        }
+        else {
+
+        }
+    }
+
+   /**
+     * @param {firebase.database.DataSnapshot} snapshot
+     */
+    onValueCollection(snapshot){
+
         const { navigation } = this.props;
         const collection = navigation.getParam('CollectionData');
 
         let propIDs = collection.propIds;
 
-        this.loadProps(propIDs);
-    }
-
-    loadProps(propIDs) {
-        db.ref('/PropertyType').once('value', (snapshot) => {
-            this.userProperties = snapshot.val();
+        this.userProperties = snapshot.val();
 
             let filteredProperties = [];
             for (const collectPropId in propIDs) {
                 console.log('collectPropId', collectPropId);
 
                 console.log("VAL ", snapshot);
-
 
                 for (const propTypeId in this.userProperties) {
                     const propTypeObj = this.userProperties[propTypeId];
@@ -78,7 +124,44 @@ export default class CollectionDetailScreen extends Component {
                 propProperties: filteredProperties
             });
             this.arrayholder = filteredProperties;
-        });
+    }
+
+    loadProps(propIDs) {
+        // db.ref('/PropertyType').once('value', (snapshot) => {
+        //     this.userProperties = snapshot.val();
+
+        //     let filteredProperties = [];
+        //     for (const collectPropId in propIDs) {
+        //         console.log('collectPropId', collectPropId);
+
+        //         console.log("VAL ", snapshot);
+
+
+        //         for (const propTypeId in this.userProperties) {
+        //             const propTypeObj = this.userProperties[propTypeId];
+        //             console.log("propTypeObj", propTypeObj);
+
+        //             if (propTypeObj.Property) {
+        //                 for (const propId in propTypeObj.Property) {
+        //                     const propObj = propTypeObj.Property[propId];
+
+        //                     if (propObj.PropId == collectPropId) {
+        //                         filteredProperties.push(propObj);
+        //                         console.log("filteredProperties", filteredProperties);
+        //                     }
+        //                 }
+        //             }
+        //         }
+
+
+        //     }
+        //     this.setState({
+        //         propProperties: filteredProperties
+        //     });
+        //     this.arrayholder = filteredProperties;
+        // });
+
+        db.ref('/PropertyType').once('value', this.onValueCollection);
     }
 
     deleteCollectionItem(propertyID) {
@@ -204,19 +287,19 @@ export default class CollectionDetailScreen extends Component {
                     onChangeText={text => this.SearchFilterFunction(text)}
                     onClear={text => this.SearchFilterFunction('')}
                 />
-                {/* {(this.state.propProperties.length == 0) ?
+                {(!this.state.loginStatus) ?
                     // this.props.navigation.navigate("Collections")
-                    <View style={{backgroundColor:'red'}}>
-                        </View>
-                    : */}
-                <FlatList
-                    data={this.state.propProperties}
-                    renderItem={item => this.renderItem(item)}
-                    keyExtractor={(item, index) => {
-                        return "" + index;
-                    }}
-                />
-                {/* } */}
+                    <View style={{ backgroundColor: 'red' }}>
+                    </View>
+                    :
+                    <FlatList
+                        data={this.state.propProperties}
+                        renderItem={item => this.renderItem(item)}
+                        keyExtractor={(item, index) => {
+                            return "" + index;
+                        }}
+                    />
+                }
 
             </View>
         );

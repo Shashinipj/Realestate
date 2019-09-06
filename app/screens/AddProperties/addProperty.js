@@ -461,6 +461,20 @@ export default class AddPropertyScreen extends Component<Props> {
         }
     }
 
+    removeImages(imgIndex) {
+        /**
+         * @type {any[]}
+         */
+        let arr = this.state.images;
+
+        arr.splice(imgIndex, 1);
+
+        this.setState({
+            images: arr
+        });
+
+    }
+
     renderImage(image, index) {
         return (
             <TouchableOpacity style={{}} onPress={() => {
@@ -532,10 +546,10 @@ export default class AddPropertyScreen extends Component<Props> {
                             key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
                             language: 'en', // language of the results
                             types: '(cities)', // default: 'geocode'
-                            region: "LK",
-                            components: 'country:lk'
-                            // region: "Canada",
-                            // components: 'country:ca'
+                            // region: "LK",
+                            // components: 'country:lk'
+                            region: "Canada",
+                            components: 'country:ca'
                         }}
 
                         styles={{

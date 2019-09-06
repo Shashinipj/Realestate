@@ -61,19 +61,15 @@ export default class SearchResultView extends Component<Props> {
 
         const user = firebase.auth().currentUser;
         if (user) {
-            this.getCollectionNames(user);
-            await this.getFavouritePropertyId(user);
+            await this.getCollectionNames(user);
+            // await this.getFavouritePropertyId(user);
             this.setState({
                 loggedUser: user
-            })
-
-            this.getSearchResults(user);
-            // console.log('this.state.favPropIds', this.state.favPropIds);
+            });
         }
         else {
-            this.getSearchResults(user);
+            this.getSearchResults();
         }
-
     }
 
     componentWillUnmount() {
@@ -83,7 +79,6 @@ export default class SearchResultView extends Component<Props> {
             db.ref(`Users/${user.uid}/Collections`).off('value', this.onValueCollection);
         }
     }
-
 
     renderModal() {
         console.log('render modal')
@@ -143,7 +138,6 @@ export default class SearchResultView extends Component<Props> {
                     onModalClose={() => {
                         // this.renderModal();
                     }}
-
                 />
             );
         }
@@ -160,7 +154,6 @@ export default class SearchResultView extends Component<Props> {
             else {
                 this.pleaseLoginInAlert();
                 console.log('pleaseLoginInAlert');
-
             }
         }
         else {
@@ -170,7 +163,7 @@ export default class SearchResultView extends Component<Props> {
     }
 
 
-    getSearchResults(user) {
+    getSearchResults() {
         let propData = this.props.navigation.state.params.data;
         console.log(propData);
 
@@ -195,7 +188,7 @@ export default class SearchResultView extends Component<Props> {
         console.log("minPrice1", minPrice);
 
 
-        PropRef.on('value', (snapshot) => {
+        PropRef.once('value', (snapshot) => {
             console.log("VAL ", snapshot);
 
             const propTypes = snapshot.val();
@@ -389,7 +382,10 @@ export default class SearchResultView extends Component<Props> {
 
 
     getCollectionNames(user) {
-        db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection);
+        return new Promise((resolve, reject) => {
+
+            db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection.bind(this, resolve, reject));
+        });
     }
 
     getFavouritePropertyId(user) {
@@ -423,33 +419,51 @@ export default class SearchResultView extends Component<Props> {
                 });
                 console.log('favProps', listFavProps);
                 resolve(true);
-            })
+            });
 
-        })
+        });
     }
 
 
     /**
      * @param {firebase.database.DataSnapshot} snapshot
      */
-    onValueCollection(snapshot) {
+    onValueCollection(resolve, reject, snapshot) {
         const collections = snapshot.val();
         console.log(collections);
 
         const arrColl = [];
-        const arrCollPropList = []
-        for (const collectionId in collections) {
+        const listFavProps = []
+        for (const collName in collections) {
             // console.log('collections[collectionId]', collections[collectionId]);
-            arrColl.push(collectionId);
+            arrColl.push(collName);
 
             console.log('arrColl', arrColl);
-            console.log('collectionId', collectionId);
+            console.log('collectionId', collName);
+            console.log('favoutiteProps[i]', collections[collName]);
+            const favProps = collections[collName]
+
+            for (const favPropId in favProps) {
+
+                console.log('favPropId', favPropId);
+                listFavProps.push({
+                    favPropId,
+                    collName
+                });
+                console.log('listFavProps', listFavProps);
+            }
         }
+
+        //here
+
 
         this.setState({
             collectionList: arrColl,
+            favPropIds: listFavProps
             // collectionListProperties: arrCollPropList
         });
+        this.getSearchResults();
+        resolve(true);
     }
 
     createCollection() {
@@ -594,7 +608,7 @@ export default class SearchResultView extends Component<Props> {
                 showFavouriteIcon={true}
                 showDeleteIcon={false}
                 onPressItem={(item) => {
-                    this.props.navigation.navigate("ExpandedView", { PropertyData: item });
+                    this.props.navigation.navigate("ExpandedView", { PropertyData: item, favIDs: this.state.favPropIds });
                 }}
 
                 onPressFavourite={(item, isMarked) => {

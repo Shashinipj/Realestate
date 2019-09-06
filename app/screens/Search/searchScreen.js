@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     View, StyleSheet, TextInput, Image, Text, TouchableOpacity,
     Dimensions, Animated, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator, SafeAreaView,
-    RefreshControl, NativeSyntheticEvent, NativeScrollEvent, ImageBackground
+    RefreshControl, NativeSyntheticEvent, NativeScrollEvent, ImageBackground, KeyboardAvoidingView
 } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
@@ -146,7 +146,7 @@ export default class SearchScreen extends Component {
             const { currentLocation, currentLat, currentLon } = this.state
 
             PropRef.once('value', (snapshot) => {
-                // console.log("VAL ", snapshot);
+                console.log("VAL ", snapshot);
 
                 const propTypes = snapshot.val();
 
@@ -431,7 +431,8 @@ export default class SearchScreen extends Component {
             success: 'Successfully login',
             // modalVisible: false,
             modalVisible: !this.state.modalVisible,
-            loginState: true
+            loginState: true,
+            loading: false
         })
     }
 
@@ -518,7 +519,7 @@ export default class SearchScreen extends Component {
             // console.log('image', this.state.image.uri);
         }).catch(e => {
             console.log(e);
-            Alert.alert(e.message ? e.message : e);
+            // Alert.alert(e.message ? e.message : e);
         });
     }
 
@@ -732,7 +733,12 @@ export default class SearchScreen extends Component {
                 <View style={{ alignItems: "center", }} >
                     <View style={{ width: '100%' }}>
                         <TouchableOpacity style={styles.loginButton}
-                            onPress={this.onSignInButtonPress.bind(this)}
+                            onPress={() => {
+                                this.onSignInButtonPress();
+                                this.setState({
+                                    loading: true
+                                });
+                            }}
                         >
                             <Text style={{ textAlign: 'center', color: '#ffffff' }}>Sign in</Text>
 
@@ -762,7 +768,14 @@ export default class SearchScreen extends Component {
             return (
                 <View style={{ alignItems: "center" }} >
                     <View style={{ alignSelf: 'center', width: '100%' }}>
-                        <TouchableOpacity style={styles.loginButton} onPress={this.validateSignUpForm.bind(this)}>
+                        <TouchableOpacity style={styles.loginButton} onPress={() => {
+                            this.validateSignUpForm();
+                            this.setState({
+                                loading: true
+                            });
+                        }
+                        }
+                        >
                             <Text style={{ textAlign: 'center', color: '#ffffff' }}>Create account</Text>
                         </TouchableOpacity>
                     </View>
@@ -791,56 +804,72 @@ export default class SearchScreen extends Component {
                 }}>
 
                 {/* <ImageBackground source={require('../../assets/images/skycraper.jpg')} style={{height:'100%', width:'100%'}}> */}
-                <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{ height: '100%', width: '100%' }}>
 
-                    <View style={{ marginTop: 22 }}>
-
-                        <TouchableOpacity
-                            style={{
-                                // backgroundColor: "red",
-                                alignSelf: "flex-start",
-                                padding: 10
-                            }}
-                            onPress={() => {
-                                this.setModalVisible(!this.state.modalVisible);
-                                this.loginReset();
-                            }}>
-
-                            <Icon
-                                name="close"
-                                type='MaterialIcons'
-                                size={20}
-                            />
-
-                        </TouchableOpacity>
+                {(this.state.loading) ?
+                    <View style={styles.loader}>
+                        <ActivityIndicator
+                            size='small'
+                            color="#757575"
+                            style={styles.activityIndicator}
+                        />
                     </View>
+                    :
+                    <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{ height: '100%', width: '100%' }}>
 
-                    <View style={styles.modalContainer}>
+                        <View style={{ marginTop: 22 }}>
 
-                        {this.renderForms()}
+                            <TouchableOpacity
+                                style={{
+                                    // backgroundColor: "red",
+                                    alignSelf: "flex-start",
+                                    padding: 10
+                                }}
+                                onPress={() => {
+                                    this.setModalVisible(!this.state.modalVisible);
+                                    this.loginReset();
+                                }}>
 
-                        <View style={{ width: "70%" }}>
-                            {this.renderSignUpSignInView()}
-                        </View>
+                                <Icon
+                                    name="close"
+                                    type='MaterialIcons'
+                                    size={20}
+                                />
 
-                        <Text style={styles.errorTextStyle} >
-                            {this.state.error}
-                        </Text>
-
-                        <Text style={styles.errorTextStyle} >
-                            {this.state.success}
-                        </Text>
-
-                        <View style={styles.footerView}>
-                            <TouchableOpacity>
-                                <Text style={{ fontSize: 12, color: '#616161' }}> Personal information collection statement</Text>
                             </TouchableOpacity>
                         </View>
 
-                    </View>
-                    {this.renderForgotPasswordModal()}
+                        <ScrollView>
+                            <KeyboardAvoidingView style={{}} behavior={'padding'}>
 
-                </ImageBackground>
+                                <View style={styles.modalContainer}>
+
+                                    {this.renderForms()}
+
+                                    <View style={{ width: "70%" }}>
+                                        {this.renderSignUpSignInView()}
+                                    </View>
+
+                                    <Text style={styles.errorTextStyle} >
+                                        {this.state.error}
+                                    </Text>
+
+                                    <Text style={styles.errorTextStyle} >
+                                        {this.state.success}
+                                    </Text>
+
+                                    {/* <View style={styles.footerView}>
+                                        <TouchableOpacity>
+                                            <Text style={{ fontSize: 12, color: '#616161' }}> Personal information collection statement</Text>
+                                        </TouchableOpacity>
+                                    </View> */}
+
+                                </View>
+                                {this.renderForgotPasswordModal()}
+                            </KeyboardAvoidingView>
+                        </ScrollView>
+
+                    </ImageBackground>
+                }
             </Modal>
         );
     }
@@ -897,7 +926,7 @@ export default class SearchScreen extends Component {
         }
         else {
             return (
-                <View style={{}}>
+                <KeyboardAvoidingView style={{}} behavior={'padding'}>
                     <Image source={require('../../assets/images/muthu.png')} style={[styles.image, { marginBottom: 10 }]} />
 
                     <TouchableOpacity onPress={this.pickProfilePicture.bind(this)}>
@@ -1037,8 +1066,9 @@ export default class SearchScreen extends Component {
                                 maxLength={40}
                                 placeholder='Address' />
                         </View>
+
                     </View>
-                </View>
+                </KeyboardAvoidingView>
             );
         }
     }
@@ -1098,70 +1128,83 @@ export default class SearchScreen extends Component {
     render() {
 
         return (
+
             <SafeAreaView style={styles.container}>
-                <View style={{}}>
-                    <View style={styles.searchBarView}>
-
-                        <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
-                            this.props.navigation.navigate('SearchBarScreen');
-                        }}>
-
-                            <View style={{ height: 30, alignItems: 'center', flexDirection: 'row' }}>
-                                <Icon
-                                    name="search"
-                                    type='MaterialIcons'
-                                    size={20}
-                                    color='gray'
-                                />
-                                <Text style={{ color: 'gray', marginLeft: 10 }}>Search suburb, postcode, state</Text>
-                            </View>
-
-                        </TouchableWithoutFeedback>
-                    </View>
-                </View>
-
-                <ScrollView onScroll={this.onScroll.bind(this)} style={{}}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.refreshing}
-                            onRefresh={() => {
-                                this.onRefresh();
-                            }}
+                {/* {(this.state.loading) ?
+                    <View style={styles.loader}>
+                        <ActivityIndicator
+                            size='small'
+                            color="#757575"
+                            style={styles.activityIndicator}
                         />
-                    }
-                >
-                    {this.renderAddNewProperty()}
-                    {this.renderLoginScreenImage()}
+                    </View>
+                    : */}
+                <KeyboardAvoidingView style={{}} behavior={'padding'}>
+                    <View style={{}}>
+                        <View style={styles.searchBarView}>
 
-                    <View style={styles.bottomContainer}>
+                            <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
+                                this.props.navigation.navigate('SearchBarScreen');
+                            }}>
 
-                        <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties around you</Text>
-                        {(this.state.loading) ?
-                            <View style={styles.loader}>
-                                <ActivityIndicator
-                                    size='small'
-                                    color="#757575"
-                                    style={styles.activityIndicator}
-                                />
-                            </View>
-                            :
-                            <FlatList
-                                data={this.state.nearByList}
-                                renderItem={item => this.renderItem(item)}
-                                keyExtractor={(item, index) => {
-                                    return "" + index;
+                                <View style={{ height: 30, alignItems: 'center', flexDirection: 'row' }}>
+                                    <Icon
+                                        name="search"
+                                        type='MaterialIcons'
+                                        size={20}
+                                        color='gray'
+                                    />
+                                    <Text style={{ color: 'gray', marginLeft: 10 }}>Search suburb, postcode, state</Text>
+                                </View>
+
+                            </TouchableWithoutFeedback>
+                        </View>
+                    </View>
+
+                    <ScrollView onScroll={this.onScroll.bind(this)} style={{}}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={this.state.refreshing}
+                                onRefresh={() => {
+                                    this.onRefresh();
                                 }}
-                                horizontal={true}
                             />
                         }
+                    >
+                        {this.renderAddNewProperty()}
+                        {this.renderLoginScreenImage()}
 
-                        {this.renderJoinButton()}
+                        <View style={styles.bottomContainer}>
 
-                    </View>
-                </ScrollView>
+                            <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties around you</Text>
+                            {(this.state.loading) ?
+                                <View style={styles.loader}>
+                                    <ActivityIndicator
+                                        size='small'
+                                        color="#757575"
+                                        style={styles.activityIndicator}
+                                    />
+                                </View>
+                                :
+                                <FlatList
+                                    data={this.state.nearByList}
+                                    renderItem={item => this.renderItem(item)}
+                                    keyExtractor={(item, index) => {
+                                        return "" + index;
+                                    }}
+                                    horizontal={true}
+                                />
+                            }
 
-                {this.renderAddNewProperty2()}
-                {this.renderJoinModal()}
+                            {this.renderJoinButton()}
+
+                        </View>
+                    </ScrollView>
+
+                    {this.renderAddNewProperty2()}
+                    {this.renderJoinModal()}
+                </KeyboardAvoidingView >
+                {/* } */}
 
             </SafeAreaView>
         );
@@ -1183,7 +1226,8 @@ const styles = StyleSheet.create({
     bottomContainer: {
         backgroundColor: "#ffffff",
         // backgroundColor:'#FFFDE7',
-        padding: 5
+        padding: 5, 
+        paddingBottom: 50
     },
     textContainer: {
         alignItems: 'center',
@@ -1290,6 +1334,12 @@ const styles = StyleSheet.create({
         right: 15,
         top: 130,
         zIndex: 5,
-    }
+    },
+    loader: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff"
+    },
 
 });

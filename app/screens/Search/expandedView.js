@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Modal, SafeAreaView, Linking } from 'react-native';
+import {
+    View, StyleSheet, Text, Image, TouchableOpacity, Modal, SafeAreaView,
+    Linking, Alert
+} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -9,6 +12,10 @@ import ReadMore from 'react-native-read-more-text';
 import ImageSlider from 'react-native-image-slider';
 import Accounting from 'accounting-js';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import ModalSelector from 'react-native-modal-selector';
+import firebase from 'react-native-firebase';
+import Dialog from "react-native-dialog";
+import { db } from '../../Database/db';
 
 
 export default class ExpandedView extends Component {
@@ -40,12 +47,326 @@ export default class ExpandedView extends Component {
 
         this.state = {
             mapModalVisible: false,
+            modalVisible: false,
+            createNewCollectionDialogVisible: false,
+            collectionName: '',
+            propertyID: '',
+            propProperties: [],
+            collectionList: [],
+            loggedUser: '',
+            isFavourite: false
         };
+
+        this.onValueCollection = this.onValueCollection.bind(this);
+    }
+
+    componentDidMount() {
+        const user = firebase.auth().currentUser;
+
+        const { navigation } = this.props;
+        const property = navigation.getParam('PropertyData');
+        const favIDs = navigation.getParam('favIDs');
+
+        console.log('property', property);
+        console.log('favIDs', favIDs);
+
+        if (user) {
+            this.getCollectionNames(user);
+
+            this.setState({
+                loggedUser: user,
+                propertyID: property.PropId
+            });
+            this.getFavouritePropertyId();
+        }
+
+    }
+
+    componentWillUnmount() {
+        const user = firebase.auth().currentUser;
+
+        if (user) {
+            db.ref(`Users/${user.uid}/Collections`).off('value', this.onValueCollection);
+        }
+    }
+
+    getFavouritePropertyId() {
+        const { navigation } = this.props;
+        const favIDs = navigation.getParam('favIDs');
+        const property = navigation.getParam('PropertyData');
+
+        for (const favProp in favIDs) {
+            const favID = favIDs[favProp]
+            console.log('favPropId', favID.favPropId);
+            console.log("property.PropId", property.PropId);
+
+            if (favID.favPropId == property.PropId) {
+                this.setState({
+                    isFavourite: true
+                })
+            }
+        }
+
+    }
+
+    getCollectionNames(user) {
+        db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection);
+    }
+
+
+    /**
+     * @param {firebase.database.DataSnapshot} snapshot
+     */
+    onValueCollection(snapshot) {
+        const collections = snapshot.val();
+        console.log(collections);
+
+        const arrColl = [];
+        const arrCollPropList = []
+        for (const collectionId in collections) {
+            // console.log('collections[collectionId]', collections[collectionId]);
+            arrColl.push(collectionId);
+
+            console.log('arrColl', arrColl);
+            console.log('collectionId', collectionId);
+        }
+
+        this.setState({
+            collectionList: arrColl,
+            // collectionListProperties: arrCollPropList
+        });
     }
 
     setModalVisible(visible) {
         this.setState({ mapModalVisible: visible });
     }
+
+    renderModal() {
+        console.log('render modal')
+        this.setState({
+            modalVisible: !this.state.modalVisible
+        });
+    }
+
+    renderModalView() {
+
+        const data = [];
+
+        data.push({
+            key: 0,
+            label: '+ Add new...'
+        })
+
+        for (let i = 0; i < this.state.collectionList.length; i++) {
+            const colName = this.state.collectionList[i];
+            data.push({
+                key: i + 1,
+                label: colName
+            });
+        }
+
+
+        if (this.state.modalVisible) {
+            return (
+                <ModalSelector
+                    data={data}
+                    visible={this.state.modalVisible}
+                    onChange={(option) => {
+
+                        console.log(option.label);
+                        // this.addToCollection(option.label);
+                        this.renderModal();
+                        this.renderModalSelectedItem(option);
+
+                    }}
+                    closeOnChange={true}
+                    onModalClose={() => {
+                        // this.renderModal();
+                    }}
+
+                />
+            );
+        }
+    }
+
+    createCollection() {
+
+
+
+        console.log(this.state.collectionName);
+        const user = firebase.auth().currentUser;
+
+        // db.ref('Collections/').child(user.uid).child(this.state.collectionName).child(this.state.propertyID).set(true)
+        db.ref(`Users/${user.uid}/Collections/${this.state.collectionName}/${this.state.propertyID}`).set(true)
+            .then(() => {
+                // const oProp = this.state.propProperties.find((val, index) => {
+                //     return val.PropId == this.state.propertyID;
+                // });
+
+                // if (oProp) {
+                //     oProp.isFavourite = true;
+                // }
+                this.setState({
+                    isFavourite: true
+                });
+                console.log('Inserted!');
+                this.handleCreateNewCollectionCancel();
+            }).catch((error) => {
+                console.log(error)
+            });
+    }
+
+
+    renderCreateNewCollectionDialog() {
+
+        return (
+
+            <Dialog.Container visible={this.state.createNewCollectionDialogVisible}>
+                {/* <Dialog.Container visible={this.state.createNewCollectionDialogVisible}></Dialog.Container> */}
+                <Dialog.Title>Create a Collection</Dialog.Title>
+                <Dialog.Description>
+                    Please enter a name for the collection
+          </Dialog.Description>
+                <Dialog.Input
+                    value={this.state.collectionName}
+                    onChangeText={collectionName => this.setState({ collectionName })}
+                ></Dialog.Input>
+                <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
+                <Dialog.Button label="Cancel" onPress={() => {
+                    this.handleCreateNewCollectionCancel();
+                }} />
+            </Dialog.Container>
+        );
+    }
+
+    renderModalSelectedItem(option) {
+        if (option.key == 0) {
+
+            if (this.state.loggedUser) {
+                this.showCreateNewCollectionDialog();
+                // console.log(option.key);
+                // console.log('create new 11111');
+            }
+            else {
+                this.pleaseLoginInAlert();
+                console.log('pleaseLoginInAlert');
+
+            }
+        }
+        else {
+            this.addToCollection(option.label);
+            console.log(option.label);
+        }
+    }
+
+    addToCollection(collectionName) {
+        const user = firebase.auth().currentUser;
+
+        db.ref(`Users/${user.uid}/Collections/${collectionName}/${this.state.propertyID}`).set(true)
+            .then(() => {
+                // const oProp = this.state.propProperties.find((val, index) => {
+                //     return val.PropId == this.state.propertyID;
+                // });
+
+                // if (oProp) {
+                //     oProp.isFavourite = true;
+                // }
+                this.setState({
+                    isFavourite: true
+                });
+
+                console.log('Inserted!');
+                // this.changefavouriteIcon(true);
+                this.handleCreateNewCollectionCancel();
+                // console.log(this.state.isFavourite);
+            }).catch((error) => {
+                console.log(error)
+            });
+    }
+
+    handleCreateNewCollectionCancel() {
+
+        this.setState({
+            createNewCollectionDialogVisible: false,
+            propertyID: ''
+        });
+    };
+
+    pleaseLoginInAlert() {
+
+        Alert.alert(
+            'Please Login',
+            'Do you want to login?',
+            [
+                {
+                    text: 'Home', onPress: () => {
+                        this.props.navigation.navigate('Search');
+                    }
+                },
+                {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true },
+        );
+    }
+
+    onPressRemoveFavourite(propertyID, collName) {
+
+        Alert.alert(
+            'Delete',
+            'Do you really want to delete this property?',
+            [
+                {
+                    text: 'No',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => {
+                        this.deleteCollectionItem(propertyID, collName);
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
+    }
+
+    deleteCollectionItem(propertyID, colName) {
+
+        const user = firebase.auth().currentUser;
+
+        db.ref(`Users/${user.uid}/Collections/${colName}/${propertyID}`).remove()
+            .then(() => {
+
+                // const oProp = this.state.propProperties.find((val, index) => {
+                //     return val.PropId == propertyID;
+                // });
+
+                // if (oProp) {
+                //     oProp.isFavourite = false;
+                // }
+                this.setState({
+                    isFavourite: false
+                });
+
+                console.log('Deleted!!');
+            }).catch((error) => {
+                console.log(error)
+            });
+    }
+
+    showCreateNewCollectionDialog() {
+        console.log("show dialog")
+        this.setState({
+            createNewCollectionDialogVisible: true,
+            collectionName: ''
+        });
+    };
+
 
     showMapModal() {
         console.log('map modal visible');
@@ -169,6 +490,53 @@ export default class ExpandedView extends Component {
         );
     }
 
+    renderHeartIcon(propID, collectionName) {
+        if (!this.state.isFavourite) {
+            return (
+                <TouchableOpacity style={{ flex: 1, padding: 10 }}
+                    onPress={() => {
+                        if (this.state.loggedUser) {
+                            this.renderModal();
+                        }
+                        else {
+                            this.pleaseLoginInAlert();
+                        }
+
+                    }}
+                >
+                    <Meticon
+                        name="heart-outline"
+                        size={25}
+                        style={{ marginRight: 0 }}
+                    />
+                </TouchableOpacity>
+            );
+        }
+        else {
+            return (
+                <TouchableOpacity style={{ flex: 1, padding: 10 }}
+                    onPress={() => {
+                        // if (this.state.loggedUser) {
+                        //     this.renderModal();
+                        // }
+                        // else {
+                        //     this.pleaseLoginInAlert();
+                        // }
+
+                        this.onPressRemoveFavourite(propID, collectionName);
+
+                    }}
+                >
+                    <Meticon
+                        name="heart"
+                        size={25}
+                        style={{ marginRight: 0 }}
+                    />
+                </TouchableOpacity>
+            );
+        }
+    }
+
 
     render() {
         const { navigation } = this.props;
@@ -205,9 +573,16 @@ export default class ExpandedView extends Component {
 
                         {/* </ImageBackground> */}
 
-                        <View style={{ marginLeft: 10 }}>
-                            <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{Accounting.formatMoney(property.Price)}</Text>
-                            <Text style={{ fontSize: 12, color: 'gray' }}>{property.Address}</Text>
+                        <View style={{ marginHorizontal: 10 }}>
+                            <View style={{ flexDirection: 'row', flex: 1 }}>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 10, marginBottom: 5 }}>{Accounting.formatMoney(property.Price)}</Text>
+                                    <Text style={{ fontSize: 12, color: 'gray' }}>{property.Address}</Text>
+                                </View>
+                                <View style={{ alignContent: 'center', justifyContent: 'center' }}>
+                                    {this.renderHeartIcon(property.PropId, property.collectionName)}
+                                </View>
+                            </View>
 
                             <View style={{ flexDirection: 'row', marginTop: 5 }}>
 
@@ -224,13 +599,13 @@ export default class ExpandedView extends Component {
                                 <Text style={[styles.subDetailsText, { marginRight: 0 }]}>{property.LandSize} m</Text>
                                 <Text style={{ fontSize: 10, lineHeight: 10 }}>2</Text>
 
-                                <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
+                                {/* <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View>
 
-                                <Text style={styles.subDetailsText}>{property.PropType}</Text>
+                                <Text style={styles.subDetailsText}>{property.PropType}</Text> */}
                             </View>
                         </View>
 
-                        <View style={{ borderTopWidth: 1, marginVertical: 10 }}></View>
+                        {/* <View style={{ borderTopWidth: 1, marginVertical: 10 }}></View>
 
                         <TouchableOpacity >
                             <View style={{ flexDirection: 'row' }}>
@@ -249,9 +624,9 @@ export default class ExpandedView extends Component {
                                 </View>
 
                             </View>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
-                        <View style={{ borderTopWidth: 1, marginVertical: 10 }}></View>
+                        {/* <View style={{ borderTopWidth: 1, marginVertical: 10 }}></View>
 
                         <TouchableOpacity >
                             <View style={{ flexDirection: 'row' }}>
@@ -273,7 +648,7 @@ export default class ExpandedView extends Component {
                                 </View>
 
                             </View>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                     </View>
 
@@ -350,11 +725,11 @@ export default class ExpandedView extends Component {
                 </ScrollView>
                 {/* {this.showMapModal()} */}
 
-                <View style={{ height: 60, backgroundColor: 'white', alignItems: 'center', flexDirection:'row', justifyContent:'space-between' }}>
-                    <TouchableOpacity onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com')} style={{flex: 1}}>
+                <View style={{ height: 60, backgroundColor: 'white', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <TouchableOpacity onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com')} style={{ flex: 1 }}>
 
                         <View style={{
-                            backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10, 
+                            backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10,
                             borderRadius: 7, alignItems: 'center', justifyContent: 'center'
                         }}>
                             <Text style={{ color: 'white', fontWeight: '600' }}>Email agent</Text>
@@ -362,12 +737,12 @@ export default class ExpandedView extends Component {
 
                     </TouchableOpacity>
 
-                    <TouchableOpacity 
-                    // onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com')} 
-                    style={{flex: 1}}>
+                    <TouchableOpacity
+                        // onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com')} 
+                        style={{ flex: 1 }}>
 
                         <View style={{
-                            backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10, 
+                            backgroundColor: '#49141E', marginVertical: 12, flex: 1, marginHorizontal: 10,
                             borderRadius: 7, alignItems: 'center', justifyContent: 'center'
                         }}>
                             <Text style={{ color: 'white', fontWeight: '600' }}>Make an Appoinment</Text>
@@ -375,6 +750,8 @@ export default class ExpandedView extends Component {
 
                     </TouchableOpacity>
                 </View>
+                {this.renderCreateNewCollectionDialog()}
+                {this.renderModalView()}
             </SafeAreaView >
         );
     }

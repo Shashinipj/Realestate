@@ -1241,10 +1241,10 @@ export default class SearchBarScreen extends Component {
                     key: 'AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA',
                     language: 'en', // language of the results
                     types: '(cities)', // default: 'geocode'
-                    region: "LK",
-                    components: 'country:lk'
-                    // region: "Canada",
-                    // components: 'country:ca'
+                    // region: "LK",
+                    // components: 'country:lk'
+                    region: "Canada",
+                    components: 'country:ca'
                 }}
 
                 styles={{
