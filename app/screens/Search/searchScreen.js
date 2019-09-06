@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     View, StyleSheet, TextInput, Image, Text, TouchableOpacity,
-    Dimensions, Animated, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator, SafeAreaView,
+    Linking, Animated, Modal, AsyncStorage, Alert, FlatList, ActivityIndicator, SafeAreaView,
     RefreshControl, NativeSyntheticEvent, NativeScrollEvent, ImageBackground, KeyboardAvoidingView
 } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
@@ -88,7 +88,27 @@ export default class SearchScreen extends Component {
                 console.log("data loading error", error);
             })
         }).catch((error) => {
-            Alert.alert(error.message);
+            // Alert.alert(error.message);
+
+            Alert.alert(
+                'RealEstate does not have access to your location. To enable access, tap Settings > Location',
+                '',
+                [
+                    {
+                        text: 'Cancel',
+                        onPress: () => this.loadData(),
+                        style: 'cancel',
+                        
+                    },
+                    {
+                        text: 'Settings', 
+                        onPress: () => {
+                            Linking.openURL('app-settings:');
+                        }
+                    },
+                ],
+                { cancelable: true },
+            );
         })
 
     }

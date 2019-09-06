@@ -224,9 +224,9 @@ export default class SearchResultView extends Component<Props> {
                                                     if (landSize == 0 || propObj.LandSize >= landSize) {
 
                                                         if (priceRange == 0 || (propObj.Price <= maxPrice && propObj.Price >= minPrice)) {
-                                                            console.log("pricerange", priceRange);
-                                                            console.log("maxPrice", maxPrice);
-                                                            console.log("minPrice", minPrice);
+                                                            // console.log("pricerange", priceRange);
+                                                            // console.log("maxPrice", maxPrice);
+                                                            // console.log("minPrice", minPrice);
 
                                                             if (propObj.Visible == true) {
 
