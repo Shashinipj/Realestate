@@ -28,8 +28,6 @@ export default class SearchScreen extends Component {
 
     };
 
-
-
     arrayholder = [];
 
     constructor(props) {

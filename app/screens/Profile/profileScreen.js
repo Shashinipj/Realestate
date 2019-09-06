@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage,
+    View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage, Dimensions, Platform,
     Image, ScrollView, FlatList, ImageBackground, Modal, TextInput, ActivityIndicator
 } from 'react-native';
 import { NavigationProp, NavigationEvents, SafeAreaView } from 'react-navigation';
@@ -54,10 +54,18 @@ export default class ProfileScreen extends Component<Props> {
 
             editModalVisible: false,
             loading: true,
+
+            orientation: '',
         };
     }
 
     componentDidMount() {
+
+        this.getOrientation();
+
+        Dimensions.addEventListener('change', () => {
+            this.getOrientation();
+        });
 
         firebase.auth().onAuthStateChanged(user => {
             this.fetchUser(user);
@@ -68,6 +76,17 @@ export default class ProfileScreen extends Component<Props> {
 
     componentWillUnmount() {
         // TODO: Add event disposing (.off) here.
+    }
+
+    getOrientation() {
+        // if (this.refs.rootView) {
+        if (Dimensions.get('window').width < Dimensions.get('window').height) {
+            this.setState({ orientation: 'portrait' });
+        }
+        else {
+            this.setState({ orientation: 'landscape' });
+        }
+        // }
     }
 
     fetchUser(user) {
@@ -211,9 +230,6 @@ export default class ProfileScreen extends Component<Props> {
                 },
                 {
                     text: 'Yes', onPress: () => {
-                        // this.setState({
-                        //     loading: true
-                        // });
 
                         firebase.auth().signOut()
                             .then(() => {
@@ -369,7 +385,6 @@ export default class ProfileScreen extends Component<Props> {
                 }).catch((error) => {
                     console.log(error)
                 });
-
     }
 
     showAdvertisement(propertyID, adType) {
@@ -384,41 +399,6 @@ export default class ProfileScreen extends Component<Props> {
                 });
 
     }
-
-    // editProfile() {
-
-    //     const user = firebase.auth().currentUser;
-
-    //     db.ref(`Users/${user.uid}/UserDetails`)
-    //         .update(
-    //             {
-    //                 UserName: this.state.userName,
-    //                 ContactNumber: this.state.contactNumber,
-    //                 Address: this.state.address,
-    //                 ProfilePicUrl: this.state.profilePicUrl
-
-    //             })
-    //         .then(() => {
-
-
-    //             // this.saveProfilePicture(this.state.profilePic, user.uid)
-    //             //     .then(() => {
-
-    //             //         this.onPressProfileEditButton(false);
-    //             //         console.log('Update User Details!!!');
-
-    //             //     }).catch((error) => {
-    //             //         console.log('image update error', error);
-    //             //     });
-    //             // this.setState({
-    //             //     loading: false,
-    //             // });
-
-
-    //         }).catch((error) => {
-    //             console.log('update error', error);
-    //         });
-    // }
 
     updateProfilePic() {
 
@@ -443,8 +423,6 @@ export default class ProfileScreen extends Component<Props> {
                     reject(error);
                 });
         });
-
-
     }
 
     updateUserDetails() {
@@ -589,6 +567,7 @@ export default class ProfileScreen extends Component<Props> {
         return (
             <Modal
                 animationType="slide"
+                supportedOrientations={['landscape', 'landscape-left', 'landscape-right', 'portrait']}
                 transparent={false}
                 visible={this.state.editModalVisible}
                 onRequestClose={() => {
@@ -707,6 +686,21 @@ export default class ProfileScreen extends Component<Props> {
     }
 
     renderProfileView() {
+        if (this.state.orientation == 'portrait') {
+            return (
+                this.renderProfilePortraitView()
+            );
+        }
+        else if (this.state.orientation == 'landscape') {
+            return (
+                this.renderProfileLandscapeView()
+            );
+        }
+    }
+
+    renderProfileLandscapeView() {
+
+
 
         if (!this.state.loggedIn) {
             return (
@@ -735,6 +729,7 @@ export default class ProfileScreen extends Component<Props> {
             // console.log("list: ", this.state.myProperties);
 
             return (
+
                 <View style={styles.buttonContainer}>
                     {(this.state.loading) ?
                         <View style={styles.loader}>
@@ -745,7 +740,269 @@ export default class ProfileScreen extends Component<Props> {
                             />
                         </View>
                         :
-                       <View style={styles.buttonContainer}>
+
+                        <View style={[styles.buttonContainer, { marginTop: -30 }]}>
+
+                            <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{}}>
+
+                                <View style={{ flexDirection: 'row' }}>
+                                    <View style={{ flex: 1 }}>
+                                        {(this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
+                                            <TouchableOpacity style={{ marginTop: 25, alignSelf: 'flex-start' }} onPress={() => {
+                                                this.props.navigation.navigate('AddPropertyScreen');
+                                            }}>
+                                                {/* <View style={{ height: 50, backgroundColor: '#bdbdbd', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}> */}
+                                                <View style={[styles.buttons, {
+                                                    backgroundColor: '#bdbdbd', width: 100, marginBottom: 0,
+                                                    flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 0
+                                                }]}>
+                                                    <Ionicon name="md-add-circle" size={25} color='#212121' />
+                                                    {/* <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#212121' }}> */}
+                                                    <Text style={[styles.buttonText, { color: '#212121' }]}>
+                                                        Add </Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                            :
+                                            null
+                                        }
+                                    </View>
+
+                                    <View>
+
+                                        <TouchableOpacity style={{ marginTop: 25, alignSelf: 'flex-end' }} onPress={() => {
+                                            this.onPressSignOutButton();
+                                        }}>
+                                            <View style={[styles.buttons, { backgroundColor: '#bdbdbd', width: 100, marginBottom: 0 }]}>
+                                                <Text style={[styles.buttonText, { color: '#212121' }]}>
+                                                    Sign Out</Text>
+                                            </View>
+                                        </TouchableOpacity>
+
+                                    </View>
+
+
+
+
+                                </View>
+
+
+
+                                <View style={{ justifyContent: 'flex-start', marginTop: -30 }}>
+                                    <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 10 }}>{this.state.userName}</Text>
+                                    <View style={{
+                                        width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginTop: 0, alignItems: 'center', justifyContent: 'center', marginBottom: 20,
+                                        backgroundColor: '#ffffff', padding: 0
+                                    }}>
+                                        <Image source={{ uri: this.state.profilePicUrl }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
+                                    </View>
+
+
+                                </View>
+
+
+                            </ImageBackground>
+
+                            <View style={{ backgroundColor: '#ffffff', flex: 1, justifyContent: 'center' }}>
+
+                                <IndicatorViewPager
+                                    style={{ flex: 1, backgroundColor: '#ffffff', flexDirection: 'column-reverse' }}
+                                    indicator={this.renderTabIndicator()}
+                                >
+
+                                    <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', alignContent: 'center', paddingLeft: 30 }}>
+                                        <ScrollView>
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Meticon name="email-outline" size={25} style={{ color: '#212121' }} />
+                                                </View>
+                                                <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text>
+
+                                            </View>
+
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Meticon name="phone" size={25} style={{ color: '#212121' }} />
+                                                </View>
+                                                <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.contactNumber}</Text>
+
+                                            </View>
+
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Octicons name="location" size={25} style={{ color: '#212121' }} />
+                                                </View>
+                                                <Text style={{ fontSize: 15, fontWeight: '400', justifyContent: 'center', color: 'grey', alignSelf: 'center' }}>{this.state.address}</Text>
+
+                                            </View>
+                                        </ScrollView>
+                                    </View>
+
+
+                                    <View style={{ padding: 10, paddingHorizontal: 30, backgroundColor: '#ffffff', }}>
+
+                                        <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => {
+                                            this.onPressProfileEditButton(true);
+                                        }}>
+                                            <View>
+                                                {/* <Text>Edit</Text> */}
+                                                <AntDesign
+                                                    name="edit"
+                                                    size={20}
+                                                    style={{ marginRight: 0 }}
+                                                />
+                                            </View>
+                                        </TouchableOpacity>
+
+                                        <ScrollView style={{ paddingTop: 20 }}>
+
+                                            <View>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Username</Text>
+                                                <Text style={{ fontSize: 15 }}>{this.state.userName}</Text>
+
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Email</Text>
+                                                <Text style={{ fontSize: 15 }}>{this.state.userEmail}</Text>
+
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Contact Number</Text>
+                                                <Text style={{ fontSize: 15 }}>{this.state.contactNumber}</Text>
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Address</Text>
+                                                <Text style={{ fontSize: 15 }}>{this.state.address}</Text>
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Get Current Location</Text>
+                                                <View style={{ flexDirection: 'row' }}>
+
+                                                    <Text style={{ fontSize: 15 }}>{this.state.isLocationEnable ? 'Enable' : 'Disable'}</Text>
+                                                    <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                                        <Switch
+                                                            value={this.state.isLocationEnable}
+                                                            onSyncPress={() => { this.switchLocationEnable(!this.state.isLocationEnable) }}
+                                                            style={{}}
+                                                        />
+
+                                                    </View>
+                                                </View>
+                                            </View>
+
+                                            <View style={{ marginTop: 20, paddingBottom: 30 }}>
+                                                <Text style={{ color: 'grey', marginBottom: 5 }}>Receive Notifications</Text>
+                                                <View style={{ flexDirection: 'row' }}>
+
+                                                    <Text style={{ fontSize: 15 }}>{this.state.receiveNotification ? 'Enable' : 'Disable'}</Text>
+                                                    <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                                        <Switch
+                                                            value={this.state.receiveNotification}
+                                                            onSyncPress={() => { this.switchNotificationEnable(!this.state.receiveNotification) }}
+                                                            style={{}}
+                                                        />
+
+                                                    </View>
+                                                </View>
+                                            </View>
+
+                                        </ScrollView>
+
+                                    </View>
+
+                                    {
+                                        // (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
+                                        (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
+                                            <View style={{}}>
+                                                {/* <TouchableOpacity onPress={() => {
+                                                    this.props.navigation.navigate('AddPropertyScreen');
+                                                }}>
+                                                    <View style={{ height: 50, backgroundColor: '#bdbdbd', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                                                        <Ionicon name="md-add-circle" size={30} color='#212121' />
+                                                        <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#212121' }}>Add new property</Text>
+                                                    </View>
+                                                </TouchableOpacity> */}
+
+                                                <View style={{ flex: 1 }}>
+                                                    <FlatList
+                                                        data={this.state.myProperties}
+                                                        // extraData={this.state}
+                                                        renderItem={item => this.renderMyProperties(item)}
+                                                        keyExtractor={(item, index) => {
+                                                            return "" + index;
+                                                        }}
+                                                    />
+                                                </View>
+                                            </View>
+                                            :
+                                            null
+                                    }
+
+                                </IndicatorViewPager>
+                            </View>
+
+
+
+
+                        </View>
+                    }
+
+                    {/* {this.renderEditProfileModal()} */}
+                </View>
+            );
+        }
+
+    }
+
+
+    renderProfilePortraitView() {
+
+
+
+        if (!this.state.loggedIn) {
+            return (
+                <View style={[styles.buttonContainer, { justifyContent: 'center', backgroundColor: '#ffffff' }]}>
+                    <Text style={{ textAlign: 'center', fontWeight: '400', fontSize: 15, color: '#000000' }}>
+                        Please Login to see user details
+                    </Text>
+
+                    <View style={{ justifyContent: 'center', alignContent: 'center' }}>
+                        <TouchableOpacity onPress={() => {
+                            this.props.navigation.navigate('Search');
+                        }}>
+                            {/* <View style={[styles.buttons, {width: '25%', height: 30, alignContent:'center',  backgroundColor: '#f3d500',}]}> */}
+                            <View style={[styles.buttons, { width: '25%', height: 30, alignContent: 'center', backgroundColor: '#212121', }]}>
+                                <Text style={[styles.buttonText, { fontSize: 15 }]}>
+                                    Home
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            );
+        }
+
+        else if (this.state.loggedIn) {
+            // console.log("list: ", this.state.myProperties);
+
+            return (
+
+                <View style={styles.buttonContainer}>
+                    {(this.state.loading) ?
+                        <View style={styles.loader}>
+                            <ActivityIndicator
+                                size='small'
+                                color="#757575"
+                                style={styles.activityIndicator}
+                            />
+                        </View>
+                        :
+
+                        <View style={styles.buttonContainer}>
+
                             <ImageBackground source={require('../../assets/images/sky7.jpg')} style={{}}>
                                 <View style={{ justifyContent: 'flex-start' }}>
                                     <View style={{
@@ -770,30 +1027,33 @@ export default class ProfileScreen extends Component<Props> {
                                     style={{ flex: 1, backgroundColor: '#ffffff', flexDirection: 'column-reverse' }}
                                     indicator={this.renderTabIndicator()}
                                 >
+
                                     <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', alignContent: 'center', paddingLeft: 30 }}>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                                <Meticon name="email-outline" size={25} style={{ color: '#212121' }} />
+                                        <ScrollView>
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Meticon name="email-outline" size={25} style={{ color: '#212121' }} />
+                                                </View>
+                                                <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text>
+
                                             </View>
-                                            <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.userEmail}</Text>
 
-                                        </View>
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Meticon name="phone" size={25} style={{ color: '#212121' }} />
+                                                </View>
+                                                <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.contactNumber}</Text>
 
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                                <Meticon name="phone" size={25} style={{ color: '#212121' }} />
                                             </View>
-                                            <Text style={{ fontSize: 15, fontWeight: '400', color: 'grey', alignSelf: 'center' }}>{this.state.contactNumber}</Text>
 
-                                        </View>
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Octicons name="location" size={25} style={{ color: '#212121' }} />
+                                                </View>
+                                                <Text style={{ fontSize: 15, fontWeight: '400', justifyContent: 'center', color: 'grey', alignSelf: 'center' }}>{this.state.address}</Text>
 
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
-                                                <Octicons name="location" size={25} style={{ color: '#212121' }} />
                                             </View>
-                                            <Text style={{ fontSize: 15, fontWeight: '400', justifyContent: 'center', color: 'grey', alignSelf: 'center' }}>{this.state.address}</Text>
-
-                                        </View>
+                                        </ScrollView>
                                     </View>
 
 
@@ -917,8 +1177,11 @@ export default class ProfileScreen extends Component<Props> {
                                 </Text>
                                 </View>
                             </TouchableOpacity>
+
                         </View>
                     }
+
+                    {/* {this.renderEditProfileModal()} */}
                 </View>
             );
         }
@@ -1020,20 +1283,13 @@ export default class ProfileScreen extends Component<Props> {
     render() {
         return (
             <View style={styles.container}>
-                {/* {(this.state.loading) ?
-                    <View style={styles.loader}>
-                        <ActivityIndicator
-                            size='small'
-                            color="#757575"
-                            style={styles.activityIndicator}
-                        />
-                    </View>
-                    :  */}
-                {/* <View style={styles.container}> */}
+                {console.log('orientation', this.state.orientation)}
+
+
                 {this.renderProfileView()}
+
                 {this.renderEditProfileModal()}
-                {/* </View> */}
-                {/* } */}
+
             </View>
         );
     }
