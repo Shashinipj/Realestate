@@ -1243,14 +1243,14 @@ export default class SearchBarScreen extends Component {
                     types: '(cities)', // default: 'geocode'
                     // region: "LK",
                     // components: 'country:lk'
-                    region: "Canada",
-                    components: 'country:ca'
+                    // region: "Canada",
+                    // components: 'country:ca'
                 }}
 
                 styles={{
                     textInputContainer: {
                         width: '100%',
-                        backgroundColor: '#ffffff',
+                        backgroundColor: '#EEEEEE',
                     },
                     description: {
                         fontWeight: 'bold',

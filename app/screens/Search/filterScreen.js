@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, Switch, TextInput, LayoutAnimation, AsyncStorage } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Modal, ScrollView, KeyboardAvoidingView, TextInput, LayoutAnimation, AsyncStorage } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Icon, ListItem } from 'react-native-elements';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -366,7 +366,8 @@ export default class FilterScreen extends Component {
 
         return (
 
-            <View style={{ flex: 1, paddingTop: 20 }}>
+            // <View style={{ flex: 1, paddingTop: 20 }}>
+            <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
                 <View style={[styles.searchBarView, { flexDirection: 'row', width: "100%" }]}>
 
                     <TouchableWithoutFeedback style={{ padding: 5, flex: 1 }} onPress={() => {
@@ -948,7 +949,8 @@ export default class FilterScreen extends Component {
                     </TouchableOpacity>
 
                 </View>
-            </View>
+            {/* </View> */}
+            </KeyboardAvoidingView>
         );
     }
 }
@@ -958,7 +960,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // backgroundColor:'red',
-        // paddingTop: 100
+        paddingTop: 20
     },
     searchBarView: {
         marginTop: 15,

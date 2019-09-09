@@ -96,10 +96,10 @@ export default class SearchScreen extends Component {
                         text: 'Cancel',
                         onPress: () => this.loadData(),
                         style: 'cancel',
-                        
+
                     },
                     {
-                        text: 'Settings', 
+                        text: 'Settings',
                         onPress: () => {
                             Linking.openURL('app-settings:');
                         }
@@ -1161,7 +1161,7 @@ export default class SearchScreen extends Component {
                     <View style={{}}>
                         <View style={styles.searchBarView}>
 
-                            <TouchableWithoutFeedback style={{ padding: 5 }} onPress={() => {
+                            <TouchableWithoutFeedback style={{ padding: 5, backgroundColor: "#EEEEEE" }} onPress={() => {
                                 this.props.navigation.navigate('SearchBarScreen');
                             }}>
 
@@ -1203,15 +1203,21 @@ export default class SearchScreen extends Component {
                                         style={styles.activityIndicator}
                                     />
                                 </View>
-                                :
-                                <FlatList
-                                    data={this.state.nearByList}
-                                    renderItem={item => this.renderItem(item)}
-                                    keyExtractor={(item, index) => {
-                                        return "" + index;
-                                    }}
-                                    horizontal={true}
-                                />
+                                : (this.state.nearByList.length != 0 ?
+                                    <FlatList
+                                        data={this.state.nearByList}
+                                        renderItem={item => this.renderItem(item)}
+                                        keyExtractor={(item, index) => {
+                                            return "" + index;
+                                        }}
+                                        horizontal={true}
+                                    />
+                                    :
+                                    <View style={{flex: 1, padding: 10}}>
+                                        <Text style={{color:'gray'}}>No properties around you</Text>
+                                    </View>
+                                )
+
                             }
 
                             {this.renderJoinButton()}
@@ -1244,7 +1250,7 @@ const styles = StyleSheet.create({
     bottomContainer: {
         backgroundColor: "#ffffff",
         // backgroundColor:'#FFFDE7',
-        padding: 5, 
+        padding: 5,
         paddingBottom: 50
     },
     textContainer: {
@@ -1271,7 +1277,7 @@ const styles = StyleSheet.create({
     },
     searchBarView: {
         borderRadius: 4,
-        paddingHorizontal: 5,
+        // paddingHorizontal: 5,
         backgroundColor: '#ffffff'
     },
 
@@ -1350,7 +1356,7 @@ const styles = StyleSheet.create({
         width: 70,
         borderRadius: 15,
         right: 15,
-        top: 130,
+        top: 53,
         zIndex: 5,
     },
     loader: {

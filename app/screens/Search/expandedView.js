@@ -231,10 +231,10 @@ export default class ExpandedView extends Component {
                     value={this.state.collectionName}
                     onChangeText={collectionName => this.setState({ collectionName })}
                 ></Dialog.Input>
-                <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
                 <Dialog.Button label="Cancel" onPress={() => {
                     this.handleCreateNewCollectionCancel();
                 }} />
+                 <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
             </Dialog.Container>
         );
     }

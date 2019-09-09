@@ -3,7 +3,7 @@ import {
     View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage, Dimensions, Platform,
     Image, ScrollView, FlatList, ImageBackground, Modal, TextInput, ActivityIndicator
 } from 'react-native';
-import { NavigationProp, NavigationEvents, SafeAreaView } from 'react-navigation';
+import { NavigationScreenProp, NavigationActions, SafeAreaView, StackActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -19,7 +19,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 let PropRef = db.ref('/PropertyType');
 
 type Props = {
-    navigation: NavigationProp;
+    navigation: NavigationScreenProp;
 };
 
 export default class ProfileScreen extends Component<Props> {
@@ -219,6 +219,13 @@ export default class ProfileScreen extends Component<Props> {
 
     onPressSignOutButton() {
 
+        let resetNavigation = StackActions.reset({
+            index: 0,
+            actions: [
+                NavigationActions.navigate({ routeName: 'App' })
+            ],
+        });
+
         Alert.alert(
             'Sign Out',
             'Are you sure to want sign out?',
@@ -238,7 +245,9 @@ export default class ProfileScreen extends Component<Props> {
                                     loading: false
                                 });
                                 this.loginReset();
-                                this.props.navigation.navigate('Search');
+
+                                this.props.navigation.dispatch(resetNavigation);
+                                this.props.navigation.navigate('Search')
                                 this.clearAsyncStorage();
                             });
                     }
@@ -552,9 +561,10 @@ export default class ProfileScreen extends Component<Props> {
 
                 })
                 .catch((error) => {
-                    console.log(error);
-
                     reject(error);
+                    console.log(error);
+                    throw error
+
                 });
         });
     }
@@ -562,7 +572,7 @@ export default class ProfileScreen extends Component<Props> {
 
     renderEditProfileModal() {
 
-        console.log("profilePicUrl", this.state.profilePicUrl);
+        // console.log("profilePicUrl", this.state.profilePicUrl);
 
         return (
             <Modal
@@ -772,20 +782,13 @@ export default class ProfileScreen extends Component<Props> {
                                         <TouchableOpacity style={{ marginTop: 25, alignSelf: 'flex-end' }} onPress={() => {
                                             this.onPressSignOutButton();
                                         }}>
-                                            <View style={[styles.buttons, { backgroundColor: '#bdbdbd', width: 100, marginBottom: 0 }]}>
-                                                <Text style={[styles.buttonText, { color: '#212121' }]}>
+                                            <View style={[styles.buttons, { backgroundColor:'#212121', width: 100, marginBottom: 0 }]}>
+                                                <Text style={[styles.buttonText, { color: '#e0e0e0' }]}>
                                                     Sign Out</Text>
                                             </View>
                                         </TouchableOpacity>
-
                                     </View>
-
-
-
-
                                 </View>
-
-
 
                                 <View style={{ justifyContent: 'flex-start', marginTop: -30 }}>
                                     <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 10 }}>{this.state.userName}</Text>
@@ -795,11 +798,7 @@ export default class ProfileScreen extends Component<Props> {
                                     }}>
                                         <Image source={{ uri: this.state.profilePicUrl }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                                     </View>
-
-
                                 </View>
-
-
                             </ImageBackground>
 
                             <View style={{ backgroundColor: '#ffffff', flex: 1, justifyContent: 'center' }}>
@@ -844,12 +843,12 @@ export default class ProfileScreen extends Component<Props> {
                                             this.onPressProfileEditButton(true);
                                         }}>
                                             <View>
-                                                {/* <Text>Edit</Text> */}
-                                                <AntDesign
+                                                <Text>Edit</Text>
+                                                {/* <AntDesign
                                                     name="edit"
                                                     size={20}
                                                     style={{ marginRight: 0 }}
-                                                />
+                                                /> */}
                                             </View>
                                         </TouchableOpacity>
 
@@ -877,7 +876,7 @@ export default class ProfileScreen extends Component<Props> {
                                                 <Text style={{ fontSize: 15 }}>{this.state.address}</Text>
                                             </View>
 
-                                            <View style={{ marginTop: 20 }}>
+                                            {/* <View style={{ marginTop: 20 }}>
                                                 <Text style={{ color: 'grey', marginBottom: 5 }}>Get Current Location</Text>
                                                 <View style={{ flexDirection: 'row' }}>
 
@@ -891,7 +890,7 @@ export default class ProfileScreen extends Component<Props> {
 
                                                     </View>
                                                 </View>
-                                            </View>
+                                            </View> */}
 
                                             <View style={{ marginTop: 20, paddingBottom: 30 }}>
                                                 <Text style={{ color: 'grey', marginBottom: 5 }}>Receive Notifications</Text>
@@ -1063,12 +1062,12 @@ export default class ProfileScreen extends Component<Props> {
                                             this.onPressProfileEditButton(true);
                                         }}>
                                             <View>
-                                                {/* <Text>Edit</Text> */}
-                                                <AntDesign
+                                                <Text>Edit</Text>
+                                                {/* <AntDesign
                                                     name="edit"
                                                     size={20}
                                                     style={{ marginRight: 0 }}
-                                                />
+                                                /> */}
                                             </View>
                                         </TouchableOpacity>
 
@@ -1096,7 +1095,7 @@ export default class ProfileScreen extends Component<Props> {
                                                 <Text style={{ fontSize: 15 }}>{this.state.address}</Text>
                                             </View>
 
-                                            <View style={{ marginTop: 20 }}>
+                                            {/* <View style={{ marginTop: 20 }}>
                                                 <Text style={{ color: 'grey', marginBottom: 5 }}>Get Current Location</Text>
                                                 <View style={{ flexDirection: 'row' }}>
 
@@ -1110,7 +1109,7 @@ export default class ProfileScreen extends Component<Props> {
 
                                                     </View>
                                                 </View>
-                                            </View>
+                                            </View> */}
 
                                             <View style={{ marginTop: 20, paddingBottom: 30 }}>
                                                 <Text style={{ color: 'grey', marginBottom: 5 }}>Receive Notifications</Text>
@@ -1171,8 +1170,8 @@ export default class ProfileScreen extends Component<Props> {
                             <TouchableOpacity style={{ backgroundColor: '#ffffff' }} onPress={() => {
                                 this.onPressSignOutButton();
                             }}>
-                                <View style={[styles.buttons, { backgroundColor: '#bdbdbd' }]}>
-                                    <Text style={[styles.buttonText, { color: '#212121' }]}>
+                                <View style={[styles.buttons, { backgroundColor: '#212121' }]}>
+                                    <Text style={[styles.buttonText, { color: '#e0e0e0' }]}>
                                         Sign Out
                                 </Text>
                                 </View>
@@ -1283,7 +1282,7 @@ export default class ProfileScreen extends Component<Props> {
     render() {
         return (
             <View style={styles.container}>
-                {console.log('orientation', this.state.orientation)}
+                {/* {console.log('orientation', this.state.orientation)} */}
 
 
                 {this.renderProfileView()}

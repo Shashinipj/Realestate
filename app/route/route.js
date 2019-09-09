@@ -101,20 +101,20 @@ const TabNavigator = createBottomTabNavigator({
             )
         },
     },
-    Notifications: {
-        screen: notificationStack,
+    // Notifications: {
+    //     screen: notificationStack,
 
-        navigationOptions: {
-            tabBarIcon: ({ tintColor }) => (
-                <Icon
-                    name="notifications"
-                    type='MaterialIcons'
-                    size={25}
-                    color='gray'
-                />
-            )
-        },
-    },
+    //     navigationOptions: {
+    //         tabBarIcon: ({ tintColor }) => (
+    //             <Icon
+    //                 name="notifications"
+    //                 type='MaterialIcons'
+    //                 size={25}
+    //                 color='gray'
+    //             />
+    //         )
+    //     },
+    // },
     Profile: {
         screen: profileStack,
 

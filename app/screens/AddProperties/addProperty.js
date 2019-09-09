@@ -525,10 +525,10 @@ export default class AddPropertyScreen extends Component<Props> {
                         renderDescription={row => row.description || row.formatted_address || row.name}
                         // renderDescription={row =>  row.formatted_address}
                         onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                            console.log(data, details);
-                            console.log(data.description);
-                            console.log('details', details.geometry.location.lat);
-                            console.log('details', details.geometry.location.lng);
+                            // console.log(data, details);
+                            // console.log(data.description);
+                            // console.log('details', details.geometry.location.lat);
+                            // console.log('details', details.geometry.location.lng);
                             // this.setFilterModalVisible();
                             this.setState({
                                 location: data.description,
@@ -548,8 +548,8 @@ export default class AddPropertyScreen extends Component<Props> {
                             types: '(cities)', // default: 'geocode'
                             // region: "LK",
                             // components: 'country:lk'
-                            region: "Canada",
-                            components: 'country:ca'
+                            // region: "Canada",
+                            // components: 'country:ca'
                         }}
 
                         styles={{

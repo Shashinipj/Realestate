@@ -43,20 +43,11 @@ export default class CollectionDetailScreen extends Component {
     }
 
     componentDidMount() {
-        // const { navigation } = this.props;
-        // const collection = navigation.getParam('CollectionData');
-
-        // let propIDs = collection.propIds;
-
-        // this.loadProps(propIDs);
 
         firebase.auth().onAuthStateChanged(user => {
             this.fetchUser(user);
-
-            console.log("USER: " + user);
+            // console.log("CollectionUSER: " + user);
         });
-
-
     }
 
     componentWillUnmount() {
@@ -65,7 +56,7 @@ export default class CollectionDetailScreen extends Component {
         if (user) {
             db.ref('/PropertyType').off('value', this.onValueCollection);
         }
-     }
+    }
 
     fetchUser(user) {
 
@@ -84,10 +75,10 @@ export default class CollectionDetailScreen extends Component {
         }
     }
 
-   /**
-     * @param {firebase.database.DataSnapshot} snapshot
-     */
-    onValueCollection(snapshot){
+    /**
+      * @param {firebase.database.DataSnapshot} snapshot
+      */
+    onValueCollection(snapshot) {
 
         const { navigation } = this.props;
         const collection = navigation.getParam('CollectionData');
@@ -96,34 +87,34 @@ export default class CollectionDetailScreen extends Component {
 
         this.userProperties = snapshot.val();
 
-            let filteredProperties = [];
-            for (const collectPropId in propIDs) {
-                console.log('collectPropId', collectPropId);
+        let filteredProperties = [];
+        for (const collectPropId in propIDs) {
+            console.log('collectPropId', collectPropId);
 
-                console.log("VAL ", snapshot);
+            console.log("VAL ", snapshot);
 
-                for (const propTypeId in this.userProperties) {
-                    const propTypeObj = this.userProperties[propTypeId];
-                    console.log("propTypeObj", propTypeObj);
+            for (const propTypeId in this.userProperties) {
+                const propTypeObj = this.userProperties[propTypeId];
+                console.log("propTypeObj", propTypeObj);
 
-                    if (propTypeObj.Property) {
-                        for (const propId in propTypeObj.Property) {
-                            const propObj = propTypeObj.Property[propId];
+                if (propTypeObj.Property) {
+                    for (const propId in propTypeObj.Property) {
+                        const propObj = propTypeObj.Property[propId];
 
-                            if (propObj.PropId == collectPropId) {
-                                filteredProperties.push(propObj);
-                                console.log("filteredProperties", filteredProperties);
-                            }
+                        if (propObj.PropId == collectPropId) {
+                            filteredProperties.push(propObj);
+                            console.log("filteredProperties", filteredProperties);
                         }
                     }
                 }
-
-
             }
-            this.setState({
-                propProperties: filteredProperties
-            });
-            this.arrayholder = filteredProperties;
+
+
+        }
+        this.setState({
+            propProperties: filteredProperties
+        });
+        this.arrayholder = filteredProperties;
     }
 
     loadProps(propIDs) {
@@ -214,8 +205,8 @@ export default class CollectionDetailScreen extends Component {
     onPressDeleteButton(propertyID) {
 
         Alert.alert(
-            'Delete',
-            'Do you really want to delete this property?',
+            'Remove',
+            'Do you want to remove this property in saved collection?',
             [
                 {
                     text: 'No',

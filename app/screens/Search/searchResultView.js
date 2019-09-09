@@ -81,14 +81,14 @@ export default class SearchResultView extends Component<Props> {
     }
 
     renderModal() {
-        console.log('render modal')
+        // console.log('render modal')
         this.setState({
             modalVisible: !this.state.modalVisible
         });
     }
 
     showCreateNewCollectionDialog() {
-        console.log("show dialog")
+        // console.log("show dialog")
         this.setState({
             createNewCollectionDialogVisible: true,
             collectionName: ''
@@ -153,7 +153,7 @@ export default class SearchResultView extends Component<Props> {
             }
             else {
                 this.pleaseLoginInAlert();
-                console.log('pleaseLoginInAlert');
+                // console.log('pleaseLoginInAlert');
             }
         }
         else {
@@ -165,7 +165,7 @@ export default class SearchResultView extends Component<Props> {
 
     getSearchResults() {
         let propData = this.props.navigation.state.params.data;
-        console.log(propData);
+        // console.log(propData);
 
         let propType = propData.propertyType;
         let actionType = propData.agreementType;
@@ -183,13 +183,13 @@ export default class SearchResultView extends Component<Props> {
         // console.log(this.props.navigation.state.params.data);
 
         let filteredProperties = [];
-        console.log("pricerange1", priceRange);
-        console.log("maxPrice1", maxPrice);
-        console.log("minPrice1", minPrice);
+        // console.log("pricerange1", priceRange);
+        // console.log("maxPrice1", maxPrice);
+        // console.log("minPrice1", minPrice);
 
 
         PropRef.once('value', (snapshot) => {
-            console.log("VAL ", snapshot);
+            // console.log("VAL ", snapshot);
 
             const propTypes = snapshot.val();
 
@@ -272,14 +272,14 @@ export default class SearchResultView extends Component<Props> {
 
                                                                     for (const i in this.state.favPropIds) {
                                                                         const favProp = this.state.favPropIds[i];
-                                                                        console.log('favProp', favProp);
+                                                                        // console.log('favProp', favProp);
 
                                                                         if (favProp.favPropId == propObj.PropId) {
-                                                                            console.log('matched');
+                                                                            // console.log('matched');
 
                                                                             propObjNew.isFavourite = true;
                                                                             propObjNew.collectionName = favProp.collName;
-                                                                            console.log('propObjNew.collectionName', propObjNew.collectionName);
+                                                                            // console.log('propObjNew.collectionName', propObjNew.collectionName);
                                                                             break;
                                                                         }
                                                                     }
@@ -339,8 +339,8 @@ export default class SearchResultView extends Component<Props> {
 
                 filteredProperties.sort((a, b) => {
 
-                    console.log("a.AddedDate", a.AddedDate);
-                    console.log("b.AddedDate", b.AddedDate);
+                    // console.log("a.AddedDate", a.AddedDate);
+                    // console.log("b.AddedDate", b.AddedDate);
 
                     if (a.AddedDate < b.AddedDate) {
                         return 1;
@@ -357,8 +357,8 @@ export default class SearchResultView extends Component<Props> {
 
                 filteredProperties.sort((a, b) => {
 
-                    console.log("a.AddedDate", a.AddedDate);
-                    console.log("b.AddedDate", b.AddedDate);
+                    // console.log("a.AddedDate", a.AddedDate);
+                    // console.log("b.AddedDate", b.AddedDate);
 
                     if (a.AddedDate < b.AddedDate) {
                         return -1;
@@ -391,33 +391,33 @@ export default class SearchResultView extends Component<Props> {
     getFavouritePropertyId(user) {
 
         return new Promise((resolve, reject) => {
-            console.log('user', user.uid);
+            // console.log('user', user.uid);
 
             const listFavProps = []
 
             db.ref(`Users/${user.uid}/Collections`).on('value', (snapshot) => {
                 const collections = snapshot.val();
-                console.log('favoutiteProps', collections);
+                // console.log('favoutiteProps', collections);
                 for (const collName in collections) {
-                    console.log('favoutiteProps[i]', collections[collName]);
+                    // console.log('favoutiteProps[i]', collections[collName]);
                     const favProps = collections[collName]
 
                     for (const favPropId in favProps) {
                         // const oProp = favProps[favPropId];
 
-                        console.log('favPropId', favPropId);
+                        // console.log('favPropId', favPropId);
                         listFavProps.push({
                             favPropId,
                             collName
                         });
-                        console.log('listFavProps', listFavProps);
+                        // console.log('listFavProps', listFavProps);
                     }
                 }
 
                 this.setState({
                     favPropIds: listFavProps
                 });
-                console.log('favProps', listFavProps);
+                // console.log('favProps', listFavProps);
                 resolve(true);
             });
 
@@ -430,7 +430,7 @@ export default class SearchResultView extends Component<Props> {
      */
     onValueCollection(resolve, reject, snapshot) {
         const collections = snapshot.val();
-        console.log(collections);
+        // console.log(collections);
 
         const arrColl = [];
         const listFavProps = []
@@ -438,19 +438,19 @@ export default class SearchResultView extends Component<Props> {
             // console.log('collections[collectionId]', collections[collectionId]);
             arrColl.push(collName);
 
-            console.log('arrColl', arrColl);
-            console.log('collectionId', collName);
-            console.log('favoutiteProps[i]', collections[collName]);
+            // console.log('arrColl', arrColl);
+            // console.log('collectionId', collName);
+            // console.log('favoutiteProps[i]', collections[collName]);
             const favProps = collections[collName]
 
             for (const favPropId in favProps) {
 
-                console.log('favPropId', favPropId);
+                // console.log('favPropId', favPropId);
                 listFavProps.push({
                     favPropId,
                     collName
                 });
-                console.log('listFavProps', listFavProps);
+                // console.log('listFavProps', listFavProps);
             }
         }
 
@@ -524,10 +524,11 @@ export default class SearchResultView extends Component<Props> {
                     value={this.state.collectionName}
                     onChangeText={collectionName => this.setState({ collectionName })}
                 ></Dialog.Input>
-                <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
+                
                 <Dialog.Button label="Cancel" onPress={() => {
                     this.handleCreateNewCollectionCancel();
                 }} />
+                <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
             </Dialog.Container>
         );
     }

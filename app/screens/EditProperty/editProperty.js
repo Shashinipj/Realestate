@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     View, StyleSheet, Text, Alert, TouchableWithoutFeedback, ScrollView, TouchableOpacity,
-    Image, ImageBackground, TextInput, Modal, FlatList
+    Image, ImageBackground, TextInput, Modal, FlatList, KeyboardAvoidingView, ActivityIndicator
 } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -585,21 +585,32 @@ export default class EditPropertyScreen extends Component<Props>  {
 
         return (
 
-            <View style={styles.container}>
-                <ScrollView style={{}}>
-                    <View style={{ alignItems: 'center' }}>
-
-                        <FlatList
-                            data={this.state.images}
-                            extraData={this.state}
-                            renderItem={item => this.renderItem(item)}
-                            keyExtractor={(item, index) => {
-                                return "" + index;
-                            }}
-                            horizontal={true}
+            // <View style={styles.container}>
+            <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
+                {(this.state.loading) ?
+                    <View style={{ flex: 1 }}>
+                        <ActivityIndicator
+                            size='small'
+                            color="#757575"
+                            style={styles.activityIndicator}
                         />
+                    </View>
 
-                        {/* <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
+                    :
+                    <ScrollView style={{}}>
+                        <View style={{ alignItems: 'center' }}>
+
+                            <FlatList
+                                data={this.state.images}
+                                extraData={this.state}
+                                renderItem={item => this.renderItem(item)}
+                                keyExtractor={(item, index) => {
+                                    return "" + index;
+                                }}
+                                horizontal={true}
+                            />
+
+                            {/* <View style={{ backgroundColor: 'grey', width: 300, height: 200, alignItems: 'center', justifyContent: 'center' }}>
 
                             {this.state.defaultImage ? <Image source={this.state.defaultImage} style={{ width: 300, height: 200, alignItems: 'center' }} />
                                 : <Text style={{ fontWeight: '600', color: 'white' }}>Select a default image</Text>
@@ -607,29 +618,14 @@ export default class EditPropertyScreen extends Component<Props>  {
 
                         </View> */}
 
-                        <View style={{ height: 130 }}>
+                            <View style={{ height: 130 }}>
 
-                            <ScrollView horizontal={true}
-                                style={{ marginTop: 10, flex: 1 }}
-                            >
-                                {arrLength == 0 ?
+                                <ScrollView horizontal={true}
+                                    style={{ marginTop: 10, flex: 1 }}
+                                >
+                                    {arrLength == 0 ?
 
-                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                            <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                                <Icon
-                                                    name="add-a-photo"
-                                                    type='MaterialIcons'
-                                                    size={30}
-                                                />
-                                            </View>
-
-                                        </TouchableOpacity>
-
-                                    </View>
-                                    :
-                                    (
-                                        (arrLength < 8 ?
+                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                             <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
                                                 <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                                                     <Icon
@@ -641,275 +637,291 @@ export default class EditPropertyScreen extends Component<Props>  {
 
                                             </TouchableOpacity>
 
-                                            : null))
-                                }
-                                {this.state.newImages && this.state.newImages.length ? this.state.newImages.map((v, i) => {
-                                    return (
-                                        <View key={"" + i} style={{}}>{this.renderImage(v, i)}</View>
-                                    );
-                                }) :
-                                    null
-                                }
+                                        </View>
+                                        :
+                                        (
+                                            (arrLength < 8 ?
+                                                <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                                    <View style={{ backgroundColor: '#e0e0e0', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                                        <Icon
+                                                            name="add-a-photo"
+                                                            type='MaterialIcons'
+                                                            size={30}
+                                                        />
+                                                    </View>
 
-                            </ScrollView>
-                        </View>
+                                                </TouchableOpacity>
 
-                    </View>
-
-
-                    <View style={{ alignItems: 'flex-start', margin: 10, backgroundColor: '#ffffff' }}>
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Title</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                // maxLength={300}
-                                onChangeText={(title) => this.setState({ title })}
-                                value={this.state.title}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Description</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                multiline={true}
-                                onChangeText={(description) => this.setState({ description })}
-                                value={this.state.description}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Price</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                onChangeText={(price) => this.setState({ price })}
-                                value={this.state.price}
-                                keyboardType='numeric'
-                            />
-                        </View>
-
-                        <View style={{ margin: 10 }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Type of Advertisement</Text>
-                            <View style={styles.buttonSetView}>
-                                <TouchableOpacity
-                                    style={
-                                        this.state.advertisementType == 1
-                                            ? { flex: 1, backgroundColor: '#424242', borderTopLeftRadius: 5, borderBottomLeftRadius: 5 } : { flex: 1 }
+                                                : null))
                                     }
-                                    onPress={() => this.isAdvertisementTypeButtonPress(1)}
-                                >
-                                    <View style={[styles.subButtonView, { borderRightWidth: 1, height: 30 }]}>
-                                        <Text style={
-                                            this.state.advertisementType == 1 ?
-                                                [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO SELL</Text>
-                                    </View>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={
-                                        this.state.advertisementType == 2
-                                            ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                    {this.state.newImages && this.state.newImages.length ? this.state.newImages.map((v, i) => {
+                                        return (
+                                            <View key={"" + i} style={{}}>{this.renderImage(v, i)}</View>
+                                        );
+                                    }) :
+                                        null
                                     }
 
-                                    onPress={() => this.isAdvertisementTypeButtonPress(2)}
-                                >
-                                    <View style={styles.subButtonView}>
-                                        <Text style={
-                                            this.state.advertisementType == 2 ?
-                                                [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO RENT</Text>
-                                    </View>
-                                </TouchableOpacity>
-
+                                </ScrollView>
                             </View>
+
                         </View>
 
-                        <View style={{ margin: 10, height: 150 }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Type</Text>
-                            <ScrollView horizontal={true} >
 
-                                <View style={styles.propertyTypeView}>
-                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(1)}>
-                                        <View style={
-                                            this.state.propertyType == 1 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
-                                                : styles.propertTypeButtons
-                                        }>
+                        <View style={{ alignItems: 'flex-start', margin: 10, backgroundColor: '#ffffff' }}>
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Title</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    // maxLength={300}
+                                    onChangeText={(title) => this.setState({ title })}
+                                    value={this.state.title}
+                                />
+                            </View>
 
-                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 1 ? 'white' : 'gray'} />
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Description</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    multiline={true}
+                                    onChangeText={(description) => this.setState({ description })}
+                                    value={this.state.description}
+                                />
+                            </View>
 
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Price</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(price) => this.setState({ price })}
+                                    value={this.state.price}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10 }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Type of Advertisement</Text>
+                                <View style={styles.buttonSetView}>
+                                    <TouchableOpacity
+                                        style={
+                                            this.state.advertisementType == 1
+                                                ? { flex: 1, backgroundColor: '#424242', borderTopLeftRadius: 5, borderBottomLeftRadius: 5 } : { flex: 1 }
+                                        }
+                                        onPress={() => this.isAdvertisementTypeButtonPress(1)}
+                                    >
+                                        <View style={[styles.subButtonView, { borderRightWidth: 1, height: 30 }]}>
+                                            <Text style={
+                                                this.state.advertisementType == 1 ?
+                                                    [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO SELL</Text>
                                         </View>
                                     </TouchableOpacity>
-                                    <Text>House</Text>
-                                </View>
 
-                                <View style={styles.propertyTypeView}>
-                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(2)}>
-                                        <View style={
-                                            this.state.propertyType == 2 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
-                                                : styles.propertTypeButtons
-                                        }>
-                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 2 ? 'white' : 'gray'} />
+                                    <TouchableOpacity
+                                        style={
+                                            this.state.advertisementType == 2
+                                                ? { flex: 1, backgroundColor: '#424242' } : { flex: 1 }
+                                        }
 
+                                        onPress={() => this.isAdvertisementTypeButtonPress(2)}
+                                    >
+                                        <View style={styles.subButtonView}>
+                                            <Text style={
+                                                this.state.advertisementType == 2 ?
+                                                    [styles.propertyTypeText, { color: 'white' }] : styles.propertyTypeText}>TO RENT</Text>
                                         </View>
                                     </TouchableOpacity>
-                                    <Text style={{ textAlign: 'center' }}>Apartment{"\n&"} house </Text>
+
                                 </View>
+                            </View>
 
-                                <View style={styles.propertyTypeView}>
-                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(3)}>
-                                        <View style={
-                                            this.state.propertyType == 3 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
-                                                : styles.propertTypeButtons
-                                        }>
-                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 3 ? 'white' : 'gray'} />
+                            <View style={{ margin: 10, height: 150 }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Type</Text>
+                                <ScrollView horizontal={true} >
 
-                                        </View>
-                                    </TouchableOpacity>
-                                    <Text>Townhouse</Text>
-                                </View>
+                                    <View style={styles.propertyTypeView}>
+                                        <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(1)}>
+                                            <View style={
+                                                this.state.propertyType == 1 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                    : styles.propertTypeButtons
+                                            }>
 
-                                <View style={styles.propertyTypeView}>
-                                    <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(4)}>
-                                        <View style={
-                                            this.state.propertyType == 4 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
-                                                : styles.propertTypeButtons
-                                        }>
-                                            <Meticon name='home-outline' size={30} color={this.state.propertyType == 4 ? 'white' : 'gray'} />
+                                                <Meticon name='home-outline' size={30} color={this.state.propertyType == 1 ? 'white' : 'gray'} />
 
-                                        </View>
-                                    </TouchableOpacity>
-                                    <Text>Villa</Text>
-                                </View>
-                            </ScrollView>
-                        </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                        <Text>House</Text>
+                                    </View>
 
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bedrooms</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                onChangeText={(bedrooms) => this.setState({ bedrooms })}
-                                value={this.state.bedrooms}
-                                keyboardType='numeric'
-                            />
-                        </View>
+                                    <View style={styles.propertyTypeView}>
+                                        <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(2)}>
+                                            <View style={
+                                                this.state.propertyType == 2 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                    : styles.propertTypeButtons
+                                            }>
+                                                <Meticon name='home-outline' size={30} color={this.state.propertyType == 2 ? 'white' : 'gray'} />
 
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bathrooms</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                onChangeText={(bathrooms) => this.setState({ bathrooms })}
-                                value={this.state.bathrooms}
-                                keyboardType='numeric'
-                            />
-                        </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                        <Text style={{ textAlign: 'center' }}>Apartment{"\n&"} house </Text>
+                                    </View>
 
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Parking Slots</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                onChangeText={(parkingSlots) => this.setState({ parkingSlots })}
-                                value={this.state.parkingSlots}
-                                keyboardType='numeric'
-                            />
-                        </View>
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Location</Text>
-                            {/* <TextInput
+                                    <View style={styles.propertyTypeView}>
+                                        <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(3)}>
+                                            <View style={
+                                                this.state.propertyType == 3 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                    : styles.propertTypeButtons
+                                            }>
+                                                <Meticon name='home-outline' size={30} color={this.state.propertyType == 3 ? 'white' : 'gray'} />
+
+                                            </View>
+                                        </TouchableOpacity>
+                                        <Text>Townhouse</Text>
+                                    </View>
+
+                                    <View style={styles.propertyTypeView}>
+                                        <TouchableOpacity onPress={() => this.isPropertyTypeButtonPressed(4)}>
+                                            <View style={
+                                                this.state.propertyType == 4 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
+                                                    : styles.propertTypeButtons
+                                            }>
+                                                <Meticon name='home-outline' size={30} color={this.state.propertyType == 4 ? 'white' : 'gray'} />
+
+                                            </View>
+                                        </TouchableOpacity>
+                                        <Text>Villa</Text>
+                                    </View>
+                                </ScrollView>
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bedrooms</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(bedrooms) => this.setState({ bedrooms })}
+                                    value={this.state.bedrooms}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Number Of Bathrooms</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(bathrooms) => this.setState({ bathrooms })}
+                                    value={this.state.bathrooms}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Parking Slots</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(parkingSlots) => this.setState({ parkingSlots })}
+                                    value={this.state.parkingSlots}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Location</Text>
+                                {/* <TextInput
                                 style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14 }}
                                 // multiline={true}
                                 onChangeText={(location) => this.setState({ location })}
                                 value={this.state.location}
                             /> */}
 
-                            <TouchableWithoutFeedback onPress={() => {
-                                this.locationModalVisible(true);
-                            }}>
+                                <TouchableWithoutFeedback onPress={() => {
+                                    this.locationModalVisible(true);
+                                }}>
 
-                                <View style={{ height: 30, borderBottomWidth: 1 }}>
-                                    <Text>{this.state.location}</Text>
+                                    <View style={{ height: 30, borderBottomWidth: 1 }}>
+                                        <Text>{this.state.location}</Text>
+                                    </View>
+
+                                </TouchableWithoutFeedback>
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size(Square Feet)</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(landSize) => this.setState({ landSize })}
+                                    value={this.state.landSize}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30, paddingBottom: 5 }}
+                                    multiline={true}
+                                    placeholder='e.g Pool, garage'
+                                    onChangeText={
+                                        (keyWords) => this.getKeyWords(keyWords)
+                                    }
+                                    value={this.state.keyWords}
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Condition of the House</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(houseCondition) => this.setState({ houseCondition })}
+                                    value={this.state.houseCondition}
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Owner</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    // maxLength={300}
+                                    onChangeText={(owner) => this.setState({ owner })}
+                                    value={this.state.owner}
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Contact Number</Text>
+                                <TextInput
+                                    style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
+                                    onChangeText={(contactNumber) => this.setState({ contactNumber })}
+                                    value={this.state.contactNumber}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+
+                            <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>is Featured</Text>
+                                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                    <Switch
+                                        value={this.state.isFeatured}
+                                        onSyncPress={() => { this.isFeaturedEnable(!this.state.isFeatured) }}
+                                        style={{}}
+                                    />
+
                                 </View>
-
-                            </TouchableWithoutFeedback>
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Land Size(Square Feet)</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                onChangeText={(landSize) => this.setState({ landSize })}
-                                value={this.state.landSize}
-                                keyboardType='numeric'
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Keywords</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30, paddingBottom: 5 }}
-                                multiline={true}
-                                placeholder='e.g Pool, garage'
-                                onChangeText={
-                                    (keyWords) => this.getKeyWords(keyWords)
-                                }
-                                value={this.state.keyWords}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Condition of the House</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                onChangeText={(houseCondition) => this.setState({ houseCondition })}
-                                value={this.state.houseCondition}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Property Owner</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                // maxLength={300}
-                                onChangeText={(owner) => this.setState({ owner })}
-                                value={this.state.owner}
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Contact Number</Text>
-                            <TextInput
-                                style={{ borderColor: 'black', borderBottomWidth: 1, fontSize: 14, height: 30 }}
-                                onChangeText={(contactNumber) => this.setState({ contactNumber })}
-                                value={this.state.contactNumber}
-                                keyboardType='numeric'
-                            />
-                        </View>
-
-                        <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>is Featured</Text>
-                            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                                <Switch
-                                    value={this.state.isFeatured}
-                                    onSyncPress={() => { this.isFeaturedEnable(!this.state.isFeatured) }}
-                                    style={{}}
-                                />
-
                             </View>
-                        </View>
 
-                        <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
-                            <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Display Property</Text>
-                            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                                <Switch
-                                    value={this.state.isVisible}
-                                    onSyncPress={() => { this.isVisibleEnable(!this.state.isVisible) }}
-                                    style={{}}
-                                />
+                            <View style={{ margin: 10, width: '90%', flexDirection: 'row' }}>
+                                <Text style={{ textAlign: 'left', fontWeight: '500', fontSize: 15, color: 'grey' }}>Display Property</Text>
+                                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                                    <Switch
+                                        value={this.state.isVisible}
+                                        onSyncPress={() => { this.isVisibleEnable(!this.state.isVisible) }}
+                                        style={{}}
+                                    />
 
+                                </View>
                             </View>
+
                         </View>
 
-                    </View>
-
-                </ScrollView>
+                    </ScrollView>
+                }
 
 
                 <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
@@ -932,7 +944,8 @@ export default class EditPropertyScreen extends Component<Props>  {
 
                 {this.renderLocationModal()}
 
-            </View>
+                {/* </View> */}
+            </KeyboardAvoidingView>
 
         );
     }
@@ -986,5 +999,9 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    activityIndicator: {
+        flex: 1,
+        height: 120
     },
 });
