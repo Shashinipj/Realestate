@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     View, StyleSheet, Text, TextInputProps, FlatList,
-    TouchableOpacity, Image, ImageBackground, Alert
+    TouchableOpacity, Image, ImageBackground, Alert, RefreshControl
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -36,7 +36,8 @@ export default class CollectionDetailScreen extends Component {
             propProperties: [],
             collectionName: '',
             search: '',
-            loginStatus: false
+            loginStatus: false,
+            refreshing: false,
         };
 
         this.onValueCollection = this.onValueCollection.bind(this);
@@ -56,6 +57,26 @@ export default class CollectionDetailScreen extends Component {
         if (user) {
             db.ref('/PropertyType').off('value', this.onValueCollection);
         }
+    }
+
+    onRefresh() {
+
+        const { navigation } = this.props;
+        const collection = navigation.getParam('CollectionData');
+
+        let propIDs = collection.propIds;
+
+        this.setState({
+            refreshing: true,
+            // loading: false
+        });
+        this.loadProps(propIDs)
+            .then(() => {
+                this.setState({
+                    refreshing: false,
+                    // loading: false
+                });
+            });
     }
 
     fetchUser(user) {
@@ -78,7 +99,7 @@ export default class CollectionDetailScreen extends Component {
     /**
       * @param {firebase.database.DataSnapshot} snapshot
       */
-    onValueCollection(snapshot) {
+     onValueCollection(resolve, reject, snapshot) {
 
         const { navigation } = this.props;
         const collection = navigation.getParam('CollectionData');
@@ -115,6 +136,7 @@ export default class CollectionDetailScreen extends Component {
             propProperties: filteredProperties
         });
         this.arrayholder = filteredProperties;
+        resolve(true);
     }
 
     loadProps(propIDs) {
@@ -152,7 +174,10 @@ export default class CollectionDetailScreen extends Component {
         //     this.arrayholder = filteredProperties;
         // });
 
-        db.ref('/PropertyType').once('value', this.onValueCollection);
+        return new Promise((resolve, reject) => {
+
+        db.ref('/PropertyType').once('value', this.onValueCollection.bind(this, resolve, reject));
+        });
     }
 
     deleteCollectionItem(propertyID) {
@@ -289,6 +314,14 @@ export default class CollectionDetailScreen extends Component {
                         keyExtractor={(item, index) => {
                             return "" + index;
                         }}
+                        refreshControl = {
+                            <RefreshControl
+                                refreshing={this.state.refreshing}
+                                onRefresh={() => {
+                                    this.onRefresh();
+                                }}
+                            />
+                        }
                     />
                 }
 

@@ -104,7 +104,7 @@ export default class SearchBarScreen extends Component {
         }
     }
 
-    setValue = async (location) => {
+    async setValue(location){
 
         try {
             // console.log('location');
@@ -132,8 +132,8 @@ export default class SearchBarScreen extends Component {
 
                 // console.log('loc.description');
                 // console.log(obj.description);
-                console.log('location.name', location.name);
-                console.log('obj.description', obj.name);
+                console.log('location.name', location);
+                console.log('obj.description', obj);
 
                 if (location.name == obj.name) {
                     locationFound = true;
@@ -141,7 +141,6 @@ export default class SearchBarScreen extends Component {
                     break
                 }
             }
-
 
             if (arr.length >= 4) {
                 arr.splice(arr.length - 1, 1);
@@ -179,7 +178,7 @@ export default class SearchBarScreen extends Component {
         }
     }
 
-    getMyValue = async () => {
+    async getMyValue(){
 
         try {
             const value = await AsyncStorage.getItem('@LocationSearchList')
@@ -1214,8 +1213,9 @@ export default class SearchBarScreen extends Component {
                 // renderDescription={row =>  row.formatted_address}
                 onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
 
-                    // console.log(data, details);
-                    // console.log(data.description);
+                    console.log(data, details);
+                    console.log(data.description);
+                    console.log(details.name);
                     // console.log('details', details.geometry.location.lat);
                     // console.log('details', details.geometry.location.lng);
                     // console.log('ViewPortnortheast', details.geometry.viewport.northeast);
@@ -1226,8 +1226,8 @@ export default class SearchBarScreen extends Component {
                         location: details.name,
                         viewport: details.geometry.viewport
                     });
-                    this.ResetFilters();
                     this.setValue(details);
+                    this.ResetFilters();
 
                     this.props.navigation.navigate('FilterScreen', {location: details.name, viewport: details.geometry.viewport});
 

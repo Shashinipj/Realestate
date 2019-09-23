@@ -12,6 +12,8 @@ import ModalSelector from 'react-native-modal-selector';
 import ImageSlider from 'react-native-image-slider';
 import ListItem from '../../component/listItemComponent';
 import RNFetchBlob from 'react-native-fetch-blob';
+import Modal from 'react-native-modal';
+import { Icon } from 'react-native-elements';
 
 let PropRef = db.ref('/PropertyType');
 
@@ -33,7 +35,6 @@ export default class SearchResultView extends Component<Props> {
                 />
             </TouchableOpacity>
         };
-
     };
 
     constructor(props) {
@@ -51,7 +52,9 @@ export default class SearchResultView extends Component<Props> {
             loading: true,
 
             // isFavourite: false,
-            favPropIds: []
+            favPropIds: [],
+            sortModalVisible: false,
+            sortOrder: -1
         };
 
         this.onValueCollection = this.onValueCollection.bind(this);
@@ -87,6 +90,12 @@ export default class SearchResultView extends Component<Props> {
         });
     }
 
+    renderSortModal(visible) {
+        this.setState({
+            sortModalVisible: visible
+        });
+    }
+
     showCreateNewCollectionDialog() {
         // console.log("show dialog")
         this.setState({
@@ -102,6 +111,125 @@ export default class SearchResultView extends Component<Props> {
             propertyID: ''
         });
     };
+
+    getSortType(sortType) {
+        this.setState({
+            sortOrder: sortType
+        });
+        this.sortSearchResults(sortType);
+    }
+
+    sortSearchResults(sortType) {
+
+        const searchResults = this.state.propProperties;
+
+        if (sortType == 1) {
+
+            searchResults.sort((a, b) => {
+
+                const priceA = parseFloat(a.Price);
+                const priceB = parseFloat(b.Price);
+
+                console.log('a.Price', a.Price)
+                console.log('b.Price', b.Price)
+
+                if (priceA < priceB) {
+                    return 1;
+                } else if (priceA > priceB) {
+                    return -1;
+                }
+
+                return 0;
+            });
+        }
+
+        else if (sortType == 2) {
+
+            searchResults.sort((a, b) => {
+
+                const priceA = parseFloat(a.Price);
+                const priceB = parseFloat(b.Price);
+
+                if (priceA < priceB) {
+                    return -1;
+                } else if (priceA > priceB) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
+        }
+
+        else if (sortType == 3) {
+
+            searchResults.sort((a, b) => {
+
+                console.log("a.AddedDate", a.AddedDate);
+                console.log("b.AddedDate", b.AddedDate);
+
+                if (a.AddedDate < b.AddedDate) {
+                    return 1;
+                } else if (a.AddedDate > b.AddedDate) {
+                    return -1;
+                }
+
+                return 0;
+            });
+
+        }
+
+        else if (sortType == 4) {
+
+            searchResults.sort((a, b) => {
+
+                // console.log("a.AddedDate", a.AddedDate);
+                // console.log("b.AddedDate", b.AddedDate);
+
+                if (a.AddedDate < b.AddedDate) {
+                    return -1;
+                } else if (a.AddedDate > b.AddedDate) {
+                    return 1;
+                }
+                return 0;
+            });
+        }
+
+        this.setState({
+            propProperties: searchResults,
+            // loading: false
+        });
+    }
+
+    setTextForSortFilter() {
+        const no = this.state.sortOrder;
+
+        if (no == -1) {
+            return (
+                <Text style={{ fontSize: 12 }}>Sort</Text>
+            )
+        }
+        else if (no == 1) {
+            return (
+                <Text style={{ fontSize: 12 }}>Price (High - Low)</Text>
+            )
+        }
+        else if (no == 2) {
+            return (
+                <Text style={{ fontSize: 12 }}>Price (Low - High)</Text>
+            )
+        }
+        else if (no == 3) {
+            return (
+                <Text style={{ fontSize: 12 }}>Date (Newest - Oldest)</Text>
+            )
+        }
+        else if (no == 4) {
+            return (
+                <Text style={{ fontSize: 12 }}>Date (Oldest - Newest)</Text>
+            )
+        }
+    }
 
     renderModalView() {
 
@@ -160,6 +288,93 @@ export default class SearchResultView extends Component<Props> {
             this.addToCollection(option.label);
             console.log(option.label);
         }
+    }
+
+    renderSortModalView() {
+        return (
+            <Modal
+                // animationType="slide"
+                transparent={false}
+                visible={this.state.sortModalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}
+            >
+
+                <View style={{
+                    width: '75%', backgroundColor: '#e0e0e0',
+                    alignContent: 'center', alignSelf: 'center'
+                }}>
+
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity style={{}}
+                            onPress={() => {
+                                this.renderSortModal(false);
+                            }}>
+                            <Icon
+                                name="close"
+                                type='MaterialIcons'
+                                size={20}
+                            />
+                        </TouchableOpacity>
+
+                        <View style={{ alignContent: 'center', flex: 1 }}>
+                            <Text style={{ textAlign: 'center', fontWeight: '600' }}>Sort Order</Text>
+                        </View>
+
+                    </View>
+
+                    <View style={{ padding: 10 }}>
+                        <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
+                            this.getSortType(-1);
+                            this.renderSortModal(false);
+                        }}>
+                            <Text>None</Text>
+                        </TouchableOpacity>
+
+                        <View style={{ height: 1, backgroundColor: 'black' }} />
+
+                        <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
+                            this.getSortType(1);
+                            this.renderSortModal(false);
+                        }}>
+                            <Text>Price (High-Low)</Text>
+                        </TouchableOpacity>
+
+                        <View style={{ height: 1, backgroundColor: 'black' }} />
+
+                        <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
+                            this.getSortType(2);
+                            this.renderSortModal(false);
+                        }}>
+                            <Text>Price (Low-High)</Text>
+                        </TouchableOpacity>
+
+                        <View style={{ height: 1, backgroundColor: 'black' }} />
+
+                        <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
+                            this.getSortType(3);
+                            this.renderSortModal(false);
+                        }}>
+                            <Text>Date (Newest-Oldest)</Text>
+                        </TouchableOpacity>
+
+                        <View style={{ height: 1, backgroundColor: 'black' }} />
+
+                        <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
+                            this.getSortType(4);
+                            this.renderSortModal(false);
+                        }}>
+                            <Text>Date (Oldest-Newest)</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+
+
+            </Modal>
+        );
+
     }
 
 
@@ -304,74 +519,70 @@ export default class SearchResultView extends Component<Props> {
                 }
             }
 
-            const sortType = propData.sortOrder;
+            // const sortType = propData.sortOrder;
+            // // const sortType = this.state.sortOrder
 
-            if (sortType == 1) {
+            // if (sortType == 1) {
 
-                filteredProperties.sort((a, b) => {
+            //     filteredProperties.sort((a, b) => {
 
-                    if (a.Price < b.Price) {
-                        return 1;
-                    } else if (a.Price > b.Price) {
-                        return -1;
-                    }
-
-                    return 0;
-                });
-            }
-
-            else if (sortType == 2) {
-
-                filteredProperties.sort((a, b) => {
-
-                    if (a.Price < b.Price) {
-                        return -1;
-                    } else if (a.Price > b.Price) {
-                        return 1;
-                    }
-
-                    return 0;
-                });
-
-            }
-
-            else if (sortType == 3) {
-
-                filteredProperties.sort((a, b) => {
-
-                    // console.log("a.AddedDate", a.AddedDate);
-                    // console.log("b.AddedDate", b.AddedDate);
-
-                    if (a.AddedDate < b.AddedDate) {
-                        return 1;
-                    } else if (a.AddedDate > b.AddedDate) {
-                        return -1;
-                    }
-
-                    return 0;
-                });
-
-            }
-
-            else if (sortType == 4) {
-
-                filteredProperties.sort((a, b) => {
-
-                    // console.log("a.AddedDate", a.AddedDate);
-                    // console.log("b.AddedDate", b.AddedDate);
-
-                    if (a.AddedDate < b.AddedDate) {
-                        return -1;
-                    } else if (a.AddedDate > b.AddedDate) {
-                        return 1;
-                    }
-                    return 0;
-                });
-            }
-
-            // for(const i in this.state.collectionListProperties){
-            //     console.log('this.state.collectionListProperties', i);
+            //         if (a.Price < b.Price) {
+            //             return 1;
+            //         } else if (a.Price > b.Price) {
+            //             return -1;
+            //         }
+            //         return 0;
+            //     });
             // }
+
+            // else if (sortType == 2) {
+
+            //     filteredProperties.sort((a, b) => {
+
+            //         if (a.Price < b.Price) {
+            //             return -1;
+            //         } else if (a.Price > b.Price) {
+            //             return 1;
+            //         }
+            //         return 0;
+            //     });
+
+            // }
+
+            // else if (sortType == 3) {
+
+            //     filteredProperties.sort((a, b) => {
+
+            //         // console.log("a.AddedDate", a.AddedDate);
+            //         // console.log("b.AddedDate", b.AddedDate);
+
+            //         if (a.AddedDate < b.AddedDate) {
+            //             return 1;
+            //         } else if (a.AddedDate > b.AddedDate) {
+            //             return -1;
+            //         }
+
+            //         return 0;
+            //     });
+
+            // }
+
+            // else if (sortType == 4) {
+
+            //     filteredProperties.sort((a, b) => {
+
+            //         // console.log("a.AddedDate", a.AddedDate);
+            //         // console.log("b.AddedDate", b.AddedDate);
+
+            //         if (a.AddedDate < b.AddedDate) {
+            //             return -1;
+            //         } else if (a.AddedDate > b.AddedDate) {
+            //             return 1;
+            //         }
+            //         return 0;
+            //     });
+            // }
+
 
             this.setState({
                 propProperties: filteredProperties,
@@ -404,7 +615,6 @@ export default class SearchResultView extends Component<Props> {
 
                     for (const favPropId in favProps) {
                         // const oProp = favProps[favPropId];
-
                         // console.log('favPropId', favPropId);
                         listFavProps.push({
                             favPropId,
@@ -420,7 +630,6 @@ export default class SearchResultView extends Component<Props> {
                 // console.log('favProps', listFavProps);
                 resolve(true);
             });
-
         });
     }
 
@@ -524,7 +733,7 @@ export default class SearchResultView extends Component<Props> {
                     value={this.state.collectionName}
                     onChangeText={collectionName => this.setState({ collectionName })}
                 ></Dialog.Input>
-                
+
                 <Dialog.Button label="Cancel" onPress={() => {
                     this.handleCreateNewCollectionCancel();
                 }} />
@@ -687,27 +896,45 @@ export default class SearchResultView extends Component<Props> {
                     zIndex: 2,
                     width: "100%",
                     // marginTop: 40,
-                    backgroundColor: 'rgba(244, 244, 244, .97)'
+                    backgroundColor: 'rgba(244, 244, 244, .97)',
+                    flexDirection: 'row'
                 }}>
 
-                    <View style={{ position: 'relative', alignSelf: 'flex-end' }}>
-                        <TouchableOpacity style={styles.resetFilterButton}
-                            onPress={() => {
-                                this.props.navigation.navigate('FilterScreen', { propData: propData });
-                            }
-                                // this.ResetFilters()
-                            }
-                        >
+                    <View style={{ flex: 1 }}>
+                        <View style={{ position: 'relative', alignSelf: 'flex-start' }}>
+                            <TouchableOpacity style={[styles.resetFilterButton, { marginRight: 0 }]}
+                                onPress={() => {
+                                    // this.props.navigation.navigate('FilterScreen', { propData: propData });
+                                    this.renderSortModal(true);
+                                }}
+                            >
+                                {/* <Text style={{ fontSize: 10 }}>SORT</Text> */}
 
-                            <Text style={{ fontSize: 10 }}>SHOW FILTERS</Text>
+                                {this.setTextForSortFilter()}
 
-                        </TouchableOpacity>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                        <View style={{ position: 'relative', alignSelf: 'flex-end' }}>
+                            <TouchableOpacity style={styles.resetFilterButton}
+                                onPress={() => {
+                                    this.props.navigation.navigate('FilterScreen', { propData: propData });
+                                }}
+                            >
+                                <Text style={{ fontSize: 10 }}>SHOW FILTERS</Text>
+
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 
                 {this.renderResultView()}
                 {this.renderCreateNewCollectionDialog()}
                 {this.renderModalView()}
+                {this.renderSortModalView()}
 
             </View>
         );

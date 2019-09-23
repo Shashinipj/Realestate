@@ -39,6 +39,8 @@ export default class SearchScreen extends Component {
             propertiesRent: [],
             featuredList: [],
             nearByList: [],
+            favPropIds: [],
+            collectionList: [],
             search: '',
             modalVisible: false,
             forgotPasswordModal: false,
@@ -68,10 +70,12 @@ export default class SearchScreen extends Component {
             currentLocation: false,
         };
 
+        this.onValueCollection = this.onValueCollection.bind(this);
+
         // this.forgotPassword_Modal = this.forgotPassword_Modal.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
         firebase.auth().onAuthStateChanged(user => {
             this.fetchUser(user);
@@ -107,7 +111,8 @@ export default class SearchScreen extends Component {
                 ],
                 { cancelable: true },
             );
-        })
+        });
+        await this.getCollectionNames(user);
 
     }
 
@@ -232,6 +237,51 @@ export default class SearchScreen extends Component {
                 profilePicUrl: null,
             });
         }
+    }
+
+    getCollectionNames(user) {
+        return new Promise((resolve, reject) => {
+
+            db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection.bind(this, resolve, reject));
+        });
+    }
+
+    onValueCollection(resolve, reject, snapshot) {
+        const collections = snapshot.val();
+        // console.log(collections);
+
+        const arrColl = [];
+        const listFavProps = []
+        for (const collName in collections) {
+            // console.log('collections[collectionId]', collections[collectionId]);
+            arrColl.push(collName);
+
+            // console.log('arrColl', arrColl);
+            // console.log('collectionId', collName);
+            // console.log('favoutiteProps[i]', collections[collName]);
+            const favProps = collections[collName]
+
+            for (const favPropId in favProps) {
+
+                // console.log('favPropId', favPropId);
+                listFavProps.push({
+                    favPropId,
+                    collName
+                });
+                // console.log('listFavProps', listFavProps);
+            }
+        }
+
+        //here
+
+
+        this.setState({
+            collectionList: arrColl,
+            favPropIds: listFavProps
+            // collectionListProperties: arrCollPropList
+        });
+        // this.getSearchResults();
+        resolve(true);
     }
 
     setModalVisible(visible) {
@@ -713,7 +763,7 @@ export default class SearchScreen extends Component {
             <FeaturedListItem
                 propertyData={item}
                 onPressItem={(item) => {
-                    this.props.navigation.navigate("ExpandedView", { PropertyData: item });
+                    this.props.navigation.navigate("ExpandedView", { PropertyData: item, favIDs: this.state.favPropIds });
                 }} />
         );
     }

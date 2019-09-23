@@ -191,8 +191,6 @@ export default class ExpandedView extends Component {
 
     createCollection() {
 
-
-
         console.log(this.state.collectionName);
         const user = firebase.auth().currentUser;
 
@@ -316,8 +314,8 @@ export default class ExpandedView extends Component {
     onPressRemoveFavourite(propertyID, collName) {
 
         Alert.alert(
-            'Delete',
-            'Do you really want to delete this property?',
+            'Remove',
+            'Do you really want to remove this property in saved collections?',
             [
                 {
                     text: 'No',

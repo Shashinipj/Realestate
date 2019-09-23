@@ -78,35 +78,35 @@ export default class FilterScreen extends Component {
     }
 
 
-    setTextForSortFilter() {
-        const no = this.state.sortOrder;
+    // setTextForSortFilter() {
+    //     const no = this.state.sortOrder;
 
-        if (no == -1) {
-            return (
-                <Text style={styles.sortText}>None</Text>
-            )
-        }
-        else if (no == 1) {
-            return (
-                <Text style={styles.sortText}>Price (High - Low)</Text>
-            )
-        }
-        else if (no == 2) {
-            return (
-                <Text style={styles.sortText}>Price (Low - High)</Text>
-            )
-        }
-        else if (no == 3) {
-            return (
-                <Text style={styles.sortText}>Date (Newest - Oldest)</Text>
-            )
-        }
-        else if (no == 4) {
-            return (
-                <Text style={styles.sortText}>Date (Oldest - Newest)</Text>
-            )
-        }
-    }
+    //     if (no == -1) {
+    //         return (
+    //             <Text style={styles.sortText}>None</Text>
+    //         )
+    //     }
+    //     else if (no == 1) {
+    //         return (
+    //             <Text style={styles.sortText}>Price (High - Low)</Text>
+    //         )
+    //     }
+    //     else if (no == 2) {
+    //         return (
+    //             <Text style={styles.sortText}>Price (Low - High)</Text>
+    //         )
+    //     }
+    //     else if (no == 3) {
+    //         return (
+    //             <Text style={styles.sortText}>Date (Newest - Oldest)</Text>
+    //         )
+    //     }
+    //     else if (no == 4) {
+    //         return (
+    //             <Text style={styles.sortText}>Date (Oldest - Newest)</Text>
+    //         )
+    //     }
+    // }
 
     Onpress_PropertyTypeFilter(type) {
         if (type == PropertyTypes.All) {
@@ -275,90 +275,91 @@ export default class FilterScreen extends Component {
         }
     }
 
-    RenderSortOrderTextView() {
-        if (this.state.sortOderTextViewVisible) {
-            return (
-                <TouchableOpacity onPress={() => {
-                    this.RenderSortOrder();
-                    this.OnPress_SortOrder();
-                }}>
-                    <View style={{ marginLeft: 10 }}>
-                        {this.setTextForSortFilter()}
-                    </View>
-                </TouchableOpacity>
-            );
-        }
+    // RenderSortOrderTextView() {
+    //     if (this.state.sortOderTextViewVisible) {
+    //         return (
+    //             <TouchableOpacity onPress={() => {
+    //                 this.RenderSortOrder();
+    //                 this.OnPress_SortOrder();
+    //             }}>
+    //                 <View style={{ marginLeft: 10 }}>
+    //                     {this.setTextForSortFilter()}
+    //                 </View>
+    //             </TouchableOpacity>
+    //         );
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
-    RenderSortOrder() {
+    
+    // RenderSortOrder() {
 
-        if (!this.state.sortOderTextViewVisible) {
-            return (
-                <View style={{ marginLeft: 10 }}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.sortOrderSelected(-1);
-                            this.OnPress_SortOrder();
-                        }}
-                    >
-                        <Text style={
-                            this.state.sortOrder == -1 ? styles.sortTextSelected : styles.sortText
-                        }>None</Text>
-                    </TouchableOpacity>
+    //     if (!this.state.sortOderTextViewVisible) {
+    //         return (
+    //             <View style={{ marginLeft: 10 }}>
+    //                 <TouchableOpacity
+    //                     onPress={() => {
+    //                         this.sortOrderSelected(-1);
+    //                         this.OnPress_SortOrder();
+    //                     }}
+    //                 >
+    //                     <Text style={
+    //                         this.state.sortOrder == -1 ? styles.sortTextSelected : styles.sortText
+    //                     }>None</Text>
+    //                 </TouchableOpacity>
 
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.sortOrderSelected(1);
-                            this.OnPress_SortOrder();
-                        }}
-                    >
-                        <Text style={
-                            this.state.sortOrder == 1 ? styles.sortTextSelected : styles.sortText
-                        }>Price (High - Low)</Text>
-                    </TouchableOpacity>
+    //                 <TouchableOpacity
+    //                     onPress={() => {
+    //                         this.sortOrderSelected(1);
+    //                         this.OnPress_SortOrder();
+    //                     }}
+    //                 >
+    //                     <Text style={
+    //                         this.state.sortOrder == 1 ? styles.sortTextSelected : styles.sortText
+    //                     }>Price (High - Low)</Text>
+    //                 </TouchableOpacity>
 
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.sortOrderSelected(2);
-                            this.OnPress_SortOrder();
-                        }}
-                    >
-                        <Text style={
-                            this.state.sortOrder == 2 ? styles.sortTextSelected : styles.sortText
-                        }>Price (Low - High)</Text>
-                    </TouchableOpacity>
+    //                 <TouchableOpacity
+    //                     onPress={() => {
+    //                         this.sortOrderSelected(2);
+    //                         this.OnPress_SortOrder();
+    //                     }}
+    //                 >
+    //                     <Text style={
+    //                         this.state.sortOrder == 2 ? styles.sortTextSelected : styles.sortText
+    //                     }>Price (Low - High)</Text>
+    //                 </TouchableOpacity>
 
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.sortOrderSelected(3);
-                            this.OnPress_SortOrder();
-                        }}
-                    >
-                        <Text style={
-                            this.state.sortOrder == 3 ? styles.sortTextSelected : styles.sortText
-                        }>Date (Newest - Oldest)</Text>
-                    </TouchableOpacity>
+    //                 <TouchableOpacity
+    //                     onPress={() => {
+    //                         this.sortOrderSelected(3);
+    //                         this.OnPress_SortOrder();
+    //                     }}
+    //                 >
+    //                     <Text style={
+    //                         this.state.sortOrder == 3 ? styles.sortTextSelected : styles.sortText
+    //                     }>Date (Newest - Oldest)</Text>
+    //                 </TouchableOpacity>
 
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.sortOrderSelected(4);
-                            this.OnPress_SortOrder();
-                        }}
-                    >
-                        <Text style={
-                            this.state.sortOrder == 4 ? styles.sortTextSelected : styles.sortText
-                        }>Date (Oldest - Newest)</Text>
-                    </TouchableOpacity>
+    //                 <TouchableOpacity
+    //                     onPress={() => {
+    //                         this.sortOrderSelected(4);
+    //                         this.OnPress_SortOrder();
+    //                     }}
+    //                 >
+    //                     <Text style={
+    //                         this.state.sortOrder == 4 ? styles.sortTextSelected : styles.sortText
+    //                     }>Date (Oldest - Newest)</Text>
+    //                 </TouchableOpacity>
 
-                </View>
+    //             </View>
 
-            );
-        }
+    //         );
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
     render() {
         const { navigation } = this.props;
@@ -914,7 +915,7 @@ export default class FilterScreen extends Component {
                     />
 
                     <View style={styles.separatorView}></View>
-
+{/* 
                     <View style={styles.mainCategoryView}>
                         <Text style={styles.mainCategoryText}>Sort order</Text>
                     </View>
@@ -922,7 +923,7 @@ export default class FilterScreen extends Component {
                     {this.RenderSortOrderTextView()}
                     {this.RenderSortOrder()}
 
-                    <View style={styles.separatorView}></View>
+                    <View style={styles.separatorView}></View> */}
 
                 </ScrollView>
                 <View style={{ height: 50, backgroundColor: 'rgba(244, 244, 244, .97)', alignItems: 'center' }}>
