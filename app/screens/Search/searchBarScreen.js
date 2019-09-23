@@ -104,7 +104,7 @@ export default class SearchBarScreen extends Component {
         }
     }
 
-    async setValue(location){
+    async setValue(location, details){
 
         try {
             // console.log('location');
@@ -135,7 +135,7 @@ export default class SearchBarScreen extends Component {
                 console.log('location.name', location);
                 console.log('obj.description', obj);
 
-                if (location.name == obj.name) {
+                if (location.description == obj.description) {
                     locationFound = true;
                     arr.splice(i, 1);
                     break
@@ -157,8 +157,8 @@ export default class SearchBarScreen extends Component {
             // ];
             arr = [
                 {
-                    name: location.name,
-                    geometry: location.geometry
+                    description: location.description,
+                    geometry: details.geometry
                 },
                 ...arr
             ];
@@ -1186,11 +1186,9 @@ export default class SearchBarScreen extends Component {
     //                         />
     //                     </View>
     //                 </TouchableOpacity>
-
     //             </View>
     //         </View>
     //     );
-
     // }
 
 
@@ -1215,7 +1213,7 @@ export default class SearchBarScreen extends Component {
 
                     console.log(data, details);
                     console.log(data.description);
-                    console.log(details.name);
+                    // console.log('details.geometry.viewport',details.geometry.viewport);
                     // console.log('details', details.geometry.location.lat);
                     // console.log('details', details.geometry.location.lng);
                     // console.log('ViewPortnortheast', details.geometry.viewport.northeast);
@@ -1223,15 +1221,14 @@ export default class SearchBarScreen extends Component {
 
                     // this.setFilterModalVisible();
                     this.setState({
-                        location: details.name,
+                        location: data.description,
                         viewport: details.geometry.viewport
                     });
-                    this.setValue(details);
+                    this.setValue(data, details);
                     this.ResetFilters();
 
-                    this.props.navigation.navigate('FilterScreen', {location: details.name, viewport: details.geometry.viewport});
-
-
+                    // this.props.navigation.navigate('FilterScreen', {location: data.description});
+                    this.props.navigation.navigate('FilterScreen', {location: data.description, viewport: details.geometry.viewport});
                 }}
 
                 getDefaultValue={() => ''}
@@ -1282,7 +1279,7 @@ export default class SearchBarScreen extends Component {
                         // this.setSearchModalVisible(!this.state.searchModalVisible);
                         this.props.navigation.navigate('Search');
                     }}>
-                        <Text >cancel</Text>
+                        <Text>cancel</Text>
                     </TouchableOpacity>
                 </View>}
             />

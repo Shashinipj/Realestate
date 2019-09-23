@@ -384,6 +384,7 @@ export default class FilterScreen extends Component {
                                 color='gray'
                             />
                             <Text style={{ color: '#000000', marginLeft: 10, width: '75%' }}>{this.state.location}</Text>
+                            {console.log("location", this.state.location)}
 
                         </View>
 
