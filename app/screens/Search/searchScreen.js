@@ -68,6 +68,8 @@ export default class SearchScreen extends Component {
             currentLat: null,
             currentLon: null,
             currentLocation: false,
+
+            userRole: null,
         };
 
         this.onValueCollection = this.onValueCollection.bind(this);
@@ -216,6 +218,17 @@ export default class SearchScreen extends Component {
 
     fetchUser(user) {
         if (user) {
+
+            db.ref(`Users/${user.uid}/UserDetails`).on('value', (snapshot) => {
+                const userdetails = snapshot.val();
+                console.log('userdetails', userdetails);
+                if (userdetails) {
+                    this.setState({
+                        userRole: userdetails.Role
+                    });
+                }
+            });
+
             this.setState({
                 email: user.email,
                 loginState: true,
@@ -413,8 +426,8 @@ export default class SearchScreen extends Component {
                                 Email: this.state.email,
                                 ContactNumber: this.state.contactNumber,
                                 Address: this.state.address,
-                                ProfilePicUrl: this.state.profilePicUrl
-
+                                ProfilePicUrl: this.state.profilePicUrl,
+                                Role: 'user'
                             })
                         .then(() => {
 
@@ -614,9 +627,6 @@ export default class SearchScreen extends Component {
 
                     </TouchableOpacity>
 
-
-
-
                 </View>
             );
         }
@@ -777,7 +787,8 @@ export default class SearchScreen extends Component {
 
         else {
             // if (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
-            if (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
+            // if (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
+            if (this.state.userRole == 'Admin') {
                 return (
                     <View style={{}}>
                         <Image source={require('../../assets/images/family.jpg')} style={styles.imageTop} />
@@ -1146,7 +1157,8 @@ export default class SearchScreen extends Component {
             return null;
         }
 
-        if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
+        if (this.state.loginState && this.state.userRole == 'Admin') {
+        // if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
             // if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
 
             return (
@@ -1172,7 +1184,8 @@ export default class SearchScreen extends Component {
             return null;
         }
 
-        if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
+        if (this.state.loginState && this.state.userRole == 'Admin') {
+        // if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
             // if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
 
             if (this.state.scroll) {

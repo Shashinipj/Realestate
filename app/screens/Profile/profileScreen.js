@@ -56,6 +56,7 @@ export default class ProfileScreen extends Component<Props> {
             loading: true,
 
             orientation: '',
+            userRole: null,
         };
     }
 
@@ -124,7 +125,8 @@ export default class ProfileScreen extends Component<Props> {
                         // profilePic: userdetails.ProfilePicUrl,
                         profilePicUrl: userdetails.ProfilePicUrl,
                         contactNumber: userdetails.ContactNumber,
-                        address: userdetails.Address
+                        address: userdetails.Address,
+                        userRole: userdetails.Role
                     });
                 }
             });
@@ -757,7 +759,8 @@ export default class ProfileScreen extends Component<Props> {
 
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ flex: 1 }}>
-                                        {(this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
+                                        {/* {(this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ? */}
+                                        {(this.state.userRole == 'Admin') ?
                                             <TouchableOpacity style={{ marginTop: 25, alignSelf: 'flex-start' }} onPress={() => {
                                                 this.props.navigation.navigate('AddPropertyScreen');
                                             }}>
@@ -914,7 +917,8 @@ export default class ProfileScreen extends Component<Props> {
 
                                     {
                                         // (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
-                                        (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
+                                        // (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
+                                        (this.state.userRole == 'Admin') ?
                                             <View style={{}}>
                                                 {/* <TouchableOpacity onPress={() => {
                                                     this.props.navigation.navigate('AddPropertyScreen');
@@ -1133,7 +1137,8 @@ export default class ProfileScreen extends Component<Props> {
 
                                     {
                                         // (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
-                                        (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
+                                        // (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
+                                        (this.state.userRole == 'Admin') ?
                                             <View style={{}}>
                                                 <TouchableOpacity onPress={() => {
                                                     this.props.navigation.navigate('AddPropertyScreen');
@@ -1189,7 +1194,8 @@ export default class ProfileScreen extends Component<Props> {
 
     renderTabIndicator() {
 
-        if (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
+        // if (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
+        if (this.state.userRole == 'Admin') {
             let tabs = [{
                 text: 'About',
                 // iconSource: require('../imgs/ic_tab_home_normal.png'),
