@@ -12,6 +12,7 @@ import ExpandedView from '../screens/Search/expandedView';
 import CollectionDetailScreen from '../screens/Collection/collectionDetailScreen';
 import AddPropertyScreen from '../screens/AddProperties/addProperty';
 import EditPropertyScreen from '../screens/EditProperty/editProperty';
+import MyProperties from '../screens/Properties/myProperties';
 
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Icon } from 'react-native-elements';
@@ -47,10 +48,16 @@ const collectionStack = createStackNavigator({
 
 });
 
-const notificationStack = createStackNavigator({
-    Notifications: {
-        screen: NotificationScreen
+const propertiesStack = createStackNavigator({
+    MyProperties: {
+        screen: MyProperties
     },
+    AddPropertyScreen: {
+        screen: AddPropertyScreen
+    },
+    EditPropertyScreen: {
+        screen: EditPropertyScreen
+    }
 
 });
 
@@ -58,15 +65,15 @@ const profileStack = createStackNavigator({
     Profile: {
         screen: ProfileScreen
     },
-    AddPropertyScreen: {
-        screen: AddPropertyScreen
-    },
-    EditPropertyScreen:{
-        screen: EditPropertyScreen
-    }
-},{
-    mode:'modal'
-});
+    // AddPropertyScreen: {
+    //     screen: AddPropertyScreen
+    // },
+    // EditPropertyScreen:{
+    //     screen: EditPropertyScreen
+    // }
+}, {
+        mode: 'modal'
+    });
 
 const addPropertyStack = createStackNavigator({
     AddPropertyScreen: {
@@ -101,20 +108,19 @@ const TabNavigator = createBottomTabNavigator({
             )
         },
     },
-    // Notifications: {
-    //     screen: notificationStack,
+    Properties: {
+        screen: propertiesStack,
 
-    //     navigationOptions: {
-    //         tabBarIcon: ({ tintColor }) => (
-    //             <Icon
-    //                 name="notifications"
-    //                 type='MaterialIcons'
-    //                 size={25}
-    //                 color='gray'
-    //             />
-    //         )
-    //     },
-    // },
+        navigationOptions: {
+            tabBarIcon: ({ tintColor }) => (
+                <Meticon
+                    name="home-city-outline"
+                    type='MaterialCommunityIcons'
+                    size={25}
+                    color='gray' />
+            )
+        },
+    },
     Profile: {
         screen: profileStack,
 

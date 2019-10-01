@@ -133,7 +133,6 @@ export default class ProfileScreen extends Component<Props> {
         }
     }
 
-
     getMyProperties(user) {
         if (user) {
             db.ref(`Users/${user.uid}/UserProperties`).on('value', (snapshot) => {
@@ -180,12 +179,8 @@ export default class ProfileScreen extends Component<Props> {
                     });
 
                 });
-
             });
-
-
         }
-
     }
 
 
@@ -915,19 +910,12 @@ export default class ProfileScreen extends Component<Props> {
 
                                     </View>
 
-                                    {
+                                    {/* {
                                         // (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
                                         // (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
                                         (this.state.userRole == 'Admin') ?
                                             <View style={{}}>
-                                                {/* <TouchableOpacity onPress={() => {
-                                                    this.props.navigation.navigate('AddPropertyScreen');
-                                                }}>
-                                                    <View style={{ height: 50, backgroundColor: '#bdbdbd', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-                                                        <Ionicon name="md-add-circle" size={30} color='#212121' />
-                                                        <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#212121' }}>Add new property</Text>
-                                                    </View>
-                                                </TouchableOpacity> */}
+                                               
 
                                                 <View style={{ flex: 1 }}>
                                                     <FlatList
@@ -942,7 +930,7 @@ export default class ProfileScreen extends Component<Props> {
                                             </View>
                                             :
                                             null
-                                    }
+                                    } */}
 
                                 </IndicatorViewPager>
                             </View>
@@ -1135,7 +1123,7 @@ export default class ProfileScreen extends Component<Props> {
 
                                     </View>
 
-                                    {
+                                    {/* {
                                         // (this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') ?
                                         // (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') ?
                                         (this.state.userRole == 'Admin') ?
@@ -1144,11 +1132,8 @@ export default class ProfileScreen extends Component<Props> {
                                                     this.props.navigation.navigate('AddPropertyScreen');
                                                 }}>
 
-                                                    {/* <View style={{ height: 50, backgroundColor: '#f3d500', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}> */}
                                                     <View style={{ height: 50, backgroundColor: '#bdbdbd', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-                                                        {/* <Ionicon name="md-add-circle" size={30} color='#49141E' /> */}
                                                         <Ionicon name="md-add-circle" size={30} color='#212121' />
-                                                        {/* <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#49141E' }}>Add new property</Text> */}
                                                         <Text style={{ fontWeight: '500', fontSize: 16, marginLeft: 10, color: '#212121' }}>Add new property</Text>
                                                     </View>
                                                 </TouchableOpacity>
@@ -1166,7 +1151,7 @@ export default class ProfileScreen extends Component<Props> {
                                             </View>
                                             :
                                             null
-                                    }
+                                    } */}
 
                                 </IndicatorViewPager>
                             </View>
@@ -1195,30 +1180,30 @@ export default class ProfileScreen extends Component<Props> {
     renderTabIndicator() {
 
         // if (this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
-        if (this.state.userRole == 'Admin') {
-            let tabs = [{
-                text: 'About',
-                // iconSource: require('../imgs/ic_tab_home_normal.png'),
-                // selectedIconSource: require('../imgs/ic_tab_home_click.png')
-            }, {
-                text: 'Settings',
-                // iconSource: require('../imgs/ic_tab_task_normal.png'),
-                // selectedIconSource: require('../imgs/ic_tab_task_click.png')
-            }, {
-                text: 'My Properties',
-                // iconSource: require('../imgs/ic_tab_my_normal.png'),
-                // selectedIconSource: require('../imgs/ic_tab_my_click.png')
-            }];
-            return <PagerTabIndicator tabs={tabs}
-                // style={{ backgroundColor: '#49141E', borderTopWidth: 0 }}
-                style={{ backgroundColor: '#212121', borderTopWidth: 0 }}
-                textStyle={{ fontSize: 15, color: '#9e9e9e', paddingBottom: 10 }}
-                // selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
-                selectedTextStyle={{ fontSize: 15, color: '#ffffff' }}
-            />;
-        }
+        // if (this.state.userRole == 'Admin') {
+        //     let tabs = [{
+        //         text: 'About',
+        //         // iconSource: require('../imgs/ic_tab_home_normal.png'),
+        //         // selectedIconSource: require('../imgs/ic_tab_home_click.png')
+        //     }, {
+        //         text: 'Settings',
+        //         // iconSource: require('../imgs/ic_tab_task_normal.png'),
+        //         // selectedIconSource: require('../imgs/ic_tab_task_click.png')
+        //     }, {
+        //         text: 'My Properties',
+        //         // iconSource: require('../imgs/ic_tab_my_normal.png'),
+        //         // selectedIconSource: require('../imgs/ic_tab_my_click.png')
+        //     }];
+        //     return <PagerTabIndicator tabs={tabs}
+        //         // style={{ backgroundColor: '#49141E', borderTopWidth: 0 }}
+        //         style={{ backgroundColor: '#212121', borderTopWidth: 0 }}
+        //         textStyle={{ fontSize: 15, color: '#9e9e9e', paddingBottom: 10 }}
+        //         // selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
+        //         selectedTextStyle={{ fontSize: 15, color: '#ffffff' }}
+        //     />;
+        // }
 
-        else {
+        // else {
             let tabs = [{
                 text: 'About',
             }, {
@@ -1230,7 +1215,7 @@ export default class ProfileScreen extends Component<Props> {
                 // selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
                 selectedTextStyle={{ fontSize: 15, color: '#ffffff' }}
             />;
-        }
+        // }
     }
 
 

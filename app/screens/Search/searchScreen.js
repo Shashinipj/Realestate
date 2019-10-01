@@ -114,7 +114,7 @@ export default class SearchScreen extends Component {
                 { cancelable: true },
             );
         });
-        await this.getCollectionNames(user);
+        await this.getCollectionNames();
 
     }
 
@@ -123,14 +123,6 @@ export default class SearchScreen extends Component {
         return new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(
                 position => {
-                    // const location = JSON.stringify(position);
-
-                    // console.log("current location", location);
-                    // // this.setState({ location });
-                    // this.setState({
-                    //     currentLat: location.latitude,
-                    //     currentLon: location.longitude,
-                    // });
 
                     const latitude = Number(position.coords.latitude.toFixed(6));
                     const longitude = Number(position.coords.longitude.toFixed(6));
@@ -229,10 +221,11 @@ export default class SearchScreen extends Component {
                 }
             });
 
+            this.state.uid = user.uid;
             this.setState({
                 email: user.email,
                 loginState: true,
-                uid: user.uid
+                // uid: user.uid
             });
         }
         else {
@@ -252,10 +245,12 @@ export default class SearchScreen extends Component {
         }
     }
 
-    getCollectionNames(user) {
+    getCollectionNames() {
+        const { uid } = this.state;
+
         return new Promise((resolve, reject) => {
 
-            db.ref(`Users/${user.uid}/Collections`).on('value', this.onValueCollection.bind(this, resolve, reject));
+            db.ref(`Users/${uid}/Collections`).on('value', this.onValueCollection.bind(this, resolve, reject));
         });
     }
 
@@ -284,9 +279,6 @@ export default class SearchScreen extends Component {
                 // console.log('listFavProps', listFavProps);
             }
         }
-
-        //here
-
 
         this.setState({
             collectionList: arrColl,
@@ -676,7 +668,6 @@ export default class SearchScreen extends Component {
                         />
                     }
 
-
                     <Text style={{ fontSize: 15, fontWeight: '600', marginVertical: 10, marginHorizontal: 5 }}>Properties for Rent </Text>
 
                     {(this.state.loading) ?
@@ -706,13 +697,9 @@ export default class SearchScreen extends Component {
         return (
             <TouchableOpacity style={{}} onPress={this.pickProfilePicture.bind(this)} >
                 <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 50 }} source={image} >
-                    {/* <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: -7, marginTop: -7 }} onPress={() => this.removeImages(image)}>
-                        <Ionicon name="md-close-circle-outline" size={20} color={'grey'} />
-                    </TouchableOpacity> */}
 
                 </Image>
             </TouchableOpacity>
-
         );
     }
 
@@ -1017,7 +1004,18 @@ export default class SearchScreen extends Component {
                                 width: 100, height: 100, alignSelf: 'center', backgroundColor: '#ffffff', marginBottom: 10,
                                 borderRadius: 50
                             }}>{this.renderImage(this.state.profilePic)}</View> :
-                                null
+                                // null
+                                <View style={{
+                                    width: 100, height: 100, alignSelf: 'center', marginBottom: 10,
+                                    borderRadius: 50, justifyContent: 'center', alignItems: 'center'
+                                }}>
+                                    <MetComIcon
+                                        name="image-plus"
+                                        // type='MaterialIcons'
+                                        size={35}
+                                        color='gray'
+                                    />
+                                </View>
                             }
                         </View>
                     </TouchableOpacity>
@@ -1158,8 +1156,7 @@ export default class SearchScreen extends Component {
         }
 
         if (this.state.loginState && this.state.userRole == 'Admin') {
-        // if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
-            // if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
+            // if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
 
             return (
                 <TouchableOpacity
@@ -1185,9 +1182,7 @@ export default class SearchScreen extends Component {
         }
 
         if (this.state.loginState && this.state.userRole == 'Admin') {
-        // if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
-            // if (this.state.loginState && this.state.uid == 'DuRUxztWlbUGW7Oeq6blmY0BwIw2') {
-
+            // if (this.state.loginState && this.state.uid == 'dSVKhiZ2rTUjp8Wghlnt7Ap9QX13') {
             if (this.state.scroll) {
                 return (
                     <TouchableOpacity
@@ -1276,11 +1271,10 @@ export default class SearchScreen extends Component {
                                         horizontal={true}
                                     />
                                     :
-                                    <View style={{flex: 1, padding: 10}}>
-                                        <Text style={{color:'gray'}}>No properties around you</Text>
+                                    <View style={{ flex: 1, padding: 10 }}>
+                                        <Text style={{ color: 'gray' }}>No properties around you</Text>
                                     </View>
                                 )
-
                             }
 
                             {this.renderJoinButton()}

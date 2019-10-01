@@ -48,7 +48,7 @@ export default class FeaturedListItem extends Component<Props> {
 
                 <TouchableOpacity onPress={this.onPress_Item}>
 
-                    <View style={{ borderRadius: 4, margin: 5, width: 100, height: 120 }}>
+                    <View style={{ borderRadius: 4, margin: 5, width: 100, height: 160}}>
                     {
                         (!propertyData.images) ?
                         <Image source={require('../assets/images/house.jpg')} style={{ height: 70, width: 100, borderRadius: 4, marginBottom: 5 }} /> :
@@ -61,7 +61,7 @@ export default class FeaturedListItem extends Component<Props> {
                                 <Text style={{ fontSize: 11, fontWeight: '600' }}>Property Title </Text>
                         }
                         <Text style={{ fontSize: 10, fontWeight: '600', color: '#424242' }}>{Accounting.formatMoney(propertyData.Price)} </Text>
-                        <Text style={{ fontSize: 10, color: 'gray', marginTop: 2 }}>{propertyData.Address} | {propertyData.PropType}</Text>
+                        <Text style={{ fontSize: 10, color: 'gray', marginTop: 2 }}>{propertyData.Address}</Text>
 
                     </View>
                 </TouchableOpacity>

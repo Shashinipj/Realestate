@@ -232,7 +232,7 @@ export default class ExpandedView extends Component {
                 <Dialog.Button label="Cancel" onPress={() => {
                     this.handleCreateNewCollectionCancel();
                 }} />
-                 <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
+                <Dialog.Button label="Create" onPress={this.createCollection.bind(this)} />
             </Dialog.Container>
         );
     }
@@ -423,6 +423,8 @@ export default class ExpandedView extends Component {
                             >
 
                                 <MapView.Marker
+                                    // draggable
+
                                     ref={(ref) => {
                                         this.refMarker = ref;
                                     }}
@@ -432,6 +434,12 @@ export default class ExpandedView extends Component {
                                     }}
                                     title={property.Owner}
                                     description={property.PropType}
+
+
+                                    // onSelect={() => console.log('onSelect', arguments)}
+                                    // onDrag={() => console.log('onDrag', arguments)}
+                                    // onDragStart={() => console.log('onDragStart', arguments)}
+                                    // draggable
 
                                 />
                             </MapView>

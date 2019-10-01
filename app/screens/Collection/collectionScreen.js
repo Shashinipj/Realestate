@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, FlatList, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, FlatList, Alert, ActivityIndicator, Image } from 'react-native';
 import { db } from '../../Database/db';
 import firebase from 'react-native-firebase';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -119,7 +119,11 @@ export default class CollectionScreen extends Component {
         return (
             <TouchableOpacity onPress={() => {
                 this.props.navigation.navigate("CollectionDetailScreen", { CollectionData: item });
-            }}>
+            }}
+            style={{borderWidth: 1, marginHorizontal: 5, borderRadius: 5, marginBottom: 10, backgroundColor:'#ffffff', borderColor:'#bdbdbd'}}>
+                <View style={{height: 110, backgroundColor:'#ffffff', borderRadius: 5}}>
+                <Image source={require('../../assets/images/4.jpg')} style={{height: 100, width:'100%', resizeMode:'center', marginTop: 10}} />
+                </View>
 
                 <View style={{ backgroundColor: '#e0e0e0', margin: 5, padding: 10 }}>
                     <Text style={{ fontWeight: '500' }}> {item.name}</Text>

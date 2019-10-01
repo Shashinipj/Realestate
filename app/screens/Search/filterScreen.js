@@ -6,6 +6,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import RangeSlider from 'rn-range-slider';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Accounting from 'accounting-js';
 
 const PropertyTypes = {
@@ -72,8 +73,8 @@ export default class FilterScreen extends Component {
         });
 
         const filters = navigation.getParam('propData');
-        if(filters){
-            
+        if (filters) {
+
         }
     }
 
@@ -292,7 +293,7 @@ export default class FilterScreen extends Component {
     //     return null;
     // }
 
-    
+
     // RenderSortOrder() {
 
     //     if (!this.state.sortOderTextViewVisible) {
@@ -509,11 +510,14 @@ export default class FilterScreen extends Component {
                                         this.state.isSelectedApartment ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
-                                        <Meticon name='home-outline' size={30} color={this.state.isSelectedApartment ? 'white' : 'gray'} />
+                                        <FontAwesome5
+                                            name='building'
+                                            size={30}
+                                            color={this.state.isSelectedApartment ? 'white' : 'gray'} />
 
                                     </View>
                                 </TouchableOpacity>
-                                <Text style={{ textAlign: 'center' }}>Apartment{"\n&"} house </Text>
+                                <Text style={{ textAlign: 'center' }}>Apartment </Text>
                             </View>
 
                             <View style={styles.propertyTypeView}>
@@ -523,7 +527,10 @@ export default class FilterScreen extends Component {
                                             : styles.propertTypeButtons
                                     }>
 
-                                        <Meticon name='home-outline' size={30} color={this.state.isSelectedTownhouse ? 'white' : 'gray'} />
+                                        <Meticon
+                                            name='home-city-outline'
+                                            size={30}
+                                            color={this.state.isSelectedTownhouse ? 'white' : 'gray'} />
 
                                     </View>
                                 </TouchableOpacity>
@@ -536,7 +543,10 @@ export default class FilterScreen extends Component {
                                         this.state.isSelectedVilla ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                             : styles.propertTypeButtons
                                     }>
-                                        <Meticon name='home-outline' size={30} color={this.state.isSelectedVilla ? 'white' : 'gray'} />
+                                        <Meticon
+                                            name='home-group'
+                                            size={30}
+                                            color={this.state.isSelectedVilla ? 'white' : 'gray'} />
 
                                     </View>
                                 </TouchableOpacity>
@@ -916,7 +926,7 @@ export default class FilterScreen extends Component {
                     />
 
                     <View style={styles.separatorView}></View>
-{/* 
+                    {/* 
                     <View style={styles.mainCategoryView}>
                         <Text style={styles.mainCategoryText}>Sort order</Text>
                     </View>
@@ -951,7 +961,7 @@ export default class FilterScreen extends Component {
                     </TouchableOpacity>
 
                 </View>
-            {/* </View> */}
+                {/* </View> */}
             </KeyboardAvoidingView>
         );
     }
