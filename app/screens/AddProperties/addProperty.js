@@ -18,6 +18,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import MapView, { Marker } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
+import RNPickerSelect from 'react-native-picker-select';
 
 import { db } from '../../Database/db';
 let PropRef = db.ref('/PropertyType');
@@ -27,6 +28,17 @@ type Props = {
 };
 
 Geocoder.init("AIzaSyBMtFjgIpHg7Eu44iugytPzRYoG_1V7pOA", { language: "en" });
+
+const imagePickerList = [
+    {
+        label: 'Open Camera',
+        value: 1,
+    },
+    {
+        label: 'Open Gallery',
+        value: 2,
+    }
+];
 
 
 export default class AddPropertyScreen extends Component<Props> {
@@ -90,7 +102,8 @@ export default class AddPropertyScreen extends Component<Props> {
             street: null,
             area: null,
 
-            addressConfirmationModalVisible: false
+            addressConfirmationModalVisible: false,
+            selectedImagePicker: null
         };
 
         this.imageTest = null;
@@ -168,21 +181,7 @@ export default class AddPropertyScreen extends Component<Props> {
         });
     }
 
-    // pickSingleWithCamera(cropping, mediaType = 'photo') {
-    //     ImagePicker.openCamera({
-    //         cropping: cropping,
-    //         width: 500,
-    //         height: 500,
-    //         includeExif: true,
-    //         mediaType,
-    //     }).then(image => {
-    //         console.log('received image', image);
-    //         this.setState({
-    //             image: { uri: image.path, width: image.width, height: image.height, mime: image.mime },
-    //             images: null
-    //         });
-    //     }).catch(e => console.log(e));
-    // }
+
 
     // cleanupImages() {
     //     ImagePicker.clean().then(() => {
@@ -263,9 +262,26 @@ export default class AddPropertyScreen extends Component<Props> {
 
     }
 
-    // scaledHeight(oldW, oldH, newW) {
-    //     return (oldH / oldW) * newW;
-    // }
+    pickSingleWithCamera(cropping, mediaType = 'photo') {
+
+        const { images: savedImages } = this.state;
+
+        ImagePicker.openCamera({
+            cropping: cropping,
+            width: 500,
+            height: 500,
+            includeExif: true,
+            mediaType,
+        }).then(image => {
+            console.log('received image', image);
+            this.setState({
+                images: [
+                    ...(savedImages || []),
+                    { uri: image.path, width: image.width, height: image.height, mime: image.mime }
+                ],
+            });
+        }).catch(e => console.log(e));
+    }
 
 
     uploadImages(imgarr, index, userUID, propID, callback) {
@@ -339,8 +355,8 @@ export default class AddPropertyScreen extends Component<Props> {
             ref={(ref) => {
                 this.refs = ref;
             }}
-            
-            />;
+
+        />;
     }
 
     resetPropertyView() {
@@ -490,6 +506,18 @@ export default class AddPropertyScreen extends Component<Props> {
                         console.log(error)
                     });
             });
+    }
+
+    openImagePickerMethod() {
+        console.log("done pressed", this.state.selectedImagePicker)
+        if (this.state.selectedImagePicker == 1) {
+            this.pickSingleWithCamera(true);
+        }
+        else if (this.state.selectedImagePicker == 2) {
+            this.pickMultiple();
+        }
+        else
+            null;
     }
 
     returnImageScrollView() {
@@ -850,6 +878,47 @@ export default class AddPropertyScreen extends Component<Props> {
         );
     }
 
+    renderPickerSelectPicker() {
+        return (
+            <RNPickerSelect
+                placeholder={'placeholder'}
+                // disabled={!this.state.sortModalVisible}
+                items={imagePickerList}
+                onValueChange={value => {
+                    // this.getSortType(value);
+                    this.setState({
+                        selectedImagePicker: value
+                    });
+                    console.log(value);
+
+                }}
+                onDonePress={() => {
+                    // this.pickMultiple();
+                    this.openImagePickerMethod();
+                }}
+                style={pickerSelectStyles}
+                value={this.state.selectedImagePicker}
+            // ref={el => {
+            //   this.inputRefs.favSport0 = el;
+            // }}
+            >
+
+                <View style={{
+                    backgroundColor: '#ffffff', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5
+                }}>
+                    <Icon
+                        name="add-a-photo"
+                        type='MaterialIcons'
+                        size={30}
+                    />
+                    {/* {this.renderPickerSelectPicker()} */}
+                </View>
+                {console.log("pickervisible")}
+            </RNPickerSelect>
+
+        );
+    }
+
 
     render() {
 
@@ -900,16 +969,27 @@ export default class AddPropertyScreen extends Component<Props> {
 
                                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                                         {/* <TouchableOpacity onPress={this.pickMultiple.bind(this)}> */}
-                                                        <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                                            <View style={{ backgroundColor: '#ffffff', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                                        {/* <TouchableOpacity
+                                                            // onPress={this.pickMultiple.bind(this)}
+                                                            onPress={() => {
+                                                                // this.renderPickerSelectPicker();
+                                                                this.setState({
+                                                                    displayPickerView: !this.state.displayPickerView
+                                                                });
+                                                            }}
+                                                        > */}
+                                                        {/* <View style={{ backgroundColor: '#ffffff', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
                                                                 <Icon
                                                                     name="add-a-photo"
                                                                     type='MaterialIcons'
                                                                     size={30}
-                                                                />
-                                                            </View>
+                                                                /> */}
+                                                        {this.renderPickerSelectPicker()}
+                                                        {/* </View> */}
 
-                                                        </TouchableOpacity>
+
+
+                                                        {/* </TouchableOpacity> */}
 
                                                     </View>
 
@@ -918,16 +998,19 @@ export default class AddPropertyScreen extends Component<Props> {
                                                     (
                                                         (arrLength < 8 ?
                                                             // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                                            <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                                                                <View style={{ backgroundColor: '#ffffff', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
-                                                                    <Icon
-                                                                        name="add-a-photo"
-                                                                        type='MaterialIcons'
-                                                                        size={30}
-                                                                    />
-                                                                </View>
+                                                            // <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                                                            //     <View style={{ backgroundColor: '#ffffff', width: 100, height: 100, alignItems: 'center', justifyContent: 'center', margin: 5 }}>
+                                                            //         <Icon
+                                                            //             name="add-a-photo"
+                                                            //             type='MaterialIcons'
+                                                            //             size={30}
+                                                            //         />
+                                                            //     </View>
 
-                                                            </TouchableOpacity>
+                                                            // </TouchableOpacity>
+                                                            <View>
+                                                                {this.renderPickerSelectPicker()}
+                                                            </View>
 
                                                             : null))
 
@@ -1368,6 +1451,8 @@ export default class AddPropertyScreen extends Component<Props> {
 
                 {/* {this.renderLocationModal()} */}
                 {this.showMapModal()}
+                {/* {this.state.displayPickerView ? this.renderPickerSelectPicker() : null} */}
+
 
             </KeyboardAvoidingView>
 
@@ -1380,7 +1465,7 @@ const styles = StyleSheet.create({
         flex: 1,
         // justifyContent: 'center',
         // alignItems: 'center',
-        paddingTop: 20
+        paddingTop: 0
     },
     button: {
         backgroundColor: 'blue',
@@ -1433,4 +1518,28 @@ const styles = StyleSheet.create({
         height: '100%',
         // marginTop: 50
     }
+});
+
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 12,
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        //   borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 15,
+        color: 'black',
+        backgroundColor: 'red'
+        //   paddingRight: 30, // to ensure the text is never behind the icon
+    },
+    inputAndroid: {
+        fontSize: 12,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 0.5,
+        borderColor: 'purple',
+        borderRadius: 8,
+        color: 'black',
+        paddingRight: 30, // to ensure the text is never behind the icon
+    },
 });

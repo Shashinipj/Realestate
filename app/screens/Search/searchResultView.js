@@ -78,7 +78,8 @@ export default class SearchResultView extends Component<Props> {
             // isFavourite: false,
             favPropIds: [],
             sortModalVisible: false,
-            sortOrder: -1
+            sortOrder: -1,
+            displayPickerView: false
         };
 
         this.onValueCollection = this.onValueCollection.bind(this);
@@ -114,11 +115,11 @@ export default class SearchResultView extends Component<Props> {
         });
     }
 
-    renderSortModal(visible) {
-        this.setState({
-            sortModalVisible: visible
-        });
-    }
+    // renderSortModal(visible) {
+    //     this.setState({
+    //         sortModalVisible: visible
+    //     });
+    // }
 
     showCreateNewCollectionDialog() {
         // console.log("show dialog")
@@ -315,89 +316,6 @@ export default class SearchResultView extends Component<Props> {
     }
 
     renderSortModalView() {
-        // return (
-        //     <Modal
-        //         // animationType="slide"
-        //         transparent={true}
-        //         visible={this.state.sortModalVisible}
-        //         onRequestClose={() => {
-        //             Alert.alert('Modal has been closed.');
-        //         }}
-        //     >
-
-        //         <View style={{
-        //             width: '75%', backgroundColor: '#e0e0e0',
-        //             alignContent: 'center', alignSelf: 'center'
-        //         }}>
-
-        //             <View style={{ flexDirection: 'row' }}>
-        //                 <TouchableOpacity style={{}}
-        //                     onPress={() => {
-        //                         this.renderSortModal(false);
-        //                     }}>
-        //                     <Icon
-        //                         name="close"
-        //                         type='MaterialIcons'
-        //                         size={20}
-        //                     />
-        //                 </TouchableOpacity>
-
-        //                 <View style={{ alignContent: 'center', flex: 1 }}>
-        //                     <Text style={{ textAlign: 'center', fontWeight: '600' }}>Sort Order</Text>
-        //                 </View>
-
-        //             </View>
-
-        //             <View style={{ padding: 10 }}>
-        //                 <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
-        //                     this.getSortType(-1);
-        //                     this.renderSortModal(false);
-        //                 }}>
-        //                     <Text>None</Text>
-        //                 </TouchableOpacity>
-
-        //                 <View style={{ height: 1, backgroundColor: 'black' }} />
-
-        //                 <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
-        //                     this.getSortType(1);
-        //                     this.renderSortModal(false);
-        //                 }}>
-        //                     <Text>Price (High-Low)</Text>
-        //                 </TouchableOpacity>
-
-        //                 <View style={{ height: 1, backgroundColor: 'black' }} />
-
-        //                 <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
-        //                     this.getSortType(2);
-        //                     this.renderSortModal(false);
-        //                 }}>
-        //                     <Text>Price (Low-High)</Text>
-        //                 </TouchableOpacity>
-
-        //                 <View style={{ height: 1, backgroundColor: 'black' }} />
-
-        //                 <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
-        //                     this.getSortType(3);
-        //                     this.renderSortModal(false);
-        //                 }}>
-        //                     <Text>Date (Newest-Oldest)</Text>
-        //                 </TouchableOpacity>
-
-        //                 <View style={{ height: 1, backgroundColor: 'black' }} />
-
-        //                 <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => {
-        //                     this.getSortType(4);
-        //                     this.renderSortModal(false);
-        //                 }}>
-        //                     <Text>Date (Oldest-Newest)</Text>
-        //                 </TouchableOpacity>
-        //             </View>
-
-        //         </View>
-
-
-        //     </Modal>
-        // );
 
         return(
             <RNPickerSelect
@@ -407,17 +325,9 @@ export default class SearchResultView extends Component<Props> {
             onValueChange={value => {
                 this.getSortType(value);
             }}
-            // onUpArrow={() => {
-            //   this.inputRefs.firstTextInput.focus();
-            // }}
-            // onDownArrow={() => {
-            //   this.inputRefs.favSport1.togglePicker();
-            // }}
             style={pickerSelectStyles}
             value={this.state.sortOrder}
-            // ref={el => {
-            //   this.inputRefs.favSport0 = el;
-            // }}
+         
           />
         );
 
@@ -952,7 +862,7 @@ export default class SearchResultView extends Component<Props> {
                             <TouchableOpacity style={[styles.resetFilterButton, { marginRight: 0 }]}
                                 onPress={() => {
                                     // this.props.navigation.navigate('FilterScreen', { propData: propData });
-                                    this.renderSortModal(true);
+                                    // this.renderSortModal(true);
                                     
                                 }}
                             >
