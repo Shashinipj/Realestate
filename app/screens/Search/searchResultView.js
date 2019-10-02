@@ -9,6 +9,7 @@ import { db } from '../../Database/db';
 import Dialog from "react-native-dialog";
 import firebase from 'react-native-firebase';
 import ModalSelector from 'react-native-modal-selector';
+import ModalPicker from 'react-native-modal-picker'
 import ImageSlider from 'react-native-image-slider';
 import ListItem from '../../component/listItemComponent';
 import RNFetchBlob from 'react-native-fetch-blob';
@@ -24,26 +25,26 @@ type Props = {
 
 const sortList = [
     {
-      label: 'Sort',
-      value: -1,
+        label: 'Sort',
+        value: -1,
     },
     {
-      label: 'Price (High-Low)',
-      value: 1,
+        label: 'Price (High-Low)',
+        value: 1,
     },
     {
-      label: 'Price (Low-High)',
-      value: 2,
+        label: 'Price (Low-High)',
+        value: 2,
     },
     {
-      label: 'Date (Newest-Oldest)',
-      value: 3,
+        label: 'Date (Newest-Oldest)',
+        value: 3,
     },
     {
-      label: 'Date (Oldest-Newest)',
-      value: 4,
+        label: 'Date (Oldest-Newest)',
+        value: 4,
     },
-  ];
+];
 
 export default class SearchResultView extends Component<Props> {
 
@@ -108,10 +109,11 @@ export default class SearchResultView extends Component<Props> {
         }
     }
 
-    renderModal() {
+    renderModal(visible) {
         // console.log('render modal')
         this.setState({
             modalVisible: !this.state.modalVisible
+            // modalVisible: visible
         });
     }
 
@@ -256,6 +258,27 @@ export default class SearchResultView extends Component<Props> {
         }
     }
 
+    renderCollectionListItem({ item, index }) {
+        return (
+
+                <View style={{ padding: 7, borderBottomColor: 'gray', borderBottomWidth: 1, backgroundColor: '#ffffff', flex: 1,
+                alignItems:'center', borderRadius: 5 }}>
+                    <TouchableOpacity onPress={() => {
+                        console.log(item.label);
+                        // this.addToCollection(option.label);
+                        this.renderModal();
+                        this.renderModalSelectedItem(item);
+                    }}
+                    style={{}}
+                    >
+                        <Text>{item.label}</Text>
+                    </TouchableOpacity>
+
+                </View>
+
+        );
+    }
+
     renderModalView() {
 
         const data = [];
@@ -274,24 +297,73 @@ export default class SearchResultView extends Component<Props> {
         }
 
 
-        if (this.state.modalVisible) {
+        // if (this.state.modalVisible) 
+        {
             return (
-                <ModalSelector
-                    data={data}
-                    visible={this.state.modalVisible}
-                    onChange={(option) => {
+                // <ModalSelector
+                // // <ModalPicker
+                //     data={data}
+                //     visible={this.state.modalVisible}
+                //     onChange={(option) => {
 
-                        console.log(option.label);
-                        // this.addToCollection(option.label);
+                // console.log(option.label);
+                // // this.addToCollection(option.label);
+                // this.renderModal();
+                // this.renderModalSelectedItem(option);
+
+                //     }}
+                //     closeOnChange={true}
+                //     onModalClose={() => {
+                //         // this.renderModal();
+                //     }}
+                // >
+
+                // </ModalSelector>
+
+                <Modal
+                    // transparent={true}
+                    onBackdropPress={()=>{
                         this.renderModal();
-                        this.renderModalSelectedItem(option);
+                    }}
+                    backdropColor='#ff660f'
+                    hasBackdrop={true}
+                    presentationStyle='pageSheet'
 
+                    visible={this.state.modalVisible}
+                    onRequestClose={() => {
+                        Alert.alert('Modal has been closed.');
                     }}
-                    closeOnChange={true}
-                    onModalClose={() => {
-                        // this.renderModal();
-                    }}
-                />
+                >
+                    {/* <View style={{ justifyContent: 'center', alignContent: 'center',backgroundColor:'black' }}> */}
+                        <View style={{justifyContent:'center', alignContent:'center', margin: 20}}>
+                            <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', 
+                             borderRadius: 5, paddingTop: 10, borderRadius: 5}}>
+
+                                <FlatList
+                                    data={data}
+                                    // style={{flex:1}}
+                                    extraData={this.state}
+                                    renderItem={item => this.renderCollectionListItem(item)}
+                                    keyExtractor={(item, index) => {
+                                        return "" + index;
+                                    }}
+                                />
+
+                            </View>
+
+                            <TouchableOpacity onPress={() => {
+                                this.renderModal();
+                            }}
+                                style={{ backgroundColor: '#ffffff', marginTop: 10, padding: 5, alignItems: 'center', borderRadius: 5 }}
+                            >
+                                <Text style={{color:'#212121', fontWeight:'600'}}>Close</Text>
+                            </TouchableOpacity>
+
+                        </View>
+
+                    {/* </View> */}
+
+                </Modal>
             );
         }
     }
@@ -317,18 +389,18 @@ export default class SearchResultView extends Component<Props> {
 
     renderSortModalView() {
 
-        return(
+        return (
             <RNPickerSelect
-            placeholder={'placeholder'}
-            // disabled={!this.state.sortModalVisible}
-            items={sortList}
-            onValueChange={value => {
-                this.getSortType(value);
-            }}
-            style={pickerSelectStyles}
-            value={this.state.sortOrder}
-         
-          />
+                placeholder={'placeholder'}
+                // disabled={!this.state.sortModalVisible}
+                items={sortList}
+                onValueChange={value => {
+                    this.getSortType(value);
+                }}
+                style={pickerSelectStyles}
+                value={this.state.sortOrder}
+
+            />
         );
 
     }
@@ -773,6 +845,13 @@ export default class SearchResultView extends Component<Props> {
                 favouriteMarked={item.isFavourite}
                 showFavouriteIcon={true}
                 showDeleteIcon={false}
+
+                // renderFavouriteIcon={(state, props) => {
+                //     return (
+                //         null
+                //     );
+                // }}
+
                 onPressItem={(item) => {
                     this.props.navigation.navigate("ExpandedView", { PropertyData: item, favIDs: this.state.favPropIds });
                 }}
@@ -857,22 +936,22 @@ export default class SearchResultView extends Component<Props> {
                     flexDirection: 'row',
                 }}>
 
-                    <View style={{ flex: 1}}>
+                    <View style={{ flex: 1 }}>
                         <View style={{ position: 'relative', alignSelf: 'flex-start' }}>
                             <TouchableOpacity style={[styles.resetFilterButton, { marginRight: 0 }]}
                                 onPress={() => {
                                     // this.props.navigation.navigate('FilterScreen', { propData: propData });
                                     // this.renderSortModal(true);
-                                    
+
                                 }}
                             >
-                              
-                              {this.renderSortModalView()}
+
+                                {this.renderSortModalView()}
 
                                 {/* {this.setTextForSortFilter()} */}
-                                
-                                  {/* <Text style={{ fontSize: 10 }}>SORT</Text> */}
-                                
+
+                                {/* <Text style={{ fontSize: 10 }}>SORT</Text> */}
+
 
                             </TouchableOpacity>
                         </View>
@@ -925,23 +1004,23 @@ const styles = StyleSheet.create({
 
 const pickerSelectStyles = StyleSheet.create({
     inputIOS: {
-      fontSize: 12,
-      paddingVertical: 0,
-      paddingHorizontal: 0,
-    //   borderWidth: 1,
-      borderColor: 'gray',
-      borderRadius: 15,
-      color: 'black',
-    //   paddingRight: 30, // to ensure the text is never behind the icon
+        fontSize: 12,
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        //   borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 15,
+        color: 'black',
+        //   paddingRight: 30, // to ensure the text is never behind the icon
     },
     inputAndroid: {
-      fontSize: 12,
-      paddingHorizontal: 10,
-      paddingVertical: 8,
-      borderWidth: 0.5,
-      borderColor: 'purple',
-      borderRadius: 8,
-      color: 'black',
-      paddingRight: 30, // to ensure the text is never behind the icon
+        fontSize: 12,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 0.5,
+        borderColor: 'purple',
+        borderRadius: 8,
+        color: 'black',
+        paddingRight: 30, // to ensure the text is never behind the icon
     },
-  });
+});

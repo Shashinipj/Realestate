@@ -387,48 +387,48 @@ export default class MyProperties extends Component {
 }
 
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white'
-    },
-    buttons: {
-        // backgroundColor: '#49141E',
-        // backgroundColor: '#f3d500',
-        backgroundColor: '#e0e0e0',
-        borderRadius: 4,
-        paddingVertical: 7,
-        margin: 10,
-        marginBottom: 0,
-        paddingHorizontal: 15,
-        width: '100%',
-        alignSelf: 'center',
-        height: 40,
-        justifyContent: 'center',
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         backgroundColor: 'white'
+//     },
+//     buttons: {
+//         // backgroundColor: '#49141E',
+//         // backgroundColor: '#f3d500',
+//         backgroundColor: '#e0e0e0',
+//         borderRadius: 4,
+//         paddingVertical: 7,
+//         margin: 10,
+//         marginBottom: 0,
+//         paddingHorizontal: 15,
+//         width: '100%',
+//         alignSelf: 'center',
+//         height: 40,
+//         justifyContent: 'center',
 
-    },
-    buttonContainer: {
-        flex: 1,
-        alignContent: 'center',
-        // backgroundColor: '#e0e0e0',
-        // justifyContent: 'center',
-        // backgroundColor:'green'
-    },
-    buttonText: {
-        // color: '#49141E',
-        color: '#ffffff',
-        fontWeight: '500',
-        textAlign: 'center',
-        fontSize: 17
-    },
-    activityIndicator: {
-        flex: 1,
-        height: 120
-    },
-    loader: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#fff"
-    },
-})
+//     },
+//     buttonContainer: {
+//         flex: 1,
+//         alignContent: 'center',
+//         // backgroundColor: '#e0e0e0',
+//         // justifyContent: 'center',
+//         // backgroundColor:'green'
+//     },
+//     buttonText: {
+//         // color: '#49141E',
+//         color: '#ffffff',
+//         fontWeight: '500',
+//         textAlign: 'center',
+//         fontSize: 17
+//     },
+//     activityIndicator: {
+//         flex: 1,
+//         height: 120
+//     },
+//     loader: {
+//         flex: 1,
+//         justifyContent: "center",
+//         alignItems: "center",
+//         backgroundColor: "#fff"
+//     },
+// })

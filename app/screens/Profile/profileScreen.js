@@ -522,8 +522,8 @@ export default class ProfileScreen extends Component<Props> {
 
             const Blob = RNFetchBlob.polyfill.Blob
             const fs = RNFetchBlob.fs
-            window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-            window.Blob = Blob
+            // window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+            // window.Blob = Blob
 
             // let imageUrl = [];
             let uploadBlob = null
@@ -554,8 +554,6 @@ export default class ProfileScreen extends Component<Props> {
                         console.log('profilePicUrl', this.state.profilePicUrl);
                         resolve(true);
                     });
-
-
                 })
                 .catch((error) => {
                     reject(error);
@@ -780,7 +778,7 @@ export default class ProfileScreen extends Component<Props> {
                                         <TouchableOpacity style={{ marginTop: 25, alignSelf: 'flex-end' }} onPress={() => {
                                             this.onPressSignOutButton();
                                         }}>
-                                            <View style={[styles.buttons, { backgroundColor:'#212121', width: 100, marginBottom: 0 }]}>
+                                            <View style={[styles.buttons, { backgroundColor: '#212121', width: 100, marginBottom: 0 }]}>
                                                 <Text style={[styles.buttonText, { color: '#e0e0e0' }]}>
                                                     Sign Out</Text>
                                             </View>
@@ -1204,17 +1202,17 @@ export default class ProfileScreen extends Component<Props> {
         // }
 
         // else {
-            let tabs = [{
-                text: 'About',
-            }, {
-                text: 'Settings',
-            }];
-            return <PagerTabIndicator tabs={tabs}
-                style={{ backgroundColor: '#212121', borderTopWidth: 0 }}
-                textStyle={{ fontSize: 15, color: '#9e9e9e', paddingBottom: 10 }}
-                // selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
-                selectedTextStyle={{ fontSize: 15, color: '#ffffff' }}
-            />;
+        let tabs = [{
+            text: 'About',
+        }, {
+            text: 'Settings',
+        }];
+        return <PagerTabIndicator tabs={tabs}
+            style={{ backgroundColor: '#212121', borderTopWidth: 0 }}
+            textStyle={{ fontSize: 15, color: '#9e9e9e', paddingBottom: 10 }}
+            // selectedTextStyle={{ fontSize: 15, color: '#f3d500' }}
+            selectedTextStyle={{ fontSize: 15, color: '#ffffff' }}
+        />;
         // }
     }
 

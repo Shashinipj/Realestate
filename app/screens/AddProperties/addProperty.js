@@ -40,6 +40,10 @@ const imagePickerList = [
     }
 ];
 
+const PAGE_INDEX = {
+    PROPERTY_DETAILS: 0,
+    OWNER_DETAILS: 1
+};
 
 export default class AddPropertyScreen extends Component<Props> {
 
@@ -52,6 +56,11 @@ export default class AddPropertyScreen extends Component<Props> {
      * @type {Marker}
      */
     refMarker = null;
+
+    /**
+     * @type {IndicatorViewPager}
+     */
+    refViewPager = null;
 
     constructor() {
         super();
@@ -110,7 +119,6 @@ export default class AddPropertyScreen extends Component<Props> {
     }
 
     componentDidMount() {
-
 
         this.getCurrentLocation().then(() => {
             console.log("successfully leaded data!");
@@ -311,8 +319,8 @@ export default class AddPropertyScreen extends Component<Props> {
 
             const Blob = RNFetchBlob.polyfill.Blob
             const fs = RNFetchBlob.fs
-            window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-            window.Blob = Blob
+            // window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+            // window.Blob = Blob
 
             let imageUrl = [];
             let uploadBlob = null
@@ -944,7 +952,13 @@ export default class AddPropertyScreen extends Component<Props> {
                     <IndicatorViewPager
                         style={{ height: '100%' }}
                         autoPlayEnable={false}
-                        indicator={this.renderDotIndicator()}
+                        ref={(ref) => {
+                            this.refViewPager = ref;
+                        }}
+                        
+                    // indicator={this.renderDotIndicator()}
+                    // horizontalScroll={false}
+                    
                     >
                         <View style={{ backgroundColor: '#eeeeee' }}>
                             <ScrollView>
@@ -1235,6 +1249,15 @@ export default class AddPropertyScreen extends Component<Props> {
                                             />
                                         </View>
 
+                                        <TouchableOpacity style={{ backgroundColor:'#212121', alignSelf:'flex-end',
+                                        alignContent:'center', paddingHorizontal: 15,paddingVertical: 5, margin: 10, borderRadius: 5 }}
+                                        onPress={()=>{
+                                            this.refViewPager.setPage(PAGE_INDEX.OWNER_DETAILS);
+                                        }}>
+                                            <Text style={{color:'#e0e0e0', fontWeight:'600'}}>Next</Text>
+
+                                        </TouchableOpacity>
+
                                     </View>
                                 </KeyboardAvoidingView>
                             </ScrollView>
@@ -1350,6 +1373,15 @@ export default class AddPropertyScreen extends Component<Props> {
                                     </View>
 
                                 </View>
+
+                                <TouchableOpacity style={{ backgroundColor:'#212121', alignSelf:'flex-start',
+                                        alignContent:'center', paddingHorizontal: 15,paddingVertical: 5, margin: 10, borderRadius: 5 }}
+                                        onPress={()=>{
+                                            this.refViewPager.setPage(PAGE_INDEX.PROPERTY_DETAILS);
+                                        }}>
+                                            <Text style={{color:'#e0e0e0', fontWeight:'600'}}>Back</Text>
+
+                                        </TouchableOpacity>
 
                             </ScrollView>
 

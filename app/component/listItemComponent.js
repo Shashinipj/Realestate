@@ -9,6 +9,9 @@ import { db } from '../Database/db';
 
 type Props = {
     data1: any;
+
+    renderFavouriteIcon: (state, props) => any;
+
     showFavouriteIcon: boolean;
     enableFavouriteIcon: boolean;
     favouriteMarked: boolean;
@@ -148,6 +151,10 @@ export default class ListItem extends Component<Props> {
         if (!showFavouriteIcon) {
             return null;
         }
+
+        // if () {
+
+        // }
 
         if (!favouriteMarked) {
             return (
