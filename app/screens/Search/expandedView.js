@@ -16,7 +16,7 @@ import ModalSelector from 'react-native-modal-selector';
 import firebase from 'react-native-firebase';
 import Dialog from "react-native-dialog";
 import { db } from '../../Database/db';
-
+import getDirections from 'react-native-google-maps-directions'
 
 export default class ExpandedView extends Component {
 
@@ -54,7 +54,12 @@ export default class ExpandedView extends Component {
             propProperties: [],
             collectionList: [],
             loggedUser: '',
-            isFavourite: false
+            isFavourite: false,
+            propertyLat: null,
+            propertyLon: null,
+            currentlon: null,
+            currentLat: null,
+            currentLocation: false
         };
 
         this.onValueCollection = this.onValueCollection.bind(this);
@@ -79,6 +84,11 @@ export default class ExpandedView extends Component {
             });
             this.getFavouritePropertyId();
         }
+
+        this.setState({
+            propertyLat: property.lat,
+            propertyLon: property.lon
+        });
 
     }
 
@@ -224,33 +234,33 @@ export default class ExpandedView extends Component {
                 }}
             >
                 <View style={{ justifyContent: 'center', alignContent: 'center', flex: 1 }}>
-                <View style={{ justifyContent: 'center', alignContent: 'center', margin: 20 }}>
-                    <View style={{
-                        backgroundColor: '#ffffff', justifyContent: 'center',
-                        borderRadius: 5, paddingTop: 10, borderRadius: 5
-                    }}>
+                    <View style={{ justifyContent: 'center', alignContent: 'center', margin: 20 }}>
+                        <View style={{
+                            backgroundColor: '#ffffff', justifyContent: 'center',
+                            borderRadius: 5, paddingTop: 10, borderRadius: 5
+                        }}>
 
-                        <FlatList
-                            data={data}
-                            // style={{flex:1}}
-                            extraData={this.state}
-                            renderItem={item => this.renderCollectionListItem(item)}
-                            keyExtractor={(item, index) => {
-                                return "" + index;
-                            }}
-                        />
+                            <FlatList
+                                data={data}
+                                // style={{flex:1}}
+                                extraData={this.state}
+                                renderItem={item => this.renderCollectionListItem(item)}
+                                keyExtractor={(item, index) => {
+                                    return "" + index;
+                                }}
+                            />
+
+                        </View>
+
+                        <TouchableOpacity onPress={() => {
+                            this.renderModal();
+                        }}
+                            style={{ backgroundColor: '#ffffff', marginTop: 10, padding: 5, alignItems: 'center', borderRadius: 5 }}
+                        >
+                            <Text style={{ color: '#212121', fontWeight: '600' }}>Close</Text>
+                        </TouchableOpacity>
 
                     </View>
-
-                    <TouchableOpacity onPress={() => {
-                        this.renderModal();
-                    }}
-                        style={{ backgroundColor: '#ffffff', marginTop: 10, padding: 5, alignItems: 'center', borderRadius: 5 }}
-                    >
-                        <Text style={{ color: '#212121', fontWeight: '600' }}>Close</Text>
-                    </TouchableOpacity>
-
-                </View>
 
                 </View>
 
@@ -512,22 +522,28 @@ export default class ExpandedView extends Component {
                                 // draggable
 
                                 />
+
+                                {/* <TouchableOpacity style={{ flex: 1}}>
+                                    <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
+                                        <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Get Directions</Text>
+                                    </View>
+                                </TouchableOpacity> */}
                             </MapView>
 
-                            {/* <View style={{ flexDirection: 'row', padding: 10, backgroundColor: 'white', justifyContent: 'center', position: 'absolute', zIndex: 2, bottom: 50 }}>
+                            <View style={{ flexDirection: 'row', padding: 10, backgroundColor: 'white', justifyContent: 'center',  zIndex: 1, bottom: 50 }}>
 
-                                <TouchableOpacity style={{ flex: 1, }}>
+                                {/* <TouchableOpacity style={{ flex: 1, }}>
                                     <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
                                         <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Street View</Text>
                                     </View>
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
                                 <TouchableOpacity style={{ flex: 1, }}>
                                     <View style={{ borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5, backgroundColor: '#49141E' }}>
                                         <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600', color: 'white' }}>Get Directions</Text>
                                     </View>
                                 </TouchableOpacity>
 
-                            </View> */}
+                            </View>
 
                         </View>
                     </SafeAreaView>
@@ -611,6 +627,63 @@ export default class ExpandedView extends Component {
                 </TouchableOpacity>
             );
         }
+    }
+
+    getCurrentLocation() {
+
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+
+                    const latitude = Number(position.coords.latitude.toFixed(6));
+                    const longitude = Number(position.coords.longitude.toFixed(6));
+
+                    console.log("latitudeaaaa", latitude);
+                    console.log("longitudeaaaa", longitude);
+
+                    this.setState({
+                        currentLat: latitude,
+                        currentLon: longitude,
+                        currentLocation: true
+                    });
+
+                    resolve(true);
+
+                },
+                (error) => {
+                    reject(error);
+                },
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+            );
+
+        });
+    }
+
+    handleGetDirections() {
+        const data = {
+            source: {
+                latitude: this.state.currentLat,
+                longitude: this.state.currentlon
+                // latitude: this.state.propertyLat,
+                // longitude: this.state.propertyLon
+            },
+            destination: {
+                latitude: this.state.propertyLat,
+                longitude: this.state.propertyLon
+            },
+            params: [
+                {
+                    key: "travelmode",
+                    value: "driving"        // may be "walking", "bicycling" or "transit" as well
+                },
+                // {
+                //     key: "dir_action",
+                //     value: "navigate"       // this instantly initializes navigation using the given travel mode
+                // }
+            ],
+        }
+
+        getDirections(data)
     }
 
 
@@ -766,12 +839,40 @@ export default class ExpandedView extends Component {
 
                         </TouchableOpacity>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            {/* <TouchableOpacity style={{ flex: 1 }}>
                                 <View style={{ borderWidth: 1, borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5 }}>
                                     <Text style={{ textAlign: 'center' }}>Street View</Text>
                                 </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            </TouchableOpacity> */}
+                            <TouchableOpacity style={{ flex: 1 }} onPress={() => {
+
+                                this.getCurrentLocation().then(() => {
+                                    this.handleGetDirections();
+                                }).catch((error) => {
+
+                                    Alert.alert(
+                                        'RealEstate does not have access to your location. To enable access, tap Settings > Location',
+                                        '',
+                                        [
+                                            {
+                                                text: 'Cancel',
+                                                style: 'cancel',
+
+                                            },
+                                            {
+                                                text: 'Settings',
+                                                onPress: () => {
+                                                    Linking.openURL('app-settings:');
+                                                }
+                                            },
+                                        ],
+                                        { cancelable: true },
+                                    );
+                                });
+
+
+
+                            }}>
                                 <View style={{ borderWidth: 1, borderRadius: 4, alignContent: 'center', height: 35, justifyContent: 'center', marginHorizontal: 5 }}>
                                     <Text style={{ textAlign: 'center' }}>Get Directions</Text>
                                 </View>
