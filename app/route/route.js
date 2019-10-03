@@ -17,6 +17,7 @@ import MyProperties from '../screens/Properties/myProperties';
 import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Icon } from 'react-native-elements';
 import Icon2 from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 
 const searchStack = createStackNavigator({
@@ -113,9 +114,9 @@ const TabNavigator = createBottomTabNavigator({
 
         navigationOptions: {
             tabBarIcon: ({ tintColor }) => (
-                <Meticon
-                    name="home-city-outline"
-                    type='MaterialCommunityIcons'
+                <MaterialIcons
+                    name="location-city"
+                    type='MaterialIcons'
                     size={25}
                     color='gray' />
             )

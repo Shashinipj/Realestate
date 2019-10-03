@@ -122,7 +122,7 @@ export default class ProfileScreen extends Component<Props> {
                 if (userdetails) {
                     this.setState({
                         userName: userdetails.UserName,
-                        // profilePic: userdetails.ProfilePicUrl,
+                        profilePic: userdetails.ProfilePicUrl,
                         profilePicUrl: userdetails.ProfilePicUrl,
                         contactNumber: userdetails.ContactNumber,
                         address: userdetails.Address,
@@ -504,6 +504,7 @@ export default class ProfileScreen extends Component<Props> {
                 {/* <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 50 }} source={{ uri: this.state.profilePic }} />  */}
                 {/* : */}
                 <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 50 }} source={{ uri: this.state.profilePic }} />
+                {/* <Image style={{ width: 100, height: 100, resizeMode: 'cover', borderRadius: 60 }} source={{ uri: this.state.profilePicUrl }} /> */}
                 {/* } */}
 
 
@@ -1003,7 +1004,8 @@ export default class ProfileScreen extends Component<Props> {
                                 :
                                 <Image source={{ uri: this.state.profilePic }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                             } */}
-                                        <Image source={{ uri: this.state.profilePicUrl }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
+                                        {/* <Image source={{ uri: this.state.profilePicUrl }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} /> */}
+                                        <Image source={{ uri: this.state.profilePic}} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                                     </View>
                                     <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>{this.state.userName}</Text>
 

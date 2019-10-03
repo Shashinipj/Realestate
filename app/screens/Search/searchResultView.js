@@ -261,7 +261,7 @@ export default class SearchResultView extends Component<Props> {
     renderCollectionListItem({ item, index }) {
         return (
 
-                <View style={{ padding: 7, borderBottomColor: 'gray', borderBottomWidth: 1, backgroundColor: '#ffffff', flex: 1,
+                <View style={{ padding: 9, borderBottomColor: '#e0e0e0', borderBottomWidth: 1, backgroundColor: '#ffffff', flex: 1,
                 alignItems:'center', borderRadius: 5 }}>
                     <TouchableOpacity onPress={() => {
                         console.log(item.label);

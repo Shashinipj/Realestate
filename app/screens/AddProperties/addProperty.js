@@ -19,6 +19,8 @@ import MapView, { Marker } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
 import RNPickerSelect from 'react-native-picker-select';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Octicons from 'react-native-vector-icons/Octicons';
 
 import { db } from '../../Database/db';
 let PropRef = db.ref('/PropertyType');
@@ -161,8 +163,8 @@ export default class AddPropertyScreen extends Component<Props> {
                     const latitude = Number(position.coords.latitude.toFixed(6));
                     const longitude = Number(position.coords.longitude.toFixed(6));
 
-                    console.log("latitude", latitude);
-                    console.log("longitude", longitude);
+                    console.log("latitudeaaaa", latitude);
+                    console.log("longitudeaaaa", longitude);
 
                     this.setState({
                         currentLat: latitude,
@@ -654,10 +656,10 @@ export default class AddPropertyScreen extends Component<Props> {
                                 }}
                                 style={styles.mapViewExpand}
                                 initialRegion={{
-                                    // latitude: this.state.currentLat,
-                                    // longitude: this.state.currentLon,
-                                    latitude: 6.92,
-                                    longitude: 79.86,
+                                    latitude: this.state.currentLat,
+                                    longitude: this.state.currentLon,
+                                    // latitude: 6.92,
+                                    // longitude: 79.86,
                                     latitudeDelta: 0.0922,
                                     longitudeDelta: 0.0421,
                                 }}
@@ -1155,8 +1157,8 @@ export default class AddPropertyScreen extends Component<Props> {
                                                                 : styles.propertTypeButtons
                                                         }>
 
-                                                            <Meticon
-                                                                name='home-city-outline'
+                                                            <MaterialIcons
+                                                                name='location-city'
                                                                 size={30}
                                                                 color={this.state.propertyType == 3 ? 'white' : 'gray'} />
 
@@ -1171,8 +1173,9 @@ export default class AddPropertyScreen extends Component<Props> {
                                                             this.state.propertyType == 4 ? [styles.propertTypeButtons, { backgroundColor: '#424242' }]
                                                                 : styles.propertTypeButtons
                                                         }>
-                                                            <Meticon
-                                                                name='home-group'
+                                                            <Octicons
+                                                                name='home'
+                                                                // type="Fontisto"
                                                                 size={30}
                                                                 color={this.state.propertyType == 4 ? 'white' : 'gray'} />
 

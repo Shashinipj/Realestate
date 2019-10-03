@@ -122,7 +122,7 @@ export default class CollectionScreen extends Component {
             }}
             style={{borderWidth: 1, marginHorizontal: 5, borderRadius: 5, marginBottom: 10, backgroundColor:'#ffffff', borderColor:'#bdbdbd'}}>
                 <View style={{height: 110, backgroundColor:'#ffffff', borderRadius: 5}}>
-                <Image source={require('../../assets/images/4.jpg')} style={{height: 100, width:'100%', resizeMode:'center', marginTop: 10}} />
+                <Image source={require('../../assets/images/bnw.jpg')} style={{height: 100, width:'100%', resizeMode:'cover', marginTop: 10}} />
                 </View>
 
                 <View style={{ backgroundColor: '#e0e0e0', margin: 5, padding: 10 }}>

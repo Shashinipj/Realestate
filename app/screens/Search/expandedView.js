@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     View, StyleSheet, Text, Image, TouchableOpacity, Modal, SafeAreaView,
-    Linking, Alert
+    Linking, Alert, FlatList
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
@@ -148,6 +148,29 @@ export default class ExpandedView extends Component {
         });
     }
 
+    renderCollectionListItem({ item, index }) {
+        return (
+
+            <View style={{
+                padding: 9, borderBottomColor: '#e0e0e0', borderBottomWidth: 1, backgroundColor: '#ffffff', flex: 1,
+                alignItems: 'center', borderRadius: 5
+            }}>
+                <TouchableOpacity onPress={() => {
+                    console.log(item.label);
+                    // this.addToCollection(option.label);
+                    this.renderModal();
+                    this.renderModalSelectedItem(item);
+                }}
+                    style={{}}
+                >
+                    <Text>{item.label}</Text>
+                </TouchableOpacity>
+
+            </View>
+
+        );
+    }
+
     renderModalView() {
 
         const data = [];
@@ -166,27 +189,74 @@ export default class ExpandedView extends Component {
         }
 
 
-        if (this.state.modalVisible) {
-            return (
-                <ModalSelector
-                    data={data}
-                    visible={this.state.modalVisible}
-                    onChange={(option) => {
+        // if (this.state.modalVisible) {
+        return (
+            // <ModalSelector
+            //     data={data}
+            //     visible={this.state.modalVisible}
+            //     onChange={(option) => {
 
-                        console.log(option.label);
-                        // this.addToCollection(option.label);
+            //         console.log(option.label);
+            //         // this.addToCollection(option.label);
+            //         this.renderModal();
+            //         this.renderModalSelectedItem(option);
+
+            //     }}
+            //     closeOnChange={true}
+            //     onModalClose={() => {
+            //         // this.renderModal();
+            //     }}
+
+            // />
+
+            <Modal
+                transparent={true}
+                onBackdropPress={() => {
+                    this.renderModal();
+                }}
+                backdropColor='#ff660f'
+                // hasBackdrop={true}
+                presentationStyle='pageSheet'
+
+                visible={this.state.modalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}
+            >
+                <View style={{ justifyContent: 'center', alignContent: 'center', flex: 1 }}>
+                <View style={{ justifyContent: 'center', alignContent: 'center', margin: 20 }}>
+                    <View style={{
+                        backgroundColor: '#ffffff', justifyContent: 'center',
+                        borderRadius: 5, paddingTop: 10, borderRadius: 5
+                    }}>
+
+                        <FlatList
+                            data={data}
+                            // style={{flex:1}}
+                            extraData={this.state}
+                            renderItem={item => this.renderCollectionListItem(item)}
+                            keyExtractor={(item, index) => {
+                                return "" + index;
+                            }}
+                        />
+
+                    </View>
+
+                    <TouchableOpacity onPress={() => {
                         this.renderModal();
-                        this.renderModalSelectedItem(option);
-
                     }}
-                    closeOnChange={true}
-                    onModalClose={() => {
-                        // this.renderModal();
-                    }}
+                        style={{ backgroundColor: '#ffffff', marginTop: 10, padding: 5, alignItems: 'center', borderRadius: 5 }}
+                    >
+                        <Text style={{ color: '#212121', fontWeight: '600' }}>Close</Text>
+                    </TouchableOpacity>
 
-                />
-            );
-        }
+                </View>
+
+                </View>
+
+            </Modal>
+        );
+        // }
     }
 
     createCollection() {
@@ -436,10 +506,10 @@ export default class ExpandedView extends Component {
                                     description={property.PropType}
 
 
-                                    // onSelect={() => console.log('onSelect', arguments)}
-                                    // onDrag={() => console.log('onDrag', arguments)}
-                                    // onDragStart={() => console.log('onDragStart', arguments)}
-                                    // draggable
+                                // onSelect={() => console.log('onSelect', arguments)}
+                                // onDrag={() => console.log('onDrag', arguments)}
+                                // onDragStart={() => console.log('onDragStart', arguments)}
+                                // draggable
 
                                 />
                             </MapView>
@@ -743,7 +813,7 @@ export default class ExpandedView extends Component {
 
                     </TouchableOpacity>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         // onPress={() => Linking.openURL('mailto:realestateadmin@gmail.com')} 
                         style={{ flex: 1 }}>
 
@@ -754,7 +824,7 @@ export default class ExpandedView extends Component {
                             <Text style={{ color: 'white', fontWeight: '600' }}>Make an Appoinment</Text>
                         </View>
 
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
                 {this.renderCreateNewCollectionDialog()}
                 {this.renderModalView()}
