@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     View, StyleSheet, Text, TouchableOpacity, Alert, AsyncStorage, Dimensions, Platform,
-    Image, ScrollView, FlatList, ImageBackground, Modal, TextInput, ActivityIndicator, KeyboardAvoidingView
+    Image, ScrollView, FlatList, ImageBackground, ListView, TextInput, ActivityIndicator, KeyboardAvoidingView
 } from 'react-native';
 import { NavigationScreenProp, NavigationActions, SafeAreaView, StackActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
@@ -15,6 +15,7 @@ import ListItem from '../../component/listItemComponent'
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import RNFetchBlob from 'react-native-fetch-blob';
 import ImagePicker from 'react-native-image-crop-picker';
+import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 
 type Props = {
     navigation: NavigationScreenProp;
@@ -341,16 +342,20 @@ export default class MyProperties extends Component {
                     this.props.navigation.navigate("EditPropertyScreen", { PropertyData: item });
                 }}
             />
+
         );
     }
 
     render() {
+
+        const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+
         return (
             // <View style={{ flex: 1, backgroundColor: 'red' }}>
             <SafeAreaView style={{}}>
-                <KeyboardAvoidingView style={{}} behavior={'padding'}>
+                {/* <KeyboardAvoidingView style={{}} behavior={'padding'}> */}
                     {(this.state.userRole == 'Admin') ?
-                        <View>
+                        <View style={{paddingBottom: 100}}>
                             <TouchableOpacity onPress={() => {
                                 this.props.navigation.navigate('AddPropertyScreen');
                             }}>
@@ -364,71 +369,25 @@ export default class MyProperties extends Component {
                                 </View>
                             </TouchableOpacity>
 
-                            <View style={{}}>
-                                <FlatList
+                            <ScrollView style={{}}>
+
+                                <SwipeListView
                                     data={this.state.myProperties}
-                                    // extraData={this.state}
-                                    renderItem={item => this.renderMyProperties(item)}
+                                    renderItem={(item) => this.renderMyProperties(item)}
                                     keyExtractor={(item, index) => {
                                         return "" + index;
                                     }}
+                                    // leftOpenValue={75}
+                                    rightOpenValue={-75}
                                 />
-                            </View>
+                            </ScrollView>
                         </View>
-
                         :
                         null
                     }
-                </KeyboardAvoidingView>
+                {/* </KeyboardAvoidingView> */}
             </SafeAreaView>
             // </View>
         );
     }
 }
-
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         backgroundColor: 'white'
-//     },
-//     buttons: {
-//         // backgroundColor: '#49141E',
-//         // backgroundColor: '#f3d500',
-//         backgroundColor: '#e0e0e0',
-//         borderRadius: 4,
-//         paddingVertical: 7,
-//         margin: 10,
-//         marginBottom: 0,
-//         paddingHorizontal: 15,
-//         width: '100%',
-//         alignSelf: 'center',
-//         height: 40,
-//         justifyContent: 'center',
-
-//     },
-//     buttonContainer: {
-//         flex: 1,
-//         alignContent: 'center',
-//         // backgroundColor: '#e0e0e0',
-//         // justifyContent: 'center',
-//         // backgroundColor:'green'
-//     },
-//     buttonText: {
-//         // color: '#49141E',
-//         color: '#ffffff',
-//         fontWeight: '500',
-//         textAlign: 'center',
-//         fontSize: 17
-//     },
-//     activityIndicator: {
-//         flex: 1,
-//         height: 120
-//     },
-//     loader: {
-//         flex: 1,
-//         justifyContent: "center",
-//         alignItems: "center",
-//         backgroundColor: "#fff"
-//     },
-// })

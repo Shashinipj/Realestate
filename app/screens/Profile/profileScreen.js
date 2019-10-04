@@ -119,6 +119,7 @@ export default class ProfileScreen extends Component<Props> {
             db.ref(`Users/${user.uid}/UserDetails`).on('value', (snapshot) => {
                 const userdetails = snapshot.val();
                 console.log('userdetails', userdetails);
+                console.log('userdetails.ProfilePicUrl', userdetails.ProfilePicUrl);
                 if (userdetails) {
                     this.setState({
                         userName: userdetails.UserName,
@@ -421,7 +422,8 @@ export default class ProfileScreen extends Component<Props> {
                 .then(() => {
 
                     // this.onPressProfileEditButton(false);
-                    console.log('Update User PROFILE PIC!!!');
+                    console.log('Update User PROFILE PIC!!!', this.state.profilePicUrl);
+
                     resolve(true);
 
                 }).catch((error) => {
@@ -487,7 +489,7 @@ export default class ProfileScreen extends Component<Props> {
             // console.log('image', this.state.image.uri);
         }).catch(e => {
             console.log(e);
-            Alert.alert(e.message ? e.message : e);
+            // Alert.alert(e.message ? e.message : e);
         });
     }
 
@@ -550,9 +552,11 @@ export default class ProfileScreen extends Component<Props> {
                     console.log(url);
 
                     this.setState({
-                        profilePicUrl: url
+                        profilePicUrl: url,
+                        profilePic: url
                     }, () => {
                         console.log('profilePicUrl', this.state.profilePicUrl);
+                        this.isDetailsChanged = true;
                         resolve(true);
                     });
                 })
@@ -645,7 +649,10 @@ export default class ProfileScreen extends Component<Props> {
                                     value={this.state.contactNumber}
                                     style={[styles.textinput, { backgroundColor: 'white', padding: 5 }]}
                                     secureTextEntry={false}
-                                    onChangeText={contactNumber => this.setState({ contactNumber })}
+                                    onChangeText={contactNumber => {
+                                        this.setState({ contactNumber });
+                                        this.isDetailsChanged = true;
+                                    }}
                                     editable={true}
                                     maxLength={40}
                                     placeholder='Contact Number' />
@@ -659,7 +666,10 @@ export default class ProfileScreen extends Component<Props> {
                                     value={this.state.address}
                                     style={[styles.textinput, { backgroundColor: 'white', padding: 5 }]}
                                     secureTextEntry={false}
-                                    onChangeText={address => this.setState({ address })}
+                                    onChangeText={address => {
+                                        this.setState({ address });
+                                        this.isDetailsChanged = true;
+                                    }}
                                     editable={true}
                                     maxLength={40}
                                     placeholder='Address' />
@@ -668,16 +678,18 @@ export default class ProfileScreen extends Component<Props> {
 
                         </ScrollView>
                         <TouchableOpacity style={{ height: 30, width: '50%', backgroundColor: '#000000', alignSelf: 'center', justifyContent: 'center', borderRadius: 4 }}
-                            onPress={async () => {
+                            onPress={() => {
                                 // this.editProfile();
-                                try {
-                                    await this.updateProfilePic();
-                                    await this.updateUserDetails()
+                                this.updateProfilePic().then(() => {
+                                    this.updateUserDetails().then(() => {
+                                        this.onPressProfileEditButton(false);
+                                    }).catch((e) => {
+                                        console.log('error update db', e);
+                                    });
+                                }).catch((e) => {
+                                    console.log('error upload profile pic', e);
+                                });
 
-                                    this.onPressProfileEditButton(false);
-                                } catch (error) {
-                                    console.log(error);
-                                }
                             }}>
                             <Text style={{ color: 'white', fontSize: 17, textAlign: 'center' }}>Save</Text>
                         </TouchableOpacity>
@@ -1005,7 +1017,7 @@ export default class ProfileScreen extends Component<Props> {
                                 <Image source={{ uri: this.state.profilePic }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                             } */}
                                         {/* <Image source={{ uri: this.state.profilePicUrl }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} /> */}
-                                        <Image source={{ uri: this.state.profilePic}} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
+                                        <Image source={{ uri: this.state.profilePic }} style={{ width: 110, height: 110, borderRadius: 55, borderColor: '#ffffff', }} />
                                     </View>
                                     <Text style={{ color: '#212121', fontSize: 20, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}>{this.state.userName}</Text>
 

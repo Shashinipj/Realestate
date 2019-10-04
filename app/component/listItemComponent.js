@@ -5,6 +5,7 @@ import Meticon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Accounting from 'accounting-js';
 import { db } from '../Database/db';
+import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 
 
 type Props = {
@@ -289,68 +290,83 @@ export default class ListItem extends Component<Props> {
 
 
         return (
-            <TouchableOpacity style={styles.listView} onPress={this.onPress_Item}>
+            <View style={styles.listView} 
+            // onPress={this.onPress_Item}
+            >
+                <SwipeRow
+                    // leftOpenValue={75}
+                    rightOpenValue={-75}
+                    disableRightSwipe={true}
+                    // closeOnRowPress={true}
+                >
 
-                {
-                    (this.props.data1.Title) ? <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>{this.props.data1.Title}</Text> :
-                        <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10 }}>Title</Text>
-                }
+                    <View style={styles.standaloneRowBack}>
+                    
+                            {this.renderIcon_Pause()}
+                            {this.renderIcon_Edit()}
+                            {this.renderIcon_Delete()}
 
+                    </View>
 
-                <View style={{ flexDirection: 'row' }}>
-                    {/* <Image source={require('../assets/images/house.jpg')} style={[styles.imageTop, { marginRight: 10 }]} /> */}
-                    {
-                        (!this.props.data1.images) ?
-                            <Image source={require('../assets/images/house.jpg')} style={[styles.imageTop, { marginRight: 10 }]} /> :
+                    <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5' }}  onPress={this.onPress_Item}>
+                        <Text style={{ marginVertical: 3, fontSize: 17, fontWeight: '600', marginBottom: 10, alignSelf:'flex-start'}}>{this.props.data1.Title}</Text>
 
-                            <Image source={this.props.data1.images} style={[styles.imageTop, { marginRight: 10 }]} />
-                    }
+                        <View style={{ flexDirection: 'row', }}>
+                            {/* <Image source={require('../assets/images/house.jpg')} style={[styles.imageTop, { marginRight: 10 }]} /> */}
+                            {
+                                (!this.props.data1.images) ?
+                                    <Image source={require('../assets/images/house.jpg')} style={[styles.imageTop, { marginRight: 10 }]} /> :
 
-                    <View style={{ flex: 1 }}>
+                                    <Image source={this.props.data1.images} style={[styles.imageTop, { marginRight: 10 }]} />
+                            }
 
-                        <View style={{ flexDirection: 'row' }}>
-
-                            <View>
-                                <Text style={{ fontSize: 20, fontWeight: '600', marginTop: 5, marginBottom: 5, color: '#F57C00' }}>
-                                    {Accounting.formatMoney(this.props.data1.Price)}
-                                </Text>
-                                <Text style={{ fontSize: 15, color: 'gray', marginBottom: 5 }}>
-                                    {this.props.data1.Address}
-                                </Text>
+                            <View style={{ flex: 1 }}>
 
                                 <View style={{ flexDirection: 'row' }}>
 
-                                    <Ionicon name="ios-bed" size={17} />
-                                    <Text style={styles.subDetailsText}>{this.props.data1.Bedrooms}</Text>
+                                    <View>
+                                        <Text style={{ fontSize: 20, fontWeight: '600', marginTop: 5, marginBottom: 5, color: '#F57C00' }}>
+                                            {Accounting.formatMoney(this.props.data1.Price)}
+                                        </Text>
+                                        <Text style={{ fontSize: 15, color: 'gray', marginBottom: 5 }}>
+                                            {this.props.data1.Address}
+                                        </Text>
 
-                                    <Meticon name="shower" size={17} />
-                                    <Text style={styles.subDetailsText}>{this.props.data1.Bathrooms}</Text>
+                                        <View style={{ flexDirection: 'row' }}>
 
-                                    <Ionicon name="ios-car" size={17} />
-                                    <Text style={styles.subDetailsText}>{this.props.data1.CarPark}</Text>
+                                            <Ionicon name="ios-bed" size={17} />
+                                            <Text style={styles.subDetailsText}>{this.props.data1.Bedrooms}</Text>
 
-                                    {/* <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View> */}
+                                            <Meticon name="shower" size={17} />
+                                            <Text style={styles.subDetailsText}>{this.props.data1.Bathrooms}</Text>
 
-                                    {/* <Text style={styles.subDetailsText}>{this.props.data1.PropType}</Text> */}
+                                            <Ionicon name="ios-car" size={17} />
+                                            <Text style={styles.subDetailsText}>{this.props.data1.CarPark}</Text>
+
+                                            {/* <View style={{ borderLeftWidth: 1, marginHorizontal: 10 }}></View> */}
+
+                                            {/* <Text style={styles.subDetailsText}>{this.props.data1.PropType}</Text> */}
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.sideButtons}>
+
+                                        {this.renderIcon_Heart()}
+                                        {/* {this.renderIcon_Pause()}
+                                        {this.renderIcon_Edit()}
+                                        {this.renderIcon_Delete()} */}
+
+                                    </View>
+
                                 </View>
                             </View>
 
-                            <View style={styles.sideButtons}>
-
-                                {this.renderIcon_Heart()}
-                                {this.renderIcon_Pause()}
-                                {this.renderIcon_Edit()}
-                                {this.renderIcon_Delete()}
-
-                            </View>
-
                         </View>
-                    </View>
-
-                </View>
-                <View style={{ borderBottomColor: '#757575', borderBottomWidth: 1, width: '100%', marginTop: 15 }}></View>
-
-            </TouchableOpacity>
+                    </TouchableOpacity>
+                    <View style={{ borderBottomColor: '#757575', borderBottomWidth: 1, width: '100%', marginTop: 15 }}></View>
+                    {/* </View> */}
+                </SwipeRow>
+            </View>
         );
     }
 }
@@ -382,8 +398,19 @@ const styles = StyleSheet.create({
         // borderBottomWidth: 1,
         // paddingBottom: 10,
         marginBottom: 0,
-        padding: 10,
-        paddingHorizontal: 25
+        padding: 5,
+        paddingHorizontal: 10
+    },
+    standaloneRowBack: {
+        alignItems: 'flex-end',
+        backgroundColor: '#bdbdbd',
+        flex: 1,
+        // flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 15
+    },
+    backTextWhite: {
+        color: '#FFF'
     },
 
 });

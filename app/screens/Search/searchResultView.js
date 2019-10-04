@@ -90,8 +90,15 @@ export default class SearchResultView extends Component<Props> {
 
         const user = firebase.auth().currentUser;
         if (user) {
-            await this.getCollectionNames(user);
-            // await this.getFavouritePropertyId(user);
+            this.getCollectionNames(user).then(()=>{
+                this.getFavouritePropertyId(user).then(()=>{
+                    console.log('favPropIds', this.state.favPropIds);
+                }).catch((e)=>{
+                    console.log('error in get favId', e);
+                });
+            }).catch((e)=>{
+                console.log('error in get collection', e);
+            });
             this.setState({
                 loggedUser: user
             });
@@ -321,13 +328,13 @@ export default class SearchResultView extends Component<Props> {
                 // </ModalSelector>
 
                 <Modal
-                    // transparent={true}
+                    transparent={true}
                     onBackdropPress={()=>{
                         this.renderModal();
                     }}
                     backdropColor='#ff660f'
-                    hasBackdrop={true}
-                    presentationStyle='pageSheet'
+                    // hasBackdrop={true}
+                    // presentationStyle='pageSheet'
 
                     visible={this.state.modalVisible}
                     onRequestClose={() => {
@@ -335,7 +342,7 @@ export default class SearchResultView extends Component<Props> {
                     }}
                 >
                     {/* <View style={{ justifyContent: 'center', alignContent: 'center',backgroundColor:'black' }}> */}
-                        <View style={{justifyContent:'center', alignContent:'center', margin: 20}}>
+                        <View style={{justifyContent:'center', alignContent:'center', padding: 20, backgroundColor:'gray'}}>
                             <View style={{ backgroundColor: '#ffffff', justifyContent: 'center', 
                              borderRadius: 5, paddingTop: 10, borderRadius: 5}}>
 
@@ -515,10 +522,10 @@ export default class SearchResultView extends Component<Props> {
 
                                                                     for (const i in this.state.favPropIds) {
                                                                         const favProp = this.state.favPropIds[i];
-                                                                        // console.log('favProp', favProp);
+                                                                        console.log('favProp', favProp);
 
                                                                         if (favProp.favPropId == propObj.PropId) {
-                                                                            // console.log('matched');
+                                                                            console.log('matched');
 
                                                                             propObjNew.isFavourite = true;
                                                                             propObjNew.collectionName = favProp.collName;
@@ -648,7 +655,7 @@ export default class SearchResultView extends Component<Props> {
                             favPropId,
                             collName
                         });
-                        // console.log('listFavProps', listFavProps);
+                        console.log('listFavProps', listFavProps);
                     }
                 }
 
